@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WP-CLI + SSH 前置設定指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eef2f9',
+                            100: '#d4ddef',
+                            200: '#a9bbe0',
+                            300: '#7e99d0',
+                            400: '#5377c1',
+                            500: '#2B579A',
+                            600: '#23467b',
+                            700: '#1a345c',
+                            800: '#12233e',
+                            900: '#09111f',
+                        },
+                        accent: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3B82F6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        sidebar: {
+                            bg: '#1a1f2e',
+                            hover: '#252b3d',
+                            active: '#2d3548',
+                            border: '#333a4d',
+                        },
+                        code: {
+                            bg: '#0d1117',
+                            border: '#21262d',
+                            text: '#e6edf3',
+                            comment: '#8b949e',
+                            keyword: '#ff7b72',
+                            string: '#a5d6ff',
+                            function: '#d2a8ff',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        /* Fade-in animation */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Code block line highlight */
+        .code-line:hover {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        /* Sidebar active indicator */
+        .nav-link.active {
+            background: #2d3548;
+            border-left-color: #3B82F6;
+        }
+
+        /* Copy button */
+        .copy-btn {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .code-block-wrapper:hover .copy-btn {
+            opacity: 1;
+        }
+        .copy-btn.copied {
+            opacity: 1;
+        }
+
+        /* Checkbox custom style */
+        .custom-checkbox:checked {
+            background-color: #3B82F6;
+            border-color: #3B82F6;
+        }
+        .custom-checkbox:checked + .check-label {
+            color: #6b7280;
+            text-decoration: line-through;
+        }
+
+        /* Mobile menu animation */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        /* Architecture diagram */
+        .arch-diagram {
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1.8;
+        }
+
+        /* Table styling */
+        .security-table th {
+            background: #1e293b;
+        }
+        .security-table tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        /* Back to top button */
+        .back-to-top {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .back-to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Print styles */
+        @media print {
+            .sidebar, .mobile-header, .back-to-top, .copy-btn { display: none !important; }
+            .main-content { margin-left: 0 !important; }
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800 font-sans antialiased">
+
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-sidebar-bg text-white h-14 flex items-center px-4 shadow-lg mobile-header">
+        <button id="menuToggle" class="p-2 -ml-2 rounded-lg hover:bg-sidebar-hover transition-colors" aria-label="Toggle menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path id="menuIcon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
+        <span class="ml-3 font-semibold text-sm tracking-wide">WP-CLI + SSH 設定指南</span>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden" aria-hidden="true"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-sidebar-bg text-gray-300 z-50 mobile-menu lg:transform-none lg:translate-x-0 overflow-y-auto">
+        <div class="p-6 border-b border-sidebar-border">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-9 h-9 rounded-lg bg-accent-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-white font-bold text-base leading-tight">WP-CLI + SSH</h1>
+                    <p class="text-xs text-gray-500 mt-0.5">Setup Guide</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="p-4 space-y-1" id="sidebarNav">
+            <a href="#overview" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200">
+                <span class="w-5 h-5 flex items-center justify-center text-xs font-mono text-gray-500">1</span>
+                <span>概述</span>
+            </a>
+            <a href="#server-setup" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200">
+                <span class="w-5 h-5 flex items-center justify-center text-xs font-mono text-gray-500">2</span>
+                <span>工程師需要做的事</span>
+            </a>
+            <div class="pl-8 space-y-0.5">
+                <a href="#install-wpcli" class="nav-link flex items-center gap-2 px-3 py-1.5 rounded text-xs border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200 text-gray-500">
+                    2-1 安裝 WP-CLI
+                </a>
+                <a href="#create-ssh-user" class="nav-link flex items-center gap-2 px-3 py-1.5 rounded text-xs border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200 text-gray-500">
+                    2-2 建立 SSH 使用者
+                </a>
+                <a href="#receive-pubkey" class="nav-link flex items-center gap-2 px-3 py-1.5 rounded text-xs border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200 text-gray-500">
+                    2-3 接收公鑰
+                </a>
+                <a href="#verify-wpcli" class="nav-link flex items-center gap-2 px-3 py-1.5 rounded text-xs border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200 text-gray-500">
+                    2-4 確認 WP-CLI
+                </a>
+            </div>
+            <a href="#client-setup" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200">
+                <span class="w-5 h-5 flex items-center justify-center text-xs font-mono text-gray-500">3</span>
+                <span>使用者需要做的事</span>
+            </a>
+            <div class="pl-8 space-y-0.5">
+                <a href="#generate-sshkey" class="nav-link flex items-center gap-2 px-3 py-1.5 rounded text-xs border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200 text-gray-500">
+                    3-1 產生 SSH Key
+                </a>
+                <a href="#ssh-config" class="nav-link flex items-center gap-2 px-3 py-1.5 rounded text-xs border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200 text-gray-500">
+                    3-2 設定 SSH Config
+                </a>
+                <a href="#test-connection" class="nav-link flex items-center gap-2 px-3 py-1.5 rounded text-xs border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200 text-gray-500">
+                    3-3 測試連線
+                </a>
+            </div>
+            <a href="#claude-code-usage" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200">
+                <span class="w-5 h-5 flex items-center justify-center text-xs font-mono text-gray-500">4</span>
+                <span>在 Claude Code 裡使用</span>
+            </a>
+            <a href="#security" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200">
+                <span class="w-5 h-5 flex items-center justify-center text-xs font-mono text-gray-500">5</span>
+                <span>安全注意事項</span>
+            </a>
+            <a href="#checklist" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200">
+                <span class="w-5 h-5 flex items-center justify-center text-xs font-mono text-gray-500">6</span>
+                <span>確認清單</span>
+            </a>
+        </nav>
+
+        <div class="p-4 mt-4 mx-4 mb-6 rounded-lg bg-sidebar-hover border border-sidebar-border">
+            <p class="text-xs text-gray-500 leading-relaxed">
+                本指南適用於內部工程團隊，用以設定 WP-CLI 搭配 SSH 讓 Claude Code 遠端管理 WordPress 網站。
+            </p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="lg:ml-72 min-h-screen pt-14 lg:pt-0">
+        <div class="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 py-12 lg:py-16">
+
+            <!-- Hero Section -->
+            <section class="fade-in-section mb-20">
+                <div class="mb-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-accent-50 text-accent-600 border border-accent-200">
+                        Internal Documentation
+                    </span>
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-primary-500 mt-4 tracking-tight leading-tight">
+                    WP-CLI + SSH<br>前置設定指南
+                </h1>
+                <p class="text-lg sm:text-xl text-gray-500 mt-4 max-w-2xl leading-relaxed">
+                    讓 Claude Code 遠端管理 WordPress 網站 &mdash; 從設定到上線的完整步驟。
+                </p>
+                <div class="flex items-center gap-4 mt-8 text-sm text-gray-400">
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        預估閱讀時間：15 分鐘
+                    </span>
+                    <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                    <span>最後更新：2026-03-26</span>
+                </div>
+            </section>
+
+            <!-- Section 1: Overview -->
+            <section id="overview" class="fade-in-section mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-500 text-white text-sm font-bold flex-shrink-0">1</span>
+                    <h2 class="text-2xl font-bold text-gray-900">概述</h2>
+                </div>
+
+                <div class="prose max-w-none">
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        <strong class="text-gray-800">WP-CLI</strong> 是 WordPress 的官方命令列工具，自 2012 年開始發展，至今已是非常成熟且穩定的生態系。它讓你可以用指令完成幾乎所有 WordPress 管理操作 &mdash; 安裝外掛、更新核心、管理使用者、匯出資料庫，全部都不需要打開瀏覽器。
+                    </p>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        將 WP-CLI 與 SSH 搭配，再加上 Claude Code（AI 工具），你就可以在一個終端機裡同時管理 5 個 WordPress 網站。只需要用自然語言描述你的需求，Claude Code 就能自動產生並執行對應的 WP-CLI 指令。
+                    </p>
+                </div>
+
+                <!-- Architecture Diagram -->
+                <div class="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-6 sm:p-8 overflow-x-auto">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-5">系統架構</h3>
+                    <div class="arch-diagram text-sm text-gray-700 whitespace-pre leading-loose">
+<span class="inline-block bg-accent-100 text-accent-700 px-3 py-1 rounded-lg font-semibold border border-accent-200">Your Mac (Claude Code)</span>
+        |
+        | SSH Tunnel
+        |
+        +------&gt; <span class="inline-block bg-primary-100 text-primary-700 px-3 py-1 rounded-lg border border-primary-200">Server 1</span>  WP-CLI  &rarr;  WordPress Site A
+        |
+        +------&gt; <span class="inline-block bg-primary-100 text-primary-700 px-3 py-1 rounded-lg border border-primary-200">Server 2</span>  WP-CLI  &rarr;  WordPress Site B
+        |
+        +------&gt; <span class="inline-block bg-primary-100 text-primary-700 px-3 py-1 rounded-lg border border-primary-200">Server 3</span>  WP-CLI  &rarr;  WordPress Site C
+        |
+        +------&gt; <span class="inline-block bg-primary-100 text-primary-700 px-3 py-1 rounded-lg border border-primary-200">Server 4</span>  WP-CLI  &rarr;  WordPress Site D
+        |
+        +------&gt; <span class="inline-block bg-primary-100 text-primary-700 px-3 py-1 rounded-lg border border-primary-200">Server 5</span>  WP-CLI  &rarr;  WordPress Site E</div>
+                </div>
+            </section>
+
+            <!-- Section 2: Server Setup -->
+            <section id="server-setup" class="fade-in-section mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-500 text-white text-sm font-bold flex-shrink-0">2</span>
+                    <h2 class="text-2xl font-bold text-gray-900">工程師需要做的事（伺服器端）</h2>
+                </div>
+                <p class="text-gray-500 mb-8">以下步驟需要由有伺服器管理權限的工程師完成。每一台伺服器都需要執行一次。</p>
+
+                <!-- 2-1 -->
+                <div id="install-wpcli" class="fade-in-section mb-12 scroll-mt-20">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <span class="text-accent-500 font-mono text-sm">2-1</span>
+                        安裝 WP-CLI（每台伺服器都要）
+                    </h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        在每一台 WordPress 伺服器上執行以下指令，下載並安裝 WP-CLI：
+                    </p>
+
+                    <div class="code-block-wrapper relative group mb-4">
+                        <div class="flex items-center justify-between bg-code-bg border border-code-border rounded-t-xl px-4 py-2.5">
+                            <span class="text-xs text-gray-500 font-mono">bash</span>
+                            <button class="copy-btn flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded" onclick="copyCode(this)">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 下載 WP-CLI</span></span>
+<span class="code-line block px-1 -mx-1 rounded">curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 確認可以正常執行</span></span>
+<span class="code-line block px-1 -mx-1 rounded">php wp-cli.phar --info</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 設定執行權限並移到系統路徑</span></span>
+<span class="code-line block px-1 -mx-1 rounded">chmod +x wp-cli.phar</span>
+<span class="code-line block px-1 -mx-1 rounded">sudo mv wp-cli.phar /usr/local/bin/wp</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 驗證安裝成功</span></span>
+<span class="code-line block px-1 -mx-1 rounded">wp --version</span></code></pre>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-3">
+                        <div class="flex gap-3">
+                            <svg class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <div class="text-sm text-blue-800 leading-relaxed">
+                                <strong>前置需求：</strong>PHP 7.4 以上版本，且 WordPress 已安裝並可正常運作。
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                        <div class="flex gap-3">
+                            <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                            <div class="text-sm text-amber-800 leading-relaxed">
+                                <strong>注意：</strong>如果 WordPress 安裝在非標準路徑，執行 WP-CLI 指令時請務必加上 <code class="bg-amber-100 px-1.5 py-0.5 rounded font-mono text-xs">--path=/your/wp/path</code> 參數。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2-2 -->
+                <div id="create-ssh-user" class="fade-in-section mb-12 scroll-mt-20">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <span class="text-accent-500 font-mono text-sm">2-2</span>
+                        建立 SSH 使用者（建議）
+                    </h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        建議建立一個專用的部署帳號（例如 <code class="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm">deploy</code>），而非直接使用 root 帳號。這個使用者需要有權限執行 WP-CLI 操作 WordPress 安裝目錄下的檔案。
+                    </p>
+
+                    <div class="code-block-wrapper relative group mb-4">
+                        <div class="flex items-center justify-between bg-code-bg border border-code-border rounded-t-xl px-4 py-2.5">
+                            <span class="text-xs text-gray-500 font-mono">bash</span>
+                            <button class="copy-btn flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded" onclick="copyCode(this)">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 建立 deploy 使用者</span></span>
+<span class="code-line block px-1 -mx-1 rounded">sudo adduser deploy</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 將使用者加入 www-data 群組，使其有權限操作 WordPress 檔案</span></span>
+<span class="code-line block px-1 -mx-1 rounded">sudo usermod -aG www-data deploy</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- 2-3 -->
+                <div id="receive-pubkey" class="fade-in-section mb-12 scroll-mt-20">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <span class="text-accent-500 font-mono text-sm">2-3</span>
+                        接收公鑰
+                    </h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        工程師需要將使用者提供的公鑰新增到每台伺服器上 deploy 帳號的 <code class="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm">~/.ssh/authorized_keys</code> 檔案中。可以手動新增，也可以使用 <code class="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm">ssh-copy-id</code> 工具。
+                    </p>
+
+                    <div class="code-block-wrapper relative group mb-4">
+                        <div class="flex items-center justify-between bg-code-bg border border-code-border rounded-t-xl px-4 py-2.5">
+                            <span class="text-xs text-gray-500 font-mono">bash - 手動方式</span>
+                            <button class="copy-btn flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded" onclick="copyCode(this)">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 建立 .ssh 目錄</span></span>
+<span class="code-line block px-1 -mx-1 rounded">mkdir -p /home/deploy/.ssh</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 將使用者提供的公鑰寫入 authorized_keys</span></span>
+<span class="code-line block px-1 -mx-1 rounded">echo <span class="text-code-string">"使用者提供的公鑰內容"</span> >> /home/deploy/.ssh/authorized_keys</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 設定正確的權限（非常重要）</span></span>
+<span class="code-line block px-1 -mx-1 rounded">chmod 700 /home/deploy/.ssh</span>
+<span class="code-line block px-1 -mx-1 rounded">chmod 600 /home/deploy/.ssh/authorized_keys</span>
+<span class="code-line block px-1 -mx-1 rounded">chown -R deploy:deploy /home/deploy/.ssh</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- 2-4 -->
+                <div id="verify-wpcli" class="fade-in-section mb-12 scroll-mt-20">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <span class="text-accent-500 font-mono text-sm">2-4</span>
+                        確認 WP-CLI 可正常運作
+                    </h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        切換到 deploy 使用者，進入 WordPress 根目錄，確認 WP-CLI 可以正常存取並操作 WordPress：
+                    </p>
+
+                    <div class="code-block-wrapper relative group mb-4">
+                        <div class="flex items-center justify-between bg-code-bg border border-code-border rounded-t-xl px-4 py-2.5">
+                            <span class="text-xs text-gray-500 font-mono">bash</span>
+                            <button class="copy-btn flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded" onclick="copyCode(this)">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 切換到 deploy 使用者</span></span>
+<span class="code-line block px-1 -mx-1 rounded">su - deploy</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 進入 WordPress 根目錄</span></span>
+<span class="code-line block px-1 -mx-1 rounded">cd /var/www/html</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 確認 WordPress 版本</span></span>
+<span class="code-line block px-1 -mx-1 rounded">wp core version</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 列出已安裝的外掛</span></span>
+<span class="code-line block px-1 -mx-1 rounded">wp plugin list</span></code></pre>
+                    </div>
+
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                        <div class="flex gap-3">
+                            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <div class="text-sm text-emerald-800 leading-relaxed">
+                                如果兩個指令都能正常輸出結果，表示伺服器端設定完成。請對所有 5 台伺服器重複以上步驟。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Client Setup -->
+            <section id="client-setup" class="fade-in-section mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-500 text-white text-sm font-bold flex-shrink-0">3</span>
+                    <h2 class="text-2xl font-bold text-gray-900">使用者需要做的事（Mac 端）</h2>
+                </div>
+                <p class="text-gray-500 mb-8">以下步驟由要使用 Claude Code 的人在自己的 Mac 上完成。</p>
+
+                <!-- 3-1 -->
+                <div id="generate-sshkey" class="fade-in-section mb-12 scroll-mt-20">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <span class="text-accent-500 font-mono text-sm">3-1</span>
+                        產生 SSH Key
+                    </h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        SSH Key 是一組加密金鑰對，用來在你的 Mac 和伺服器之間建立安全連線，不需要輸入密碼。
+                    </p>
+
+                    <div class="code-block-wrapper relative group mb-4">
+                        <div class="flex items-center justify-between bg-code-bg border border-code-border rounded-t-xl px-4 py-2.5">
+                            <span class="text-xs text-gray-500 font-mono">bash</span>
+                            <button class="copy-btn flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded" onclick="copyCode(this)">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded">ssh-keygen -t ed25519 -C <span class="text-code-string">"your-email@company.com"</span></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 按 Enter 三次（使用預設路徑、不設定密碼）</span></span></code></pre>
+                    </div>
+
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        執行後會產生兩個檔案：
+                    </p>
+
+                    <div class="grid sm:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+                            <div class="font-mono text-sm font-semibold text-red-700 mb-2">~/.ssh/id_ed25519</div>
+                            <div class="text-sm text-red-600 leading-relaxed">
+                                <strong>私鑰</strong> &mdash; 留在你的 Mac 上，絕對不要分享給任何人。
+                            </div>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                            <div class="font-mono text-sm font-semibold text-emerald-700 mb-2">~/.ssh/id_ed25519.pub</div>
+                            <div class="text-sm text-emerald-600 leading-relaxed">
+                                <strong>公鑰</strong> &mdash; 交給工程師，讓他們放到伺服器上。
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        複製公鑰內容，傳給工程師：
+                    </p>
+
+                    <div class="code-block-wrapper relative group mb-4">
+                        <div class="flex items-center justify-between bg-code-bg border border-code-border rounded-t-xl px-4 py-2.5">
+                            <span class="text-xs text-gray-500 font-mono">bash</span>
+                            <button class="copy-btn flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded" onclick="copyCode(this)">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded">cat ~/.ssh/id_ed25519.pub</span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 複製輸出的內容，傳給工程師</span></span></code></pre>
+                    </div>
+                </div>
+
+                <!-- 3-2 -->
+                <div id="ssh-config" class="fade-in-section mb-12 scroll-mt-20">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <span class="text-accent-500 font-mono text-sm">3-2</span>
+                        設定 SSH Config
+                    </h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        SSH Config 就像是伺服器的電話簿。設定好之後，你只要輸入短名稱（例如 <code class="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm">site-a</code>）就能連上對應的伺服器，不需要記住 IP 和連接埠。
+                    </p>
+
+                    <div class="code-block-wrapper relative group mb-4">
+                        <div class="flex items-center justify-between bg-code-bg border border-code-border rounded-t-xl px-4 py-2.5">
+                            <span class="text-xs text-gray-500 font-mono">~/.ssh/config</span>
+                            <button class="copy-btn flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded" onclick="copyCode(this)">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># ~/.ssh/config</span></span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">Host</span> site-a</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">HostName</span> 123.456.789.001</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> deploy</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">IdentityFile</span> ~/.ssh/id_ed25519</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">Port</span> 22</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">Host</span> site-b</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">HostName</span> 123.456.789.002</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> deploy</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">IdentityFile</span> ~/.ssh/id_ed25519</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">Port</span> 22</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">Host</span> site-c</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">HostName</span> 123.456.789.003</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> deploy</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">IdentityFile</span> ~/.ssh/id_ed25519</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">Port</span> 22</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">Host</span> site-d</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">HostName</span> 123.456.789.004</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> deploy</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">IdentityFile</span> ~/.ssh/id_ed25519</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">Port</span> 22</span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">Host</span> site-e</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">HostName</span> 123.456.789.005</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> deploy</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">IdentityFile</span> ~/.ssh/id_ed25519</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">Port</span> 22</span></code></pre>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <div class="flex gap-3">
+                            <svg class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <div class="text-sm text-blue-800 leading-relaxed">
+                                <strong>重要提醒：</strong>
+                                <ul class="mt-2 space-y-1 list-disc list-inside">
+                                    <li>將 <code class="bg-blue-100 px-1 py-0.5 rounded font-mono text-xs">HostName</code> 替換為實際的 IP 位址或網域名稱</li>
+                                    <li>將 <code class="bg-blue-100 px-1 py-0.5 rounded font-mono text-xs">User</code> 替換為實際的 SSH 使用者名稱</li>
+                                    <li>Port 通常是 22，如果不同請向工程師確認</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3-3 -->
+                <div id="test-connection" class="fade-in-section mb-12 scroll-mt-20">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <span class="text-accent-500 font-mono text-sm">3-3</span>
+                        測試連線
+                    </h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        設定完成後，逐一測試每台伺服器的連線狀況：
+                    </p>
+
+                    <div class="code-block-wrapper relative group mb-4">
+                        <div class="flex items-center justify-between bg-code-bg border border-code-border rounded-t-xl px-4 py-2.5">
+                            <span class="text-xs text-gray-500 font-mono">bash</span>
+                            <button class="copy-btn flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded" onclick="copyCode(this)">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 測試 SSH 連線</span></span>
+<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"echo 'Connected!'"</span></span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 測試 WP-CLI 是否可用</span></span>
+<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp --version"</span></span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 測試 WP-CLI 能否操作 WordPress</span></span>
+<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp plugin list"</span></span></code></pre>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                        <div class="flex gap-3">
+                            <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                            <div class="text-sm text-amber-800 leading-relaxed">
+                                <strong>如果連線失敗，請檢查：</strong>
+                                <ul class="mt-2 space-y-1 list-disc list-inside">
+                                    <li>SSH 金鑰是否已正確新增到伺服器上？</li>
+                                    <li>伺服器防火牆是否允許 SSH 連線？</li>
+                                    <li>WordPress 路徑是否正確？</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Claude Code Usage -->
+            <section id="claude-code-usage" class="fade-in-section mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-500 text-white text-sm font-bold flex-shrink-0">4</span>
+                    <h2 class="text-2xl font-bold text-gray-900">在 Claude Code 裡使用</h2>
+                </div>
+                <p class="text-gray-500 mb-8">完成以上設定後，你就可以在 Claude Code 中用自然語言管理 WordPress 網站了。</p>
+
+                <!-- 4-1 -->
+                <div class="fade-in-section mb-12">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="text-accent-500 font-mono text-sm">4-1</span>
+                        你可以直接這樣說
+                    </h3>
+
+                    <div class="grid gap-3">
+                        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <div class="w-7 h-7 rounded-lg bg-accent-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            </div>
+                            <div class="text-sm text-gray-700 leading-relaxed">&laquo;幫我檢查 site-a 有哪些外掛需要更新&raquo;</div>
+                        </div>
+                        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <div class="w-7 h-7 rounded-lg bg-accent-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            </div>
+                            <div class="text-sm text-gray-700 leading-relaxed">&laquo;列出 site-b 所有已安裝的外掛&raquo;</div>
+                        </div>
+                        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <div class="w-7 h-7 rounded-lg bg-accent-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            </div>
+                            <div class="text-sm text-gray-700 leading-relaxed">&laquo;檢查 site-c 的 WordPress 核心檔案有沒有被竄改&raquo;</div>
+                        </div>
+                        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <div class="w-7 h-7 rounded-lg bg-accent-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            </div>
+                            <div class="text-sm text-gray-700 leading-relaxed">&laquo;幫我看五個站的 PHP 版本&raquo;</div>
+                        </div>
+                        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <div class="w-7 h-7 rounded-lg bg-accent-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            </div>
+                            <div class="text-sm text-gray-700 leading-relaxed">&laquo;把 site-d 的 Akismet 外掛更新到最新版&raquo;</div>
+                        </div>
+                        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <div class="w-7 h-7 rounded-lg bg-accent-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            </div>
+                            <div class="text-sm text-gray-700 leading-relaxed">&laquo;匯出 site-e 的資料庫備份&raquo;</div>
+                        </div>
+                        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <div class="w-7 h-7 rounded-lg bg-accent-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            </div>
+                            <div class="text-sm text-gray-700 leading-relaxed">&laquo;全站搜尋取代 old-domain.com 為 new-domain.com&raquo;</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4-2 -->
+                <div class="fade-in-section mb-12">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="text-accent-500 font-mono text-sm">4-2</span>
+                        Claude Code 會執行的指令範例
+                    </h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        以下是 Claude Code 根據你的指令可能會執行的實際指令：
+                    </p>
+
+                    <div class="code-block-wrapper relative group mb-4">
+                        <div class="flex items-center justify-between bg-code-bg border border-code-border rounded-t-xl px-4 py-2.5">
+                            <span class="text-xs text-gray-500 font-mono">bash - 常用指令範例</span>
+                            <button class="copy-btn flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded" onclick="copyCode(this)">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <span>複製</span>
+                            </button>
+                        </div>
+                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 檢查外掛更新</span></span>
+<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp plugin list --update=available"</span></span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 檢查核心檔案完整性</span></span>
+<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp core verify-checksums"</span></span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 檢查外掛檔案完整性</span></span>
+<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp plugin verify-checksums --all"</span></span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 查看 PHP 和 WP 版本</span></span>
+<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp core version && php -v | head -1"</span></span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 匯出資料庫</span></span>
+<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp db export ~/backup-$(date +%Y%m%d).sql"</span></span>
+<span class="code-line block px-1 -mx-1 rounded"></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 批次檢查五個站</span></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">for</span> site <span class="text-code-keyword">in</span> site-a site-b site-c site-d site-e; <span class="text-code-keyword">do</span></span>
+<span class="code-line block px-1 -mx-1 rounded">  echo <span class="text-code-string">"=== $site ==="</span></span>
+<span class="code-line block px-1 -mx-1 rounded">  ssh $site <span class="text-code-string">"cd /var/www/html && wp plugin list --update=available --format=table"</span></span>
+<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">done</span></span></code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Security -->
+            <section id="security" class="fade-in-section mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-500 text-white text-sm font-bold flex-shrink-0">5</span>
+                    <h2 class="text-2xl font-bold text-gray-900">安全注意事項</h2>
+                </div>
+                <p class="text-gray-500 mb-8">使用 SSH 連線管理 WordPress 時，請務必注意以下安全要點：</p>
+
+                <div class="overflow-x-auto rounded-xl border border-gray-200">
+                    <table class="security-table w-full text-sm">
+                        <thead>
+                            <tr>
+                                <th class="text-left px-5 py-3.5 font-semibold text-white text-xs uppercase tracking-wider rounded-tl-xl">項目</th>
+                                <th class="text-left px-5 py-3.5 font-semibold text-white text-xs uppercase tracking-wider rounded-tr-xl">說明</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr>
+                                <td class="px-5 py-4 font-medium text-gray-900 whitespace-nowrap align-top">SSH 金鑰</td>
+                                <td class="px-5 py-4 text-gray-600 leading-relaxed">私鑰絕對不離開你的 Mac，任何情況下都不要分享。只提供公鑰給工程師。</td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-4 font-medium text-gray-900 whitespace-nowrap align-top">使用者權限</td>
+                                <td class="px-5 py-4 text-gray-600 leading-relaxed">使用 deploy 帳號或 editor 角色，避免直接使用 root 帳號操作。</td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-4 font-medium text-gray-900 whitespace-nowrap align-top">防火牆</td>
+                                <td class="px-5 py-4 text-gray-600 leading-relaxed">如果條件允許，限制只有特定信任的 IP 位址可以透過 SSH 連線到伺服器。</td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-4 font-medium text-gray-900 whitespace-nowrap align-top">WP-CLI 權限</td>
+                                <td class="px-5 py-4 text-gray-600 leading-relaxed">SSH 使用者必須擁有正確的檔案讀寫權限，才能正常操作 WordPress 檔案。</td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-4 font-medium text-gray-900 whitespace-nowrap align-top">稽核</td>
+                                <td class="px-5 py-4 text-gray-600 leading-relaxed">定期檢查伺服器上的 authorized_keys 檔案，移除不再需要的公鑰。</td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-4 font-medium text-gray-900 whitespace-nowrap align-top">密碼短語</td>
+                                <td class="px-5 py-4 text-gray-600 leading-relaxed">如需更高安全性，可為 SSH 金鑰加上密碼短語（passphrase），但自動化操作時需搭配 ssh-agent 使用。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 6: Checklist -->
+            <section id="checklist" class="fade-in-section mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-500 text-white text-sm font-bold flex-shrink-0">6</span>
+                    <h2 class="text-2xl font-bold text-gray-900">確認清單</h2>
+                </div>
+                <p class="text-gray-500 mb-8">逐項確認以下事項皆已完成。勾選狀態會自動儲存在瀏覽器中。</p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Server Side -->
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-6">
+                        <div class="flex items-center gap-2 mb-5">
+                            <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+                            <h3 class="font-semibold text-gray-900">伺服器端（工程師）</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="server-1">
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">5 台伺服器皆已安裝 WP-CLI</span>
+                            </label>
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="server-2">
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">已建立 deploy 使用者並設定正確權限</span>
+                            </label>
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="server-3">
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">使用者的公鑰已加入 authorized_keys</span>
+                            </label>
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="server-4">
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">deploy 使用者可正確執行 WP-CLI</span>
+                            </label>
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="server-5">
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">防火牆允許 SSH 連線</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Client Side -->
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-6">
+                        <div class="flex items-center gap-2 mb-5">
+                            <svg class="w-5 h-5 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <h3 class="font-semibold text-gray-900">使用者端（Mac）</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="client-1">
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">Mac 上已產生 SSH 金鑰</span>
+                            </label>
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="client-2">
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">公鑰已傳給工程師</span>
+                            </label>
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="client-3">
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">SSH Config 已設定完成，包含所有 5 個站台</span>
+                            </label>
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="client-4">
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">可免密碼 SSH 連線至所有 5 台伺服器</span>
+                            </label>
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="client-5">
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">透過 SSH 執行 WP-CLI 指令可正常運作</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="mt-6 bg-gray-50 border border-gray-200 rounded-xl p-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">完成進度</span>
+                        <span id="progressText" class="text-sm font-semibold text-accent-600">0 / 10</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                        <div id="progressBar" class="bg-gradient-to-r from-accent-500 to-primary-500 h-2.5 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="border-t border-gray-200 pt-8 pb-12">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
+                    <span>WP-CLI + SSH Setup Guide -- Internal Use Only</span>
+                    <span>Last updated: 2026-03-26</span>
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="back-to-top fixed bottom-6 right-6 z-40 w-11 h-11 rounded-xl bg-primary-500 text-white shadow-lg hover:bg-primary-600 transition-all duration-300 flex items-center justify-center hover:shadow-xl hover:-translate-y-0.5" aria-label="Back to top">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+        </svg>
+    </button>
+
+    <script>
+    // ============================================================
+    // Copy Code Functionality
+    // ============================================================
+    function copyCode(button) {
+        const wrapper = button.closest('.code-block-wrapper');
+        const codeBlock = wrapper.querySelector('code');
+        const text = codeBlock.innerText;
+
+        navigator.clipboard.writeText(text).then(() => {
+            const span = button.querySelector('span');
+            const originalText = span.textContent;
+            span.textContent = '已複製';
+            button.classList.add('copied', 'text-emerald-400');
+
+            setTimeout(() => {
+                span.textContent = originalText;
+                button.classList.remove('copied', 'text-emerald-400');
+            }, 2000);
+        }).catch(() => {
+            // Fallback for older browsers
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            const span = button.querySelector('span');
+            span.textContent = '已複製';
+            button.classList.add('copied', 'text-emerald-400');
+            setTimeout(() => {
+                span.textContent = '複製';
+                button.classList.remove('copied', 'text-emerald-400');
+            }, 2000);
+        });
+    }
+
+    // ============================================================
+    // Sidebar Navigation - Active State
+    // ============================================================
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section[id], div[id]');
+
+    function updateActiveNav() {
+        let currentSection = '';
+        const scrollPos = window.scrollY + 100;
+
+        sections.forEach(section => {
+            if (section.offsetTop <= scrollPos) {
+                currentSection = section.id;
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active', 'text-white');
+            const href = link.getAttribute('href');
+            if (href && href.slice(1) === currentSection) {
+                link.classList.add('active', 'text-white');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', updateActiveNav, { passive: true });
+    updateActiveNav();
+
+    // ============================================================
+    // Mobile Menu
+    // ============================================================
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    const menuIcon = document.getElementById('menuIcon');
+
+    function openMenu() {
+        sidebar.classList.add('open');
+        mobileOverlay.classList.remove('hidden');
+        menuIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+        sidebar.classList.remove('open');
+        mobileOverlay.classList.add('hidden');
+        menuIcon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+        document.body.style.overflow = '';
+    }
+
+    menuToggle.addEventListener('click', () => {
+        if (sidebar.classList.contains('open')) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
+    });
+
+    mobileOverlay.addEventListener('click', closeMenu);
+
+    // Close menu when clicking a nav link on mobile
+    document.querySelectorAll('#sidebarNav a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth < 1024) {
+                closeMenu();
+            }
+        });
+    });
+
+    // ============================================================
+    // Back to Top Button
+    // ============================================================
+    const backToTop = document.getElementById('backToTop');
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+            backToTop.classList.add('visible');
+        } else {
+            backToTop.classList.remove('visible');
+        }
+    }, { passive: true });
+
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ============================================================
+    // Fade-in on Scroll
+    // ============================================================
+    const fadeInObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                fadeInObserver.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -40px 0px'
+    });
+
+    document.querySelectorAll('.fade-in-section').forEach(el => {
+        fadeInObserver.observe(el);
+    });
+
+    // ============================================================
+    // Checklist with localStorage
+    // ============================================================
+    const STORAGE_KEY = 'wp-cli-setup-checklist';
+
+    function loadChecklistState() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const state = JSON.parse(saved);
+                document.querySelectorAll('.custom-checkbox').forEach(cb => {
+                    const key = cb.dataset.key;
+                    if (state[key]) {
+                        cb.checked = true;
+                    }
+                });
+            }
+        } catch (e) {
+            // Ignore localStorage errors
+        }
+        updateProgress();
+    }
+
+    function saveChecklistState() {
+        try {
+            const state = {};
+            document.querySelectorAll('.custom-checkbox').forEach(cb => {
+                state[cb.dataset.key] = cb.checked;
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+            // Ignore localStorage errors
+        }
+    }
+
+    function updateProgress() {
+        const total = document.querySelectorAll('.custom-checkbox').length;
+        const checked = document.querySelectorAll('.custom-checkbox:checked').length;
+        const percentage = total > 0 ? (checked / total) * 100 : 0;
+
+        document.getElementById('progressBar').style.width = percentage + '%';
+        document.getElementById('progressText').textContent = checked + ' / ' + total;
+    }
+
+    document.querySelectorAll('.custom-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => {
+            saveChecklistState();
+            updateProgress();
+        });
+    });
+
+    loadChecklistState();
+
+    // ============================================================
+    // Handle window resize (close mobile menu if switching to desktop)
+    // ============================================================
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) {
+            closeMenu();
+        }
+    });
+    </script>
+</body>
+</html>
