@@ -224,7 +224,7 @@
             </div>
             <a href="#claude-code-usage" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200">
                 <span class="w-5 h-5 flex items-center justify-center text-xs font-mono text-gray-500">4</span>
-                <span>在 Claude Code 裡使用</span>
+                <span>在 AI 編程工具裡使用</span>
             </a>
             <a href="#security" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm border-l-2 border-transparent hover:bg-sidebar-hover hover:text-white transition-all duration-200">
                 <span class="w-5 h-5 flex items-center justify-center text-xs font-mono text-gray-500">5</span>
@@ -238,7 +238,7 @@
 
         <div class="p-4 mt-4 mx-4 mb-6 rounded-lg bg-sidebar-hover border border-sidebar-border">
             <p class="text-xs text-gray-500 leading-relaxed">
-                本指南適用於內部工程團隊，用以設定 WP-CLI 搭配 SSH 讓 Claude Code 遠端管理 WordPress 網站。
+                本指南適用於內部工程團隊，用以設定 WP-CLI 搭配 SSH 讓 AI 編程工具遠端管理 WordPress 網站。
             </p>
         </div>
     </aside>
@@ -258,7 +258,7 @@
                     WP-CLI + SSH<br>前置設定指南
                 </h1>
                 <p class="text-lg sm:text-xl text-gray-500 mt-4 max-w-2xl leading-relaxed">
-                    讓 Claude Code 遠端管理 WordPress 網站 &mdash; 從設定到上線的完整步驟。
+                    讓 AI 編程工具遠端管理 WordPress 網站 &mdash; 從設定到上線的完整步驟。
                 </p>
                 <div class="flex items-center gap-4 mt-8 text-sm text-gray-400">
                     <span class="flex items-center gap-1.5">
@@ -279,10 +279,7 @@
 
                 <div class="prose max-w-none">
                     <p class="text-gray-600 leading-relaxed mb-4">
-                        <strong class="text-gray-800">WP-CLI</strong> 是 WordPress 的官方命令列工具，自 2012 年開始發展，至今已是非常成熟且穩定的生態系。它讓你可以用指令完成幾乎所有 WordPress 管理操作 &mdash; 安裝外掛、更新核心、管理使用者、匯出資料庫，全部都不需要打開瀏覽器。
-                    </p>
-                    <p class="text-gray-600 leading-relaxed mb-4">
-                        將 WP-CLI 與 SSH 搭配，再加上 Claude Code（AI 工具），你就可以在一個終端機裡同時管理 5 個 WordPress 網站。只需要用自然語言描述你的需求，Claude Code 就能自動產生並執行對應的 WP-CLI 指令。
+                        <strong class="text-gray-800">WP-CLI</strong> 是 WordPress 的官方命令列工具。將 WP-CLI 與 SSH 搭配，再加上 AI 編程工具（如 Claude Code、Gemini CLI、Codex 等），你就可以在一個終端機裡用自然語言同時管理 5 個 WordPress 網站。
                     </p>
                 </div>
 
@@ -290,7 +287,7 @@
                 <div class="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-6 sm:p-8 overflow-x-auto">
                     <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-5">系統架構</h3>
                     <div class="arch-diagram text-sm text-gray-700 whitespace-pre leading-loose">
-<span class="inline-block bg-accent-100 text-accent-700 px-3 py-1 rounded-lg font-semibold border border-accent-200">Your Mac (Claude Code)</span>
+<span class="inline-block bg-accent-100 text-accent-700 px-3 py-1 rounded-lg font-semibold border border-accent-200">Your Mac (AI 編程工具)</span>
         |
         | SSH Tunnel
         |
@@ -469,7 +466,7 @@
                     <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-500 text-white text-sm font-bold flex-shrink-0">3</span>
                     <h2 class="text-2xl font-bold text-gray-900">使用者需要做的事（Mac 端）</h2>
                 </div>
-                <p class="text-gray-500 mb-8">以下步驟由要使用 Claude Code 的人在自己的 Mac 上完成。</p>
+                <p class="text-gray-500 mb-8">以下步驟由要使用 AI 編程工具的人在自己的 Mac 上完成。</p>
 
                 <!-- 3-1 -->
                 <div id="generate-sshkey" class="fade-in-section mb-12 scroll-mt-20">
@@ -643,9 +640,9 @@
             <section id="claude-code-usage" class="fade-in-section mb-20 scroll-mt-20">
                 <div class="flex items-center gap-3 mb-6">
                     <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-500 text-white text-sm font-bold flex-shrink-0">4</span>
-                    <h2 class="text-2xl font-bold text-gray-900">在 Claude Code 裡使用</h2>
+                    <h2 class="text-2xl font-bold text-gray-900">在 AI 編程工具裡使用</h2>
                 </div>
-                <p class="text-gray-500 mb-8">完成以上設定後，你就可以在 Claude Code 中用自然語言管理 WordPress 網站了。</p>
+                <p class="text-gray-500 mb-8">完成以上設定後，你就可以在任何 AI 編程工具（Claude Code、Gemini CLI、Codex 等）中用自然語言管理 WordPress 網站了。</p>
 
                 <!-- 4-1 -->
                 <div class="fade-in-section mb-12">
@@ -653,7 +650,7 @@
                         <span class="text-accent-500 font-mono text-sm">4-1</span>
                         你可以直接這樣說
                     </h3>
-                    <p class="text-gray-600 mb-6 leading-relaxed">以下依照不同角色整理常見的使用情境，你只要用自然語言告訴 Claude Code 就好。</p>
+                    <p class="text-gray-600 mb-6 leading-relaxed">以下依照不同角色整理常見的使用情境，你只要用自然語言告訴 AI 就好。</p>
 
                     <!-- Marketing Category -->
                     <div class="mb-8">
