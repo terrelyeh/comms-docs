@@ -776,46 +776,6 @@
                     </div>
                 </div>
 
-                <!-- 4-2 -->
-                <div class="fade-in-section mb-12">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <span class="text-accent-500 font-mono text-sm">4-2</span>
-                        Claude Code 會執行的指令範例
-                    </h3>
-                    <p class="text-gray-600 mb-4 leading-relaxed">
-                        以下是 Claude Code 根據你的指令可能會執行的實際指令：
-                    </p>
-
-                    <div class="code-block-wrapper relative group mb-4">
-                        <div class="flex items-center justify-between bg-code-bg border border-code-border rounded-t-xl px-4 py-2.5">
-                            <span class="text-xs text-gray-500 font-mono">bash - 常用指令範例</span>
-                            <button class="copy-btn flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded" onclick="copyCode(this)">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                <span>複製</span>
-                            </button>
-                        </div>
-                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 檢查外掛更新</span></span>
-<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp plugin list --update=available"</span></span>
-<span class="code-line block px-1 -mx-1 rounded"></span>
-<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 檢查核心檔案完整性</span></span>
-<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp core verify-checksums"</span></span>
-<span class="code-line block px-1 -mx-1 rounded"></span>
-<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 檢查外掛檔案完整性</span></span>
-<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp plugin verify-checksums --all"</span></span>
-<span class="code-line block px-1 -mx-1 rounded"></span>
-<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 查看 PHP 和 WP 版本</span></span>
-<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp core version && php -v | head -1"</span></span>
-<span class="code-line block px-1 -mx-1 rounded"></span>
-<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 匯出資料庫</span></span>
-<span class="code-line block px-1 -mx-1 rounded">ssh site-a <span class="text-code-string">"cd /var/www/html && wp db export ~/backup-$(date +%Y%m%d).sql"</span></span>
-<span class="code-line block px-1 -mx-1 rounded"></span>
-<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 批次檢查五個站</span></span>
-<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">for</span> site <span class="text-code-keyword">in</span> site-a site-b site-c site-d site-e; <span class="text-code-keyword">do</span></span>
-<span class="code-line block px-1 -mx-1 rounded">  echo <span class="text-code-string">"=== $site ==="</span></span>
-<span class="code-line block px-1 -mx-1 rounded">  ssh $site <span class="text-code-string">"cd /var/www/html && wp plugin list --update=available --format=table"</span></span>
-<span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">done</span></span></code></pre>
-                    </div>
-                </div>
             </section>
 
             <!-- Section 5: Security -->
