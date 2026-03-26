@@ -115,6 +115,62 @@
     .timeline-content p { font-size: 15px; color: var(--text-secondary); margin-top: 4px; }
 
     .footer { text-align: center; padding: 32px 0; font-size: 15px; color: var(--text-muted); }
+
+    /* Executive Summary */
+    .exec-summary {
+      background: linear-gradient(135deg, #1e293b 0%, #1a1a2e 100%);
+      border-radius: 12px;
+      padding: 36px 40px;
+      margin-bottom: 24px;
+      color: #e2e8f0;
+    }
+    .exec-summary .es-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 14px;
+    }
+    .exec-summary h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .exec-summary p {
+      font-size: 16px;
+      color: #cbd5e1;
+      margin-bottom: 10px;
+      line-height: 1.8;
+    }
+    .exec-summary .es-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    @media (max-width: 640px) { .exec-summary .es-grid { grid-template-columns: 1fr; } }
+    .exec-summary .es-item {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .exec-summary .es-item .es-key {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .exec-summary .es-item .es-val {
+      font-size: 16px;
+      color: #fff;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -125,6 +181,29 @@
       <h1>檔案下載追蹤方案</h1>
       <p class="subtitle">EnGenius 官網 Downloads & Guides — 如何追蹤檔案下載次數</p>
       <p class="date">2026-03-25</p>
+    </div>
+
+    <!-- Executive Summary -->
+    <div class="exec-summary">
+      <div class="es-label">Executive Summary</div>
+      <h2>我們需要追蹤官網檔案的下載次數，但目前沒有任何記錄機制。</h2>
+      <p><strong style="color:#fff;">問題：</strong>GA4 有收到下載事件，但因為檔案放在外部 S3，無法辨識是哪個檔案被下載。</p>
+      <p><strong style="color:#fff;">挑戰：</strong>全球 5 個站是獨立 WordPress 主機，各自埋了不同的 GTM container。</p>
+      <p><strong style="color:#fff;">建議：</strong>採混合方案——先在台灣站裝 Download Monitor 外掛立即上線，同時盤點各站 GTM/GA4 狀況，後續統一用 GA4 追蹤全球數據。</p>
+      <div class="es-grid">
+        <div class="es-item">
+          <div class="es-key">短期方案</div>
+          <div class="es-val">Download Monitor 外掛（免費）</div>
+        </div>
+        <div class="es-item">
+          <div class="es-key">長期方案</div>
+          <div class="es-val">GTM 自訂事件 → GA4 統一報表</div>
+        </div>
+        <div class="es-item">
+          <div class="es-key">立即行動</div>
+          <div class="es-val">台灣站先裝外掛，本週可上線</div>
+        </div>
+      </div>
     </div>
 
     <!-- 1. 現況 -->
