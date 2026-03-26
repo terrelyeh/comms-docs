@@ -189,11 +189,11 @@
       <h2>我們需要追蹤官網檔案的下載次數，但目前沒有任何記錄機制。</h2>
       <p><strong style="color:#fff;">問題：</strong>GA4 有收到下載事件，但因為檔案放在外部 S3，無法辨識是哪個檔案被下載。</p>
       <p><strong style="color:#fff;">挑戰：</strong>全球 5 個站是獨立 WordPress 主機，各自埋了不同的 GTM container。</p>
-      <p><strong style="color:#fff;">建議：</strong>採混合方案——先在台灣站裝 Download Monitor 外掛立即上線，同時盤點各站 GTM/GA4 狀況，後續統一用 GA4 追蹤全球數據。</p>
+      <p><strong style="color:#fff;">建議：</strong>採混合方案——全部 5 個站都安裝 Download Monitor 外掛立即上線，同時盤點各站 GTM/GA4 狀況，後續統一用 GA4 追蹤全球數據並整合報表。</p>
       <div class="es-grid">
         <div class="es-item">
           <div class="es-key">短期方案</div>
-          <div class="es-val">Download Monitor 外掛（免費）</div>
+          <div class="es-val">5 站皆安裝 Download Monitor（免費）</div>
         </div>
         <div class="es-item">
           <div class="es-key">長期方案</div>
@@ -201,7 +201,7 @@
         </div>
         <div class="es-item">
           <div class="es-key">立即行動</div>
-          <div class="es-val">台灣站先裝外掛，本週可上線</div>
+          <div class="es-val">各站安裝外掛 + 替換下載連結</div>
         </div>
       </div>
     </div>
@@ -260,7 +260,7 @@
         <div class="scenario-card rec">
           <div class="card-label">方案 C — 推薦</div>
           <h4>混合方案</h4>
-          <p>先裝外掛快速上線，再推進 GA4 統一追蹤</p>
+          <p>全部 5 站裝外掛快速上線，再推進 GA4 統一追蹤</p>
           <div class="detail">
             <strong>適合：</strong>先追蹤台灣站，未來擴展全球<br>
             <strong>優點：</strong>馬上有數據，不用等全部搞清楚<br>
@@ -280,8 +280,8 @@
         <div class="timeline-item">
           <div class="timeline-phase">Phase 1<br>本週</div>
           <div class="timeline-content">
-            <strong>台灣站裝 Download Monitor，立即開始收集數據</strong>
-            <p>在台灣站（/tw/）WordPress 安裝 Download Monitor，將想追蹤的檔案加入外掛，替換頁面連結。</p>
+            <strong>全部 5 站安裝 Download Monitor，立即開始收集數據</strong>
+            <p>在所有站（/、/tw/、/apac/、/in/、/eu/）的 WordPress 安裝 Download Monitor，將想追蹤的檔案加入外掛，替換頁面連結。</p>
           </div>
         </div>
         <div class="timeline-item">
@@ -307,10 +307,12 @@
       <h2>Download Monitor 設定指南</h2>
 
       <p><strong>原理：</strong>在使用者與 S3 檔案之間加一層計數器。檔案不用重新上傳，只需要貼 S3 URL，然後把頁面上的連結換成外掛產生的追蹤連結。使用者下載體驗不變。</p>
+      <p><strong>範圍：</strong>全部 5 個站（/、/tw/、/apac/、/in/、/eu/）都要執行以下步驟。每個站是獨立的 WordPress，所以每個站都要各自安裝外掛、建立下載項目、替換連結。</p>
 
-      <h3>操作步驟</h3>
+      <h3>每個站的操作步驟</h3>
       <ol class="step-list">
-        <li>WordPress 後台 → <strong>Downloads → Add New</strong></li>
+        <li>登入該站的 WordPress 後台，安裝並啟用 <strong>Download Monitor</strong> 外掛</li>
+        <li>左側選單 <strong>Downloads → Add New</strong></li>
         <li>標題填入辨識名稱，例如 <code>EPC Installer v1.8.8 (Windows)</code></li>
         <li>在 <strong>Downloadable Files/Versions</strong> 區塊點 <strong>Add file</strong>，貼上 S3 URL</li>
         <li>點 <strong>Publish</strong>，記下項目 ID</li>
