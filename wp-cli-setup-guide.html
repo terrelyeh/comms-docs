@@ -371,7 +371,7 @@
                         建立 SSH 使用者（建議）
                     </h3>
                     <p class="text-gray-600 mb-4 leading-relaxed">
-                        建議建立一個專用的部署帳號（例如 <code class="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm">deploy</code>），而非直接使用 root 帳號。這個使用者需要有權限執行 WP-CLI 操作 WordPress 安裝目錄下的檔案。
+                        建議建立一個專用的 AI 操作帳號（例如 <code class="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm">llm</code>），而非直接使用 root 帳號。命名為 llm 可以一眼辨識這是 AI 專用帳號。這個使用者需要有權限執行 WP-CLI 操作 WordPress 安裝目錄下的檔案。
                     </p>
 
                     <div class="code-block-wrapper relative group mb-4">
@@ -382,11 +382,11 @@
                                 <span>複製</span>
                             </button>
                         </div>
-                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 建立 deploy 使用者</span></span>
-<span class="code-line block px-1 -mx-1 rounded">sudo adduser deploy</span>
+                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 建立 llm 使用者（AI 專用帳號）</span></span>
+<span class="code-line block px-1 -mx-1 rounded">sudo adduser llm</span>
 <span class="code-line block px-1 -mx-1 rounded"></span>
 <span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 將使用者加入 www-data 群組，使其有權限操作 WordPress 檔案</span></span>
-<span class="code-line block px-1 -mx-1 rounded">sudo usermod -aG www-data deploy</span></code></pre>
+<span class="code-line block px-1 -mx-1 rounded">sudo usermod -aG www-data llm</span></code></pre>
                     </div>
                 </div>
 
@@ -397,7 +397,7 @@
                         接收公鑰
                     </h3>
                     <p class="text-gray-600 mb-4 leading-relaxed">
-                        工程師需要將使用者提供的公鑰新增到每台伺服器上 deploy 帳號的 <code class="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm">~/.ssh/authorized_keys</code> 檔案中。可以手動新增，也可以使用 <code class="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm">ssh-copy-id</code> 工具。
+                        工程師需要將使用者提供的公鑰新增到每台伺服器上 llm 帳號的 <code class="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm">~/.ssh/authorized_keys</code> 檔案中。可以手動新增，也可以使用 <code class="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm">ssh-copy-id</code> 工具。
                     </p>
 
                     <div class="code-block-wrapper relative group mb-4">
@@ -409,15 +409,15 @@
                             </button>
                         </div>
                         <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 建立 .ssh 目錄</span></span>
-<span class="code-line block px-1 -mx-1 rounded">mkdir -p /home/deploy/.ssh</span>
+<span class="code-line block px-1 -mx-1 rounded">mkdir -p /home/llm/.ssh</span>
 <span class="code-line block px-1 -mx-1 rounded"></span>
 <span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 將使用者提供的公鑰寫入 authorized_keys</span></span>
-<span class="code-line block px-1 -mx-1 rounded">echo <span class="text-code-string">"使用者提供的公鑰內容"</span> >> /home/deploy/.ssh/authorized_keys</span>
+<span class="code-line block px-1 -mx-1 rounded">echo <span class="text-code-string">"使用者提供的公鑰內容"</span> >> /home/llm/.ssh/authorized_keys</span>
 <span class="code-line block px-1 -mx-1 rounded"></span>
 <span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 設定正確的權限（非常重要）</span></span>
-<span class="code-line block px-1 -mx-1 rounded">chmod 700 /home/deploy/.ssh</span>
-<span class="code-line block px-1 -mx-1 rounded">chmod 600 /home/deploy/.ssh/authorized_keys</span>
-<span class="code-line block px-1 -mx-1 rounded">chown -R deploy:deploy /home/deploy/.ssh</span></code></pre>
+<span class="code-line block px-1 -mx-1 rounded">chmod 700 /home/llm/.ssh</span>
+<span class="code-line block px-1 -mx-1 rounded">chmod 600 /home/llm/.ssh/authorized_keys</span>
+<span class="code-line block px-1 -mx-1 rounded">chown -R llm:llm /home/llm/.ssh</span></code></pre>
                     </div>
                 </div>
 
@@ -428,7 +428,7 @@
                         確認 WP-CLI 可正常運作
                     </h3>
                     <p class="text-gray-600 mb-4 leading-relaxed">
-                        切換到 deploy 使用者，進入 WordPress 根目錄，確認 WP-CLI 可以正常存取並操作 WordPress：
+                        切換到 llm 使用者，進入 WordPress 根目錄，確認 WP-CLI 可以正常存取並操作 WordPress：
                     </p>
 
                     <div class="code-block-wrapper relative group mb-4">
@@ -439,8 +439,8 @@
                                 <span>複製</span>
                             </button>
                         </div>
-                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 切換到 deploy 使用者</span></span>
-<span class="code-line block px-1 -mx-1 rounded">su - deploy</span>
+                        <pre class="bg-code-bg border border-t-0 border-code-border rounded-b-xl p-4 overflow-x-auto"><code class="text-code-text text-sm font-mono leading-relaxed"><span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 切換到 llm 使用者</span></span>
+<span class="code-line block px-1 -mx-1 rounded">su - llm</span>
 <span class="code-line block px-1 -mx-1 rounded"></span>
 <span class="code-line block px-1 -mx-1 rounded"><span class="text-code-comment"># 進入 WordPress 根目錄</span></span>
 <span class="code-line block px-1 -mx-1 rounded">cd /var/www/html</span>
@@ -551,31 +551,31 @@
 <span class="code-line block px-1 -mx-1 rounded"></span>
 <span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">Host</span> site-a</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">HostName</span> 123.456.789.001</span>
-<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> deploy</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> llm</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">IdentityFile</span> ~/.ssh/id_ed25519</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">Port</span> 22</span>
 <span class="code-line block px-1 -mx-1 rounded"></span>
 <span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">Host</span> site-b</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">HostName</span> 123.456.789.002</span>
-<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> deploy</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> llm</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">IdentityFile</span> ~/.ssh/id_ed25519</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">Port</span> 22</span>
 <span class="code-line block px-1 -mx-1 rounded"></span>
 <span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">Host</span> site-c</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">HostName</span> 123.456.789.003</span>
-<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> deploy</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> llm</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">IdentityFile</span> ~/.ssh/id_ed25519</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">Port</span> 22</span>
 <span class="code-line block px-1 -mx-1 rounded"></span>
 <span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">Host</span> site-d</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">HostName</span> 123.456.789.004</span>
-<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> deploy</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> llm</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">IdentityFile</span> ~/.ssh/id_ed25519</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">Port</span> 22</span>
 <span class="code-line block px-1 -mx-1 rounded"></span>
 <span class="code-line block px-1 -mx-1 rounded"><span class="text-code-keyword">Host</span> site-e</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">HostName</span> 123.456.789.005</span>
-<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> deploy</span>
+<span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">User</span> llm</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">IdentityFile</span> ~/.ssh/id_ed25519</span>
 <span class="code-line block px-1 -mx-1 rounded">    <span class="text-code-function">Port</span> 22</span></code></pre>
                     </div>
@@ -765,7 +765,7 @@
                             </tr>
                             <tr>
                                 <td class="px-5 py-4 font-medium text-gray-900 whitespace-nowrap align-top">使用者權限</td>
-                                <td class="px-5 py-4 text-gray-600 leading-relaxed">使用 deploy 帳號或 editor 角色，避免直接使用 root 帳號操作。</td>
+                                <td class="px-5 py-4 text-gray-600 leading-relaxed">使用 llm 帳號（AI 專用），避免直接使用 root 帳號操作。</td>
                             </tr>
                             <tr>
                                 <td class="px-5 py-4 font-medium text-gray-900 whitespace-nowrap align-top">防火牆</td>
@@ -810,7 +810,7 @@
                             </label>
                             <label class="flex items-start gap-3 cursor-pointer group">
                                 <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="server-2">
-                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">已建立 deploy 使用者並設定正確權限</span>
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">已建立 llm 使用者並設定正確權限</span>
                             </label>
                             <label class="flex items-start gap-3 cursor-pointer group">
                                 <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="server-3">
@@ -818,7 +818,7 @@
                             </label>
                             <label class="flex items-start gap-3 cursor-pointer group">
                                 <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="server-4">
-                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">deploy 使用者可正確執行 WP-CLI</span>
+                                <span class="check-label text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">llm 使用者可正確執行 WP-CLI</span>
                             </label>
                             <label class="flex items-start gap-3 cursor-pointer group">
                                 <input type="checkbox" class="custom-checkbox w-5 h-5 rounded border-2 border-gray-300 text-accent-500 focus:ring-accent-500 focus:ring-offset-0 mt-0.5 flex-shrink-0 transition-colors" data-key="server-5">
