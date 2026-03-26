@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download Monitor 設定指南 — EnGenius EPC Downloads</title>
+  <style>
+    :root {
+      --text-primary: #1a1a2e;
+      --text-secondary: #4a4a68;
+      --text-muted: #7a7a96;
+      --bg-page: #f5f6fa;
+      --bg-card: #ffffff;
+      --bg-code: #f0f1f5;
+      --border: #e2e4ea;
+      --accent: #2563eb;
+      --accent-light: #eff4ff;
+      --green: #16a34a;
+      --green-light: #f0fdf4;
+      --orange: #ea580c;
+      --orange-light: #fff7ed;
+      --red: #dc2626;
+      --red-light: #fef2f2;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      font-size: 17px;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .header .badge {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 6px 18px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+    }
+
+    .header h1 {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .header .subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+    }
+
+    .header .date {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* Sections */
+    .section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px;
+      margin-bottom: 24px;
+    }
+
+    .section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+
+    .section h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      letter-spacing: -0.01em;
+    }
+
+    .section h3 {
+      font-size: 19px;
+      font-weight: 600;
+      margin-top: 28px;
+      margin-bottom: 12px;
+    }
+
+    .section p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+
+    /* Flow diagram */
+    .flow {
+      background: var(--bg-code);
+      border-radius: 10px;
+      padding: 24px;
+      margin: 16px 0;
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 14px;
+      line-height: 2;
+      color: var(--text-secondary);
+      overflow-x: auto;
+    }
+
+    .flow .label {
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .flow .arrow { color: var(--accent); }
+    .flow .highlight { color: var(--accent); font-weight: 600; }
+    .flow .counter { color: var(--green); font-weight: 700; }
+
+    /* Steps */
+    .step-list {
+      list-style: none;
+      counter-reset: step;
+    }
+
+    .step-list li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 40px;
+      margin-bottom: 18px;
+      font-size: 17px;
+      color: var(--text-secondary);
+    }
+
+    .step-list li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 2px;
+      width: 28px;
+      height: 28px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-list li strong {
+      color: var(--text-primary);
+    }
+
+    /* Code blocks */
+    code {
+      background: var(--bg-code);
+      padding: 3px 9px;
+      border-radius: 5px;
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 15px;
+      color: var(--accent);
+    }
+
+    .code-block {
+      background: var(--text-primary);
+      color: #e2e8f0;
+      padding: 20px 24px;
+      border-radius: 10px;
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 15px;
+      line-height: 1.8;
+      margin: 14px 0;
+      overflow-x: auto;
+    }
+
+    .code-block .comment { color: #6b7a99; }
+    .code-block .url { color: #7dd3fc; }
+    .code-block .tag { color: #fbbf24; }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 16px;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      background: var(--bg-code);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    /* Callout boxes */
+    .callout {
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin: 18px 0;
+      font-size: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .callout.warning {
+      background: var(--orange-light);
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+    }
+
+    .callout.danger {
+      background: var(--red-light);
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .callout.success {
+      background: var(--green-light);
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+
+    .callout.info {
+      background: var(--accent-light);
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+    }
+
+    .callout .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .callout .content { flex: 1; }
+    .callout strong { display: block; margin-bottom: 2px; }
+
+    /* Comparison */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    @media (max-width: 600px) {
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+
+    .compare-card {
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .compare-card.before {
+      background: var(--red-light);
+      border: 1px solid #fecaca;
+    }
+
+    .compare-card.after {
+      background: var(--green-light);
+      border: 1px solid #bbf7d0;
+    }
+
+    .compare-card .label {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .compare-card.before .label { color: var(--red); }
+    .compare-card.after .label { color: var(--green); }
+
+    .compare-card p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    /* Checklist */
+    .checklist {
+      list-style: none;
+      margin: 12px 0;
+    }
+
+    .checklist li {
+      padding: 10px 0 10px 36px;
+      position: relative;
+      font-size: 17px;
+      color: var(--text-secondary);
+    }
+
+    .checklist li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 13px;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 32px 0;
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <span class="badge">Internal Guide</span>
+      <h1>Download Monitor 設定指南</h1>
+      <p class="subtitle">追蹤 EPC Downloads 頁面的檔案下載次數</p>
+      <p class="date">建立日期：2026-03-25 &nbsp;|&nbsp; 適用網站：www.engeniustech.com</p>
+    </div>
+
+    <!-- Section 1: 為什麼要裝 -->
+    <div class="section">
+      <div class="section-number">1</div>
+      <h2>為什麼需要這個外掛？</h2>
+      <p>我們需要知道 Downloads & Guides 頁面上的檔案（例如 EPC_Installer.exe）被下載了幾次。</p>
+      <p>雖然網站有安裝 GA4（透過 GTM），但 GA4 的 <code>file_download</code> 事件沒有正確收到檔案名稱參數，無法區分是哪個檔案被下載。</p>
+      <p><strong>Download Monitor</strong> 是一個免費的 WordPress 外掛，可以在後台直接看到每個檔案的精確下載次數。</p>
+    </div>
+
+    <!-- Section 2: 運作原理 -->
+    <div class="section">
+      <div class="section-number">2</div>
+      <h2>運作原理</h2>
+      <p>Download Monitor 的原理很簡單——它在使用者和實際檔案之間加了一層「計數器」。</p>
+
+      <div class="compare-grid">
+        <div class="compare-card before">
+          <div class="label">改之前（無法追蹤）</div>
+          <p>使用者點「Download」</p>
+          <p>↓</p>
+          <p>直接連到 S3 下載檔案</p>
+          <p style="color:#991b1b; font-weight:600; margin-top:8px;">沒有任何紀錄</p>
+        </div>
+        <div class="compare-card after">
+          <div class="label">改之後（有追蹤）</div>
+          <p>使用者點「Download」</p>
+          <p>↓</p>
+          <p>經過 Download Monitor（計數 +1）</p>
+          <p>↓</p>
+          <p>自動轉到 S3 下載檔案</p>
+          <p style="color:#166534; font-weight:600; margin-top:8px;">每次下載都有紀錄</p>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="icon">💡</span>
+        <div class="content">
+          <strong>使用者感受不到差異</strong>
+          下載體驗跟以前完全一樣，只是連結 URL 變了。檔案不需要重新上傳或搬移，仍然放在原本的 S3 上。
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: 設定步驟 -->
+    <div class="section">
+      <div class="section-number">3</div>
+      <h2>設定步驟</h2>
+
+      <h3>Step A：在 Download Monitor 建立下載項目</h3>
+      <ol class="step-list">
+        <li>登入 WordPress 後台 <code>/wp-admin</code></li>
+        <li>左側選單 → <strong>Downloads</strong> → <strong>Add New</strong></li>
+        <li>在標題欄填入辨識名稱，例如：<code>EPC Installer v1.8.8 (Windows)</code></li>
+        <li>往下找到 <strong>「Downloadable Files/Versions」</strong> 區塊</li>
+        <li>點 <strong>「Add file」</strong></li>
+        <li>
+          在 File URL 欄位<strong>貼上原本的 S3 下載連結</strong>，例如：<br>
+          <code>https://engenius-epc.s3.us-west-2.amazonaws.com/dev/1.8.8/epc.sh</code>
+        </li>
+        <li>點 <strong>Publish（發佈）</strong></li>
+        <li>發佈後記下這個項目的 <strong>ID</strong>（網址列會顯示 <code>post=123</code>）</li>
+      </ol>
+
+      <div class="callout warning">
+        <span class="icon">⚠️</span>
+        <div class="content">
+          <strong>不需要上傳檔案</strong>
+          只要貼上現有的 S3 URL 即可，檔案繼續放在 S3 上，不需要搬到 WordPress。
+        </div>
+      </div>
+
+      <h3>Step B：取得新的下載連結</h3>
+      <p>每個建好的下載項目，Download Monitor 會自動產生一個追蹤連結：</p>
+      <div class="code-block">
+        <span class="comment">// 格式如下（123 換成你的 ID）</span><br>
+        <span class="url">https://www.engeniustech.com/?download=123</span><br><br>
+        <span class="comment">// 如果有設定 permalink，也可能是</span><br>
+        <span class="url">https://www.engeniustech.com/download/epc-installer-v1-8-8/</span>
+      </div>
+
+      <h3>Step C：替換頁面上的連結</h3>
+      <ol class="step-list">
+        <li>到 Downloads & Guides 頁面的編輯畫面</li>
+        <li>找到原本的下載按鈕/連結</li>
+        <li>
+          將原本的 S3 直連：<br>
+          <code>https://engenius-epc.s3...amazonaws.com/dev/1.8.8/...</code><br>
+          替換成 Download Monitor 的連結：<br>
+          <code>https://www.engeniustech.com/?download=123</code>
+        </li>
+        <li>儲存頁面</li>
+        <li><strong>測試點擊</strong>，確認能正常下載檔案</li>
+      </ol>
+    </div>
+
+    <!-- Section 4: 哪些檔案需要做 -->
+    <div class="section">
+      <div class="section-number">4</div>
+      <h2>哪些檔案需要設定？</h2>
+      <p><strong>只需要針對想追蹤的檔案操作</strong>，不需要把所有下載都搬進來。</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>檔案</th>
+              <th>平台</th>
+              <th>需要追蹤？</th>
+              <th>動作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>EPC_Installer.exe v1.8.8</td>
+              <td>Windows</td>
+              <td>由你決定</td>
+              <td>加進 Download Monitor + 換連結</td>
+            </tr>
+            <tr>
+              <td>EPC_Installer.exe v1.8.7</td>
+              <td>Windows</td>
+              <td>由你決定</td>
+              <td>如不需要可跳過</td>
+            </tr>
+            <tr>
+              <td>epc.sh v1.8.8</td>
+              <td>Linux</td>
+              <td>由你決定</td>
+              <td>加進 Download Monitor + 換連結</td>
+            </tr>
+            <tr>
+              <td>epc.sh v1.8.7</td>
+              <td>Linux</td>
+              <td>由你決定</td>
+              <td>如不需要可跳過</td>
+            </tr>
+            <tr>
+              <td>epc.sh v1.7.2 (beta)</td>
+              <td>Linux</td>
+              <td>由你決定</td>
+              <td>如不需要可跳過</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout success">
+        <span class="icon">✅</span>
+        <div class="content">
+          <strong>建議</strong>
+          先針對最新版本（v1.8.8 的 Windows + Linux）做就好，未來新版本上架時再新增。
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: 查看下載次數 -->
+    <div class="section">
+      <div class="section-number">5</div>
+      <h2>如何查看下載次數</h2>
+      <ol class="step-list">
+        <li>WordPress 後台 → 左側 <strong>Downloads</strong></li>
+        <li>在列表中每個檔案旁邊會顯示 <strong>Download Count</strong> 欄位</li>
+        <li>點進單一檔案也可以看到更詳細的下載記錄</li>
+      </ol>
+      <p>如果需要更進階的報表（圖表、匯出），那是 Pro 付費版功能，但目前免費版的計數已經夠用。</p>
+    </div>
+
+    <!-- Section 6: 注意事項 -->
+    <div class="section">
+      <div class="section-number">6</div>
+      <h2>注意事項</h2>
+
+      <div class="callout danger">
+        <span class="icon">🚨</span>
+        <div class="content">
+          <strong>換連結後一定要測試</strong>
+          替換完畢後，務必用無痕視窗點擊下載按鈕，確認：(1) 檔案能正常下載、(2) 回到 Downloads 頁面看計數有 +1。
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <span class="icon">⚠️</span>
+        <div class="content">
+          <strong>多語系 / 多區域頁面</strong>
+          網站是全球共用 domain（/tw、/eu 等），如果不同地區頁面都有同一個檔案的下載連結，全部都要換成 Download Monitor 的連結才能完整追蹤。一個 Download Monitor 項目可以在多個頁面使用。
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <span class="icon">⚠️</span>
+        <div class="content">
+          <strong>未來新版本上架時</strong>
+          每次有新版本的 EPC Installer，除了上傳到 S3 之外，也要在 Download Monitor 新增一筆對應的下載項目，並更新頁面連結。建議加進 SOP。
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="icon">💡</span>
+        <div class="content">
+          <strong>Linux 的 Deploy Command</strong>
+          Linux 區域顯示的是 <code>wget</code> 指令，使用者是複製指令後在終端執行，不是點擊下載。這種情況 Download Monitor 無法追蹤（因為使用者直接連到 S3）。如果要追蹤 Linux 的下載，需要把 wget 的 URL 也換成 Download Monitor 的連結。
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 7: Checklist -->
+    <div class="section">
+      <div class="section-number">7</div>
+      <h2>設定完成 Checklist</h2>
+      <ul class="checklist">
+        <li>Download Monitor 外掛已安裝並啟用</li>
+        <li>已為需要追蹤的檔案建立 Download 項目</li>
+        <li>每個項目都已貼上正確的 S3 檔案 URL</li>
+        <li>頁面上的下載連結已替換為 Download Monitor 連結</li>
+        <li>用無痕視窗測試過，確認可正常下載</li>
+        <li>確認 Download Count 有正確 +1</li>
+        <li>如有多語系頁面（/tw、/eu），各頁面的連結都已更新</li>
+      </ul>
+    </div>
+
+    <!-- Section 8: 快速參考 -->
+    <div class="section">
+      <div class="section-number">8</div>
+      <h2>快速參考</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>資訊</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>外掛名稱</td>
+              <td>Download Monitor（by WPChill）</td>
+            </tr>
+            <tr>
+              <td>費用</td>
+              <td>免費（Pro 版 $99-199/年，目前不需要）</td>
+            </tr>
+            <tr>
+              <td>WordPress 後台路徑</td>
+              <td>Downloads → 列表 / Add New</td>
+            </tr>
+            <tr>
+              <td>追蹤連結格式</td>
+              <td><code>https://www.engeniustech.com/?download={ID}</code></td>
+            </tr>
+            <tr>
+              <td>GTM Container</td>
+              <td>GTM-WR5K9J8</td>
+            </tr>
+            <tr>
+              <td>GA4 Measurement ID</td>
+              <td>G-3QS0NVS8NH</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer">
+      EnGenius Technologies — Internal Document<br>
+      Generated on 2026-03-25
+    </div>
+
+  </div>
+</body>
+</html>
