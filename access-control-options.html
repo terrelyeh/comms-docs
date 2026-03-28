@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>內部工具的存取控制方案評估</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand-1: #F59E0B;
+      --brand-2: #F97316;
+      --brand-3: #EF4444;
+      --bg: #F5F3F0;
+      --card: #FFFFFF;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-tertiary: #64748B;
+      --ring: rgba(15, 23, 42, 0.06);
+      --teal: #0D9488;
+      --teal-light: #F0FDFA;
+      --teal-ring: rgba(13, 148, 136, 0.12);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Header ---- */
+    header { background: #0F172A; position: sticky; top: 0; z-index: 40; }
+    header .inner {
+      max-width: 1120px; margin: 0 auto;
+      padding: 0 32px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header .logo { display: flex; align-items: center; gap: 14px; }
+    header .logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+    }
+    header .logo-icon svg { width: 20px; height: 20px; color: white; }
+    header .brand-name { font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em; }
+    header .brand-sub {
+      font-size: 13px; font-weight: 600; color: var(--teal);
+      margin-left: 10px;
+      background: rgba(13, 148, 136, 0.1);
+      padding: 2px 10px; border-radius: 99px;
+    }
+    header .back-link {
+      font-size: 14px; font-weight: 500; color: #E2E8F0; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      transition: all 0.15s;
+    }
+    header .back-link:hover { background: rgba(255,255,255,0.12); color: #FFFFFF; }
+    .accent-line { height: 3px; background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3)); }
+
+    /* ---- Hero ---- */
+    .hero { max-width: 1120px; margin: 0 auto; padding: 64px 32px 48px; }
+    .hero h1 {
+      font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #0D9488, #0891B2);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      font-size: 19px; color: var(--text-secondary); max-width: 720px; line-height: 1.8;
+    }
+
+    /* ---- Sections ---- */
+    .section { max-width: 1120px; margin: 0 auto; padding: 0 32px 56px; }
+    .section-title {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 24px;
+    }
+
+    /* ---- Cards ---- */
+    .card {
+      background: var(--card); border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      outline: 1px solid var(--ring);
+      padding: 40px; margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .card h3 {
+      font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+      margin-bottom: 8px; margin-top: 32px;
+    }
+    .card h3:first-child { margin-top: 0; }
+    .card p { color: var(--text-secondary); margin-bottom: 14px; font-size: 17px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    /* ---- Plan Header (inside card) ---- */
+    .plan-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 20px;
+    }
+    .plan-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .plan-header h2 { margin-bottom: 0; }
+    .plan-header .plan-label {
+      font-size: 13px; font-weight: 600; margin-top: 2px;
+    }
+
+    /* Plan color themes */
+    .plan-green .plan-icon { background: #F0FDFA; color: #0D9488; }
+    .plan-green .plan-label { color: #0D9488; }
+    .plan-amber .plan-icon { background: #FFFBEB; color: #D97706; }
+    .plan-amber .plan-label { color: #B45309; }
+    .plan-orange .plan-icon { background: #FFF7ED; color: #EA580C; }
+    .plan-orange .plan-label { color: #C2410C; }
+    .plan-indigo .plan-icon { background: #EEF2FF; color: #6366F1; }
+    .plan-indigo .plan-label { color: #4F46E5; }
+    .plan-slate .plan-icon { background: #F1F5F9; color: #475569; }
+    .plan-slate .plan-label { color: #475569; }
+
+    /* ---- Method grid ---- */
+    .method-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin: 20px 0;
+    }
+    @media (max-width: 700px) {
+      .method-grid { grid-template-columns: 1fr; }
+    }
+    .method-item {
+      border-radius: 14px; padding: 24px;
+      outline: 1px solid var(--ring); background: #F8FAFC;
+    }
+    .method-item h4 {
+      font-size: 17px; font-weight: 700; margin-bottom: 6px;
+      letter-spacing: -0.01em; color: var(--text-primary);
+    }
+    .method-item p {
+      font-size: 15px; color: var(--text-secondary); line-height: 1.7; margin: 0;
+    }
+    .method-item .method-badge {
+      display: inline-block; font-size: 12px; font-weight: 600;
+      padding: 2px 10px; border-radius: 99px; margin-bottom: 10px;
+    }
+    .method-item .badge-purple { background: #EDE9FE; color: #6D28D9; }
+    .method-item .badge-blue { background: #DBEAFE; color: #1D4ED8; }
+    .method-item .badge-green { background: #D1FAE5; color: #047857; }
+    .method-item .badge-gray { background: #E2E8F0; color: #334155; }
+
+    /* ---- Flow ---- */
+    .flow {
+      background: #F8FAFC; border-radius: 14px; padding: 24px 28px;
+      margin: 20px 0; font-size: 16px; line-height: 2;
+      color: var(--text-secondary);
+      border-left: 4px solid var(--teal);
+    }
+    .flow .arrow { color: var(--teal); font-weight: 700; margin: 0 4px; }
+
+    /* ---- Pros / Cons ---- */
+    .pros-cons {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin: 20px 0;
+    }
+    @media (max-width: 700px) {
+      .pros-cons { grid-template-columns: 1fr; }
+    }
+    .pros, .cons {
+      border-radius: 14px; padding: 24px 28px;
+    }
+    .pros {
+      background: #F0FDFA;
+      outline: 1px solid rgba(13, 148, 136, 0.12);
+    }
+    .cons {
+      background: #FFF7ED;
+      outline: 1px solid rgba(234, 88, 12, 0.12);
+    }
+    .pros-title, .cons-title {
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 12px;
+    }
+    .pros-title { color: #0F766E; }
+    .cons-title { color: #C2410C; }
+    .pros ul, .cons ul {
+      list-style: none; padding: 0;
+    }
+    .pros li, .cons li {
+      font-size: 16px; color: var(--text-secondary); line-height: 1.7;
+      padding: 4px 0 4px 24px; position: relative;
+    }
+    .pros li::before {
+      content: "✓"; position: absolute; left: 0;
+      color: #0D9488; font-weight: 700;
+    }
+    .cons li::before {
+      content: "✗"; position: absolute; left: 0;
+      color: #EA580C; font-weight: 700;
+    }
+
+    /* ---- When to use ---- */
+    .when-to-use {
+      background: #FFFBEB; border-radius: 12px; padding: 20px 24px;
+      outline: 1px solid rgba(245,158,11,0.15);
+      margin-top: 20px;
+    }
+    .when-to-use .label {
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #B45309; margin-bottom: 8px;
+    }
+    .when-to-use p { font-size: 16px; color: #92400E; margin-bottom: 0; }
+
+    /* ---- Specs Table ---- */
+    .specs-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 20px 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden;
+      outline: 1px solid var(--ring);
+    }
+    .specs-table th {
+      background: #F8FAFC; text-align: left; padding: 14px 20px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .specs-table td {
+      padding: 14px 20px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .specs-table tr:last-child td { border-bottom: none; }
+    .specs-table td:first-child {
+      font-weight: 600; color: var(--text-primary); white-space: nowrap;
+    }
+
+    /* ---- Comparison Table ---- */
+    .compare-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 20px 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden;
+      outline: 1px solid var(--ring);
+    }
+    .compare-table th {
+      background: #F8FAFC; text-align: left; padding: 14px 18px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .compare-table th:first-child { width: 160px; }
+    .compare-table td {
+      padding: 14px 18px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table td:first-child {
+      font-weight: 600; color: var(--text-primary);
+    }
+    .compare-table .highlight { color: var(--teal); font-weight: 600; }
+    @media (max-width: 800px) {
+      .compare-table { font-size: 14px; }
+      .compare-table th, .compare-table td { padding: 10px 12px; }
+    }
+
+    /* ---- Code block ---- */
+    .code-block {
+      background: #0F172A; color: #E2E8F0;
+      border-radius: 14px; padding: 24px 28px;
+      margin: 16px 0;
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      font-size: 14px; line-height: 1.9;
+      overflow-x: auto;
+    }
+    .code-block .comment { color: #64748B; }
+    .code-block .key { color: #2DD4BF; }
+    .code-block .str { color: #FCD34D; }
+
+    /* ---- Roadmap ---- */
+    .roadmap {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin: 24px 0 8px;
+    }
+    @media (max-width: 700px) {
+      .roadmap { grid-template-columns: 1fr; }
+    }
+    .roadmap-step {
+      border-radius: 16px; padding: 28px 24px;
+      outline: 1px solid var(--ring); position: relative;
+    }
+    .roadmap-step .step-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 10px;
+    }
+    .roadmap-step h4 {
+      font-size: 18px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em;
+    }
+    .roadmap-step p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; margin: 0; }
+    .roadmap-step.r1 { background: #F0FDFA; }
+    .roadmap-step.r1 .step-label { color: #0F766E; }
+    .roadmap-step.r1 h4 { color: #0F766E; }
+    .roadmap-step.r2 { background: #FFFBEB; }
+    .roadmap-step.r2 .step-label { color: #B45309; }
+    .roadmap-step.r2 h4 { color: #B45309; }
+    .roadmap-step.r3 { background: #FFF7ED; }
+    .roadmap-step.r3 .step-label { color: #C2410C; }
+    .roadmap-step.r3 h4 { color: #EA580C; }
+
+    /* ---- Divider ---- */
+    .divider {
+      height: 1px; background: rgba(15, 23, 42, 0.06);
+      max-width: 1120px; margin: 0 auto;
+    }
+
+    /* ---- Note ---- */
+    .note {
+      background: var(--teal-light); border-radius: 12px; padding: 20px 24px;
+      outline: 1px solid var(--teal-ring);
+      font-size: 16px; color: #115E59; line-height: 1.7;
+      margin-top: 24px;
+    }
+    .note strong { font-weight: 700; }
+
+    /* ---- Footer ---- */
+    footer {
+      max-width: 1120px; margin: 0 auto; padding: 32px 32px 48px;
+      text-align: center; font-size: 14px; color: var(--text-tertiary);
+    }
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ---- Mobile RWD ---- */
+    @media (max-width: 640px) {
+      body { font-size: 16px; }
+
+      /* Header */
+      header .inner { padding: 0 16px; height: 52px; }
+      header .brand-name { font-size: 14px; }
+      header .brand-sub { font-size: 11px; margin-left: 6px; padding: 2px 8px; }
+      header .back-link { font-size: 13px; padding: 5px 12px; }
+
+      /* Hero */
+      .hero { padding: 40px 20px 32px; }
+      .hero h1 { font-size: 28px; }
+      .hero .subtitle { font-size: 16px; }
+
+      /* Sections */
+      .section { padding: 0 20px 40px; }
+      .section-title { font-size: 22px; margin-bottom: 16px; }
+
+      /* Cards */
+      .card { padding: 24px 20px; border-radius: 16px; }
+      .card h2 { font-size: 22px; }
+      .card h3 { font-size: 17px; margin-top: 24px; }
+      .card p { font-size: 16px; }
+
+      /* Plan header */
+      .plan-header { gap: 12px; }
+      .plan-icon { width: 44px; height: 44px; border-radius: 12px; font-size: 20px; }
+      .plan-header .plan-label { font-size: 12px; }
+
+      /* Flow */
+      .flow { padding: 18px 20px; font-size: 15px; line-height: 2.2; }
+
+      /* Pros / Cons */
+      .pros-cons { grid-template-columns: 1fr; gap: 12px; }
+      .pros, .cons { padding: 20px; }
+      .pros li, .cons li { font-size: 15px; }
+
+      /* Tables */
+      .specs-table { font-size: 15px; }
+      .specs-table td { padding: 12px 16px; }
+
+      /* Comparison table — horizontal scroll */
+      .card:has(.compare-table) { padding: 24px 12px; overflow-x: auto; }
+      .compare-table { font-size: 14px; min-width: 600px; }
+      .compare-table th, .compare-table td { padding: 10px 12px; }
+
+      /* Code block */
+      .code-block { padding: 18px 16px; font-size: 13px; }
+
+      /* When to use */
+      .when-to-use { padding: 16px 18px; }
+      .when-to-use p { font-size: 15px; }
+
+      /* Roadmap */
+      .roadmap { grid-template-columns: 1fr; gap: 12px; }
+      .roadmap-step { padding: 22px 20px; }
+      .roadmap-step h4 { font-size: 17px; }
+      .roadmap-step p { font-size: 14px; }
+
+      /* Note */
+      .note { padding: 16px 18px; font-size: 15px; }
+
+      /* Divider */
+      .divider { margin: 0 20px; }
+
+      /* Method grid */
+      .method-grid { grid-template-columns: 1fr; }
+      .method-item { padding: 20px; }
+      .method-item h4 { font-size: 16px; }
+      .method-item p { font-size: 14px; }
+
+      /* Footer */
+      footer { padding: 24px 20px 40px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+      </div>
+      <span class="brand-name">內部工具</span>
+      <span class="brand-sub">存取控制方案評估</span>
+    </div>
+    <a href="index.html" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回文件列表
+    </a>
+  </div>
+</header>
+<div class="accent-line"></div>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>誰可以用<span class="gradient">我們的工具？</span></h1>
+  <p class="subtitle">
+    當內部工具綁定了 API Key 或涉及付費服務，就需要存取控制來管理誰能使用。以下整理多種方案，從最簡單到最完整，適用於任何透過 coding 建立的工具類網站，方便內部評估與討論。
+  </p>
+</div>
+
+<!-- ============================== -->
+<!-- WHY -->
+<!-- ============================== -->
+<div class="section">
+  <div class="section-title">為什麼需要存取控制？</div>
+  <div class="card">
+    <p>目前任何知道網址的人都可以直接使用本工具，沒有任何身份驗證機制。這代表：</p>
+    <table class="specs-table">
+      <tr>
+        <td>費用風險</td>
+        <td>任何人都能呼叫 Gemini API 生圖，API 費用由我們承擔</td>
+      </tr>
+      <tr>
+        <td>無法追蹤</td>
+        <td>不知道是誰在使用、用了多少張圖</td>
+      </tr>
+      <tr>
+        <td>無法管理</td>
+        <td>無法停用特定人的存取權限</td>
+      </tr>
+    </table>
+    <div class="note">
+      <strong>API Key 安全說明：</strong>API Key（GEMINI_API_KEY）存放在 Vercel 環境變數中，只在 Serverless Function 內使用，不會暴露到前端瀏覽器。以下所有方案都維持這個架構不變。
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- PLAN 1 -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">方案一</div>
+  <div class="card plan-green">
+    <div class="plan-header">
+      <div class="plan-icon">&#128274;</div>
+      <div>
+        <h2>靜態密碼保護</h2>
+        <div class="plan-label">最快上線 &middot; 約 30 分鐘實作</div>
+      </div>
+    </div>
+
+    <h3>概念</h3>
+    <p>所有使用者共用一組密碼。打開網站時需要先輸入密碼才能使用，密碼存在瀏覽器中，下次不用再輸。</p>
+
+    <h3>運作流程</h3>
+    <div class="flow">
+      使用者打開網站 <span class="arrow">&rarr;</span> 顯示密碼輸入頁
+      <span class="arrow">&rarr;</span> 輸入密碼，存入瀏覽器
+      <span class="arrow">&rarr;</span> 每次呼叫 API 時帶上密碼
+      <span class="arrow">&rarr;</span> 後端比對密碼
+      <span class="arrow">&rarr;</span> 正確才執行
+    </div>
+
+    <h3>需要什麼</h3>
+    <table class="specs-table">
+      <tr><td>外部服務</td><td>無</td></tr>
+      <tr><td>資料庫</td><td>無</td></tr>
+      <tr><td>環境變數</td><td>新增 <code>SITE_PASSWORD</code>（存在 Vercel）</td></tr>
+      <tr><td>前端改動</td><td>新增密碼輸入頁面 + 每次 API 請求帶密碼 header</td></tr>
+      <tr><td>後端改動</td><td>每個 API function 開頭加一行密碼驗證</td></tr>
+    </table>
+
+    <h3>實作方式</h3>
+    <p><strong>Vercel 環境變數</strong>設定一組密碼：</p>
+    <div class="code-block">
+      <span class="comment"># Vercel &gt; Settings &gt; Environment Variables</span><br>
+      <span class="key">SITE_PASSWORD</span> = <span class="str">你設定的密碼</span>
+    </div>
+    <p><strong>後端</strong>：每個 <code>api/*.ts</code> 開頭加入驗證：</p>
+    <div class="code-block">
+      <span class="comment">// 取得前端送來的密碼</span><br>
+      <span class="key">const</span> password = req.headers[<span class="str">'x-site-password'</span>];<br>
+      <span class="key">if</span> (password !== process.env.<span class="str">SITE_PASSWORD</span>) {<br>
+      &nbsp;&nbsp;<span class="key">return</span> res.status(<span class="str">401</span>).json({ error: <span class="str">'Unauthorized'</span> });<br>
+      }
+    </div>
+    <p><strong>前端</strong>：新增密碼輸入畫面，通過後將密碼存入 <code>localStorage</code>，之後每次 API 請求在 header 帶上 <code>x-site-password</code>。</p>
+
+    <h3>管理方式</h3>
+    <table class="specs-table">
+      <tr><td>換密碼</td><td>去 Vercel 改環境變數 &rarr; 重新部署 &rarr; 通知所有人新密碼</td></tr>
+      <tr><td>加人</td><td>直接把密碼告訴對方</td></tr>
+      <tr><td>移除人</td><td>換一組新密碼，通知其他人（無法只停用一個人）</td></tr>
+    </table>
+
+    <div class="pros-cons">
+      <div class="pros">
+        <div class="pros-title">好處</div>
+        <ul>
+          <li>實作最快，30 分鐘內上線</li>
+          <li>不依賴任何外部服務</li>
+          <li>不需要資料庫</li>
+          <li>使用者體驗簡單，輸入一次就好</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <div class="cons-title">限制</div>
+        <ul>
+          <li>所有人共用同一組密碼</li>
+          <li>無法辨識是誰在使用</li>
+          <li>無法停用特定人</li>
+          <li>密碼可能被轉傳給不該有權限的人</li>
+          <li>無法追蹤個人用量</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="when-to-use">
+      <div class="label">適用時機</div>
+      <p>只有 1&ndash;3 人使用，或是需要最快速度先保護起來，之後再升級到更完整的方案。</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- PLAN 2 -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">方案二</div>
+  <div class="card plan-amber">
+    <div class="plan-header">
+      <div class="plan-icon">&#128100;</div>
+      <div>
+        <h2>Google 登入 + Email 白名單</h2>
+        <div class="plan-label">不需要資料庫 &middot; 約 3&ndash;4 小時實作</div>
+      </div>
+    </div>
+
+    <h3>概念</h3>
+    <p>使用者用自己的 Google 帳號登入，後端驗證身份後比對 email 是否在白名單內。白名單存在 Vercel 環境變數中，不需要任何資料庫。</p>
+
+    <h3>運作流程</h3>
+    <div class="flow">
+      使用者打開網站 <span class="arrow">&rarr;</span> 顯示 Google 登入按鈕
+      <span class="arrow">&rarr;</span> Google 登入成功，回傳 ID Token（含 email）
+      <span class="arrow">&rarr;</span> 前端將 Token 帶在 API 請求 header
+      <span class="arrow">&rarr;</span> 後端向 Google 驗證 Token 真偽
+      <span class="arrow">&rarr;</span> 取出 email，比對白名單
+      <span class="arrow">&rarr;</span> 在白名單上才放行
+    </div>
+
+    <h3>需要什麼</h3>
+    <table class="specs-table">
+      <tr><td>外部服務</td><td>Google Cloud Console（免費）</td></tr>
+      <tr><td>資料庫</td><td>無</td></tr>
+      <tr><td>環境變數</td><td><code>GOOGLE_CLIENT_ID</code> + <code>ALLOWED_EMAILS</code></td></tr>
+      <tr><td>前端改動</td><td>Google Sign-In 按鈕 + Token 管理</td></tr>
+      <tr><td>後端改動</td><td>每個 API function 驗證 Google ID Token + 比對白名單</td></tr>
+      <tr><td>前置設定</td><td>Google Cloud Console 建立 OAuth Client ID（一次性，約 15 分鐘）</td></tr>
+    </table>
+
+    <h3>實作方式</h3>
+    <p><strong>1. Google Cloud Console 設定</strong>（一次性）：</p>
+    <div class="flow">
+      建立 GCP 專案 <span class="arrow">&rarr;</span> 啟用 Google Identity Services
+      <span class="arrow">&rarr;</span> 建立 OAuth 2.0 Client ID（Web application）
+      <span class="arrow">&rarr;</span> 設定 Authorized JavaScript origins
+      <span class="arrow">&rarr;</span> 取得 Client ID
+    </div>
+    <p><strong>2. Vercel 環境變數</strong>：</p>
+    <div class="code-block">
+      <span class="key">GOOGLE_CLIENT_ID</span> = <span class="str">xxxxxxxxxxxx.apps.googleusercontent.com</span><br>
+      <span class="key">ALLOWED_EMAILS</span> = <span class="str">terrel@gmail.com,colleague1@company.com,colleague2@company.com</span>
+    </div>
+    <p><strong>3. 後端驗證</strong>：使用 <code>google-auth-library</code> 驗證 Token 真偽，取出 email 後比對環境變數中的白名單。</p>
+
+    <h3>管理方式</h3>
+    <table class="specs-table">
+      <tr><td>加人</td><td>Vercel Dashboard &rarr; 在 <code>ALLOWED_EMAILS</code> 加入新 email &rarr; Redeploy</td></tr>
+      <tr><td>移除人</td><td>Vercel Dashboard &rarr; 從 <code>ALLOWED_EMAILS</code> 刪除該 email &rarr; Redeploy</td></tr>
+      <tr><td>查看誰有權限</td><td>查看 <code>ALLOWED_EMAILS</code> 環境變數</td></tr>
+    </table>
+
+    <div class="pros-cons">
+      <div class="pros">
+        <div class="pros-title">好處</div>
+        <ul>
+          <li>不需要資料庫</li>
+          <li>使用者不用記密碼（用自己的 Google 帳號）</li>
+          <li>可以辨識是誰在使用</li>
+          <li>Google 負責身份驗證的安全性</li>
+          <li>Token 有過期機制（約 1 小時），比靜態密碼安全</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <div class="cons-title">限制</div>
+        <ul>
+          <li>每次加人/移除人都要改環境變數 + 重新部署</li>
+          <li>沒有角色區分（所有人權限一樣）</li>
+          <li>無法追蹤個人用量（除非另外加 log）</li>
+          <li>白名單變長時環境變數會比較難管理</li>
+          <li>需要設定 Google Cloud Console（一次性）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="when-to-use">
+      <div class="label">適用時機</div>
+      <p>團隊 3&ndash;15 人、人員異動不頻繁、使用者都有 Google 帳號、需要知道「誰」在用但不需要細緻的權限管理。</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- PLAN 3 -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">方案三</div>
+  <div class="card plan-orange">
+    <div class="plan-header">
+      <div class="plan-icon">&#128737;</div>
+      <div>
+        <h2>Google 登入 + Supabase 使用者管理</h2>
+        <div class="plan-label">完整角色管理 &middot; 約半天實作</div>
+      </div>
+    </div>
+
+    <h3>概念</h3>
+    <p>使用者用 Google 帳號登入，身份驗證和使用者管理都交給 Supabase。管理者可以在 Supabase Dashboard 即時管理使用者、角色、停用權限，不需要重新部署。</p>
+
+    <h3>運作流程</h3>
+    <div class="flow">
+      使用者打開網站 <span class="arrow">&rarr;</span> 顯示 Google 登入按鈕
+      <span class="arrow">&rarr;</span> 透過 Supabase Auth 導向 Google OAuth
+      <span class="arrow">&rarr;</span> 登入成功，Supabase 發出 JWT
+      <span class="arrow">&rarr;</span> 前端將 JWT 帶在 API 請求 header
+      <span class="arrow">&rarr;</span> 後端驗證 JWT + 查詢資料庫確認角色
+      <span class="arrow">&rarr;</span> 通過才放行
+    </div>
+
+    <h3>需要什麼</h3>
+    <table class="specs-table">
+      <tr><td>外部服務</td><td>Google Cloud Console（免費）+ Supabase（免費額度 50,000 MAU）</td></tr>
+      <tr><td>資料庫</td><td>Supabase PostgreSQL（profiles table）</td></tr>
+      <tr><td>環境變數</td><td><code>GOOGLE_CLIENT_ID</code> + <code>SUPABASE_URL</code> + <code>SUPABASE_ANON_KEY</code> + <code>SUPABASE_SERVICE_ROLE_KEY</code></td></tr>
+      <tr><td>前端改動</td><td>Supabase Auth UI + AuthContext + Protected Route</td></tr>
+      <tr><td>後端改動</td><td>每個 API function 驗證 Supabase JWT + 查詢角色</td></tr>
+      <tr><td>npm 套件</td><td><code>@supabase/supabase-js</code></td></tr>
+    </table>
+
+    <h3>角色設計（建議）</h3>
+    <table class="specs-table">
+      <tr>
+        <td style="color: #0D9488; font-weight: 700;">admin</td>
+        <td>所有功能 + 未來的管理頁面</td>
+        <td>你自己</td>
+      </tr>
+      <tr>
+        <td style="color: #D97706; font-weight: 700;">user</td>
+        <td>生圖、合規檢測、全部操作功能</td>
+        <td>電商部門同事</td>
+      </tr>
+      <tr>
+        <td style="color: #64748B; font-weight: 700;">viewer</td>
+        <td>只能瀏覽歷史圖片，不能生圖（省 API 費用）</td>
+        <td>主管、需要看成果的人</td>
+      </tr>
+    </table>
+
+    <h3>資料庫結構</h3>
+    <div class="code-block">
+      <span class="comment">-- Supabase 資料庫中的 profiles table</span><br><br>
+      <span class="key">email</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">role</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">is_active</span><br>
+      ─────────────────────────────────────────────────<br>
+      <span class="str">terrel@gmail.com</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;admin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;true<br>
+      <span class="str">colleague1@company.com</span>&nbsp;&nbsp;&nbsp;user&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;true<br>
+      <span class="str">colleague2@company.com</span>&nbsp;&nbsp;&nbsp;viewer&nbsp;&nbsp;&nbsp;&nbsp;true<br>
+      <span class="str">ex-employee@company.com</span>&nbsp;&nbsp;user&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #EF4444;">false</span> <span class="comment">&larr; 已停用</span>
+    </div>
+
+    <h3>管理方式</h3>
+    <table class="specs-table">
+      <tr><td>加人</td><td>使用者用 Google 登入 &rarr; 自動出現在 profiles table &rarr; 管理者啟用</td></tr>
+      <tr><td>移除人</td><td>Supabase Dashboard &rarr; 把 <code>is_active</code> 改 false，<strong>即時生效，不需要重新部署</strong></td></tr>
+      <tr><td>改角色</td><td>Supabase Dashboard &rarr; 修改 <code>role</code> 欄位，即時生效</td></tr>
+      <tr><td>查看所有使用者</td><td>Supabase Dashboard &rarr; Table Editor &rarr; profiles</td></tr>
+    </table>
+
+    <div class="pros-cons">
+      <div class="pros">
+        <div class="pros-title">好處</div>
+        <ul>
+          <li>加人/移除人/改角色即時生效，不需要重新部署</li>
+          <li>可以區分角色（admin / user / viewer）</li>
+          <li>可以追蹤個人用量</li>
+          <li>Supabase 免費額度充裕（50,000 MAU）</li>
+          <li>未來可擴展（用量統計、計費、Admin 頁面）</li>
+          <li>Google 登入體驗佳，使用者不用記密碼</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <div class="cons-title">限制</div>
+        <ul>
+          <li>多一個外部依賴（Supabase）</li>
+          <li>初始設定較複雜（Google OAuth + Supabase + DB）</li>
+          <li>需要處理 JWT refresh 邏輯</li>
+          <li>新使用者首次登入後可能需要管理者手動啟用</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="when-to-use">
+      <div class="label">適用時機</div>
+      <p>團隊 10+ 人或人員頻繁變動、需要角色區分、想追蹤個人用量、未來可能開放給更多部門或外部合作夥伴。</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- MORE METHODS -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">更多驗證方式</div>
+  <div class="card plan-indigo">
+    <div class="plan-header">
+      <div class="plan-icon">&#128295;</div>
+      <div>
+        <h2>自建帳號管理（不依賴 Google）</h2>
+        <div class="plan-label">搭配 Supabase Auth &middot; 後端驗證邏輯相同</div>
+      </div>
+    </div>
+
+    <p>如果不想讓使用者透過 Google 登入，Supabase Auth 也支援以下幾種自建帳號的方式。這些方式的後端驗證邏輯都和方案三完全相同（驗 JWT → 查 profiles table），差別只在「使用者怎麼登入」。</p>
+
+    <div class="method-grid">
+      <div class="method-item">
+        <span class="method-badge badge-purple">自建帳密</span>
+        <h4>Email + 密碼</h4>
+        <p>管理者在 Supabase 手動建立帳號（email + 密碼），把帳密發給使用者。完全不經過 Google，你掌控所有帳號。適合需要最高控制權的場景。</p>
+      </div>
+      <div class="method-item">
+        <span class="method-badge badge-blue">邀請制</span>
+        <h4>Invite Code 邀請碼</h4>
+        <p>管理者產生邀請碼 → 發給新使用者 → 使用者用邀請碼 + 自訂密碼完成註冊 → 邀請碼用過即失效。嚴格控制誰能註冊，不需要管理者逐一建帳。</p>
+      </div>
+      <div class="method-item">
+        <span class="method-badge badge-green">無密碼</span>
+        <h4>Magic Link 魔法連結</h4>
+        <p>使用者輸入 email → 信箱收到一封登入連結 → 點連結直接登入，不需要密碼。Supabase Auth 原生支援，體驗接近 Google 登入。</p>
+      </div>
+      <div class="method-item">
+        <span class="method-badge badge-green">無密碼</span>
+        <h4>Email OTP 驗證碼</h4>
+        <p>使用者輸入 email → 信箱收到 6 位數驗證碼 → 輸入驗證碼登入。比 Magic Link 更快（不用切到信箱點連結），Supabase Auth 原生支援。</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>關鍵優勢：</strong>以上所有方式都基於 Supabase Auth，後端驗證邏輯完全一樣（驗 JWT → 查 profiles → 確認角色）。你可以同時開啟多種登入方式，讓使用者自己選最方便的。未來要加新的登入方式，只要在 Supabase Dashboard 開一個 Provider，不需要改後端程式碼。
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- PLATFORM PROTECTION -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">平台層級保護（零程式碼）</div>
+  <div class="card plan-slate">
+    <div class="plan-header">
+      <div class="plan-icon">&#128737;</div>
+      <div>
+        <h2>不改程式碼的替代方案</h2>
+        <div class="plan-label">由外部平台在應用層之外攔截</div>
+      </div>
+    </div>
+
+    <p>除了在應用內實作驗證，也可以在「請求到達你的 App 之前」就擋住未授權的人，完全不需要修改程式碼。</p>
+
+    <div class="method-grid">
+      <div class="method-item">
+        <span class="method-badge badge-gray">Vercel 內建</span>
+        <h4>Vercel Password Protection</h4>
+        <p>Vercel Pro Plan（$20/月）→ Settings → Password Protection → 開啟。整個網站（含所有 API routes）都被保護，訪客會看到 Vercel 原生的密碼頁。本質上和方案一類似，但零程式碼。</p>
+      </div>
+      <div class="method-item">
+        <span class="method-badge badge-blue">網路層攔截</span>
+        <h4>Cloudflare Access（Zero Trust）</h4>
+        <p>把網站放到 Cloudflare 後面，在網路層攔截未授權請求。可設定 email 白名單、Google 登入、甚至企業 SSO。免費額度 50 人。需要把 DNS 搬到 Cloudflare。</p>
+      </div>
+    </div>
+
+    <div class="when-to-use">
+      <div class="label">適用時機</div>
+      <p>不想改程式碼、或者想在應用層驗證之外再多一層防護。Vercel Password Protection 適合臨時保護；Cloudflare Access 適合長期、安全性要求高的場景。</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- OTHER LOGIN PROVIDERS -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">其他第三方登入選項</div>
+  <div class="card plan-indigo">
+    <p>如果選擇 Supabase Auth 作為驗證底層，除了 Google 之外，還可以開啟以下第三方登入。在 Supabase Dashboard 開啟 Provider 即可，後端驗證邏輯完全不用改。</p>
+
+    <table class="specs-table">
+      <tr>
+        <td style="font-weight: 700; color: #06C755;">LINE Login</td>
+        <td>台灣團隊幾乎人人有 LINE，登入門檻最低</td>
+      </tr>
+      <tr>
+        <td style="font-weight: 700; color: #0078D4;">Microsoft / Azure AD</td>
+        <td>公司使用 Microsoft 365 時，員工可以用公司帳號直接登入</td>
+      </tr>
+      <tr>
+        <td style="font-weight: 700; color: #24292F;">GitHub</td>
+        <td>技術團隊適用，開發者都有 GitHub 帳號</td>
+      </tr>
+      <tr>
+        <td style="font-weight: 700; color: #4267B2;">Facebook</td>
+        <td>消費端使用者常用，但企業內部較少用</td>
+      </tr>
+    </table>
+
+    <div class="note">
+      <strong>可以混搭：</strong>Supabase Auth 允許同時開啟多個 Provider。例如同時開啟 Google + LINE，使用者在登入頁自己選。所有 Provider 登入後都拿到同一種 JWT，後端驗證邏輯不變。
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- COMPARISON -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">三方案總覽比較</div>
+  <div class="card" style="overflow-x: auto;">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>方案一：靜態密碼</th>
+          <th>方案二：Google + 白名單</th>
+          <th>方案三：Google + Supabase</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>實作時間</td>
+          <td class="highlight">~30 分鐘</td>
+          <td>~3&ndash;4 小時</td>
+          <td>~半天</td>
+        </tr>
+        <tr>
+          <td>外部服務</td>
+          <td class="highlight">無</td>
+          <td>Google Cloud</td>
+          <td>Google Cloud + Supabase</td>
+        </tr>
+        <tr>
+          <td>資料庫</td>
+          <td class="highlight">不需要</td>
+          <td class="highlight">不需要</td>
+          <td>需要（Supabase 免費）</td>
+        </tr>
+        <tr>
+          <td>辨識使用者</td>
+          <td>不能</td>
+          <td>能（email）</td>
+          <td class="highlight">能（email + profile）</td>
+        </tr>
+        <tr>
+          <td>角色管理</td>
+          <td>無</td>
+          <td>無</td>
+          <td class="highlight">有（自訂角色）</td>
+        </tr>
+        <tr>
+          <td>加人 / 移除人</td>
+          <td>改密碼通知所有人</td>
+          <td>改環境變數 + 重新部署</td>
+          <td class="highlight">改 DB，即時生效</td>
+        </tr>
+        <tr>
+          <td>追蹤用量</td>
+          <td>不能</td>
+          <td>不能</td>
+          <td class="highlight">能</td>
+        </tr>
+        <tr>
+          <td>安全性</td>
+          <td>低</td>
+          <td>中</td>
+          <td class="highlight">高</td>
+        </tr>
+        <tr>
+          <td>維護成本</td>
+          <td class="highlight">極低</td>
+          <td>低</td>
+          <td>中</td>
+        </tr>
+        <tr>
+          <td>適合人數</td>
+          <td>1&ndash;3 人</td>
+          <td>3&ndash;15 人</td>
+          <td class="highlight">10+ 人</td>
+        </tr>
+        <tr>
+          <td>擴展性</td>
+          <td>低</td>
+          <td>低</td>
+          <td class="highlight">高</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- ROADMAP -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">建議的升級路徑</div>
+  <div class="card">
+    <p>如果不確定要選哪個，可以分階段升級。每一階段都可以獨立運作，往下一階段升級時直接替換驗證邏輯，不影響其他功能。</p>
+    <div class="roadmap">
+      <div class="roadmap-step r1">
+        <div class="step-label">Phase 1 &middot; 現在</div>
+        <h4>靜態密碼</h4>
+        <p>先保護起來，30 分鐘上線。適合開發和內部初期測試階段。</p>
+      </div>
+      <div class="roadmap-step r2">
+        <div class="step-label">Phase 2 &middot; 試用期</div>
+        <h4>Google + 白名單</h4>
+        <p>電商部門開始試用時升級，知道誰在用，不需要額外基礎設施。</p>
+      </div>
+      <div class="roadmap-step r3">
+        <div class="step-label">Phase 3 &middot; 正式推廣</div>
+        <h4>Google + Supabase</h4>
+        <p>需要管理更多人、追蹤用量、區分角色時再升級到完整方案。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>內部工具存取控制方案評估 &middot; 內部討論用文件</p>
+  <p style="margin-top: 6px;"><a href="index.html">返回文件列表</a></p>
+</footer>
+
+</body>
+</html>
