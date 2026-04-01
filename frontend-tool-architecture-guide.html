@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小工具架構選型指南</title>
+  <style>
+    :root {
+      --text-primary: #1a1a2e;
+      --text-secondary: #4a4a68;
+      --text-muted: #7a7a96;
+      --bg-page: #f5f6fa;
+      --bg-card: #ffffff;
+      --bg-code: #f0f1f5;
+      --border: #e2e4ea;
+      --accent: #2563eb;
+      --accent-light: #eff4ff;
+      --green: #16a34a;
+      --green-light: #f0fdf4;
+      --orange: #ea580c;
+      --orange-light: #fff7ed;
+      --red: #dc2626;
+      --red-light: #fef2f2;
+      --purple: #7c3aed;
+      --purple-light: #f5f3ff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      font-size: 17px;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 48px 32px 80px; }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header .back { display: inline-block; font-size: 14px; color: var(--text-muted); text-decoration: none; margin-bottom: 20px; }
+    .header .back:hover { color: var(--accent); }
+    .header .badge { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: 15px; font-weight: 600; padding: 6px 18px; border-radius: 100px; margin-bottom: 16px; }
+    .header h1 { font-size: 34px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em; }
+    .header .subtitle { font-size: 18px; color: var(--text-muted); }
+    .header .date { font-size: 15px; color: var(--text-muted); margin-top: 8px; }
+
+    /* Executive summary */
+    .exec-summary {
+      background: linear-gradient(135deg, #1e293b 0%, #1a1a2e 100%);
+      border-radius: 12px;
+      padding: 36px 40px;
+      margin-bottom: 24px;
+      color: #e2e8f0;
+    }
+    .exec-summary .es-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 14px;
+    }
+    .exec-summary h2 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+    .exec-summary p { font-size: 16px; color: #cbd5e1; line-height: 1.8; margin-bottom: 10px; }
+    .exec-summary p:last-child { margin-bottom: 0; }
+    .exec-summary strong { color: #fff; }
+
+    /* Section */
+    .section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 36px 40px; margin-bottom: 24px; }
+    .section-label { display: inline-block; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 12px; border-radius: 100px; margin-bottom: 14px; }
+    .section-label.concept { background: var(--accent-light); color: var(--accent); }
+    .section-label.decision { background: var(--purple-light); color: var(--purple); }
+    .section-label.pattern { background: var(--orange-light); color: var(--orange); }
+    .section-label.faq { background: var(--green-light); color: var(--green); }
+    .section h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.01em; }
+    .section h3 { font-size: 18px; font-weight: 600; margin-top: 28px; margin-bottom: 12px; color: var(--text-primary); }
+    .section p { font-size: 17px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.8; }
+
+    /* Two questions highlight */
+    .two-questions { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    @media (max-width: 640px) { .two-questions { grid-template-columns: 1fr; } }
+    .question-card { background: var(--bg-page); border: 2px solid var(--accent); border-radius: 12px; padding: 20px 24px; }
+    .question-card .q-num { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.04em; margin-bottom: 6px; }
+    .question-card p { font-size: 17px; font-weight: 600; color: var(--text-primary); margin: 0; }
+
+    /* Decision tree */
+    .dtree { background: var(--bg-code); border-radius: 10px; padding: 28px 32px; margin: 20px 0; font-family: "SF Mono", "Fira Code", monospace; font-size: 15px; line-height: 2.2; overflow-x: auto; white-space: pre; color: var(--text-secondary); }
+    .dtree .q { color: var(--accent); font-weight: 700; }
+    .dtree .yes { color: var(--green); font-weight: 600; }
+    .dtree .no { color: var(--red); font-weight: 600; }
+    .dtree .result { color: var(--orange); font-weight: 600; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 16px; }
+    th { text-align: left; padding: 12px 16px; background: var(--bg-code); font-weight: 600; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .tag { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .tag.yes { background: var(--green-light); color: var(--green); }
+    .tag.no { background: var(--red-light); color: var(--red); }
+    .tag.opt { background: var(--orange-light); color: var(--orange); }
+
+    /* Three cards */
+    .framework-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 20px 0; }
+    @media (max-width: 640px) { .framework-grid { grid-template-columns: 1fr; } }
+    .fw-card { border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; }
+    .fw-card.rec { border-color: var(--accent); background: var(--accent-light); }
+    .fw-card .fw-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 6px; }
+    .fw-card.rec .fw-label { color: var(--accent); }
+    .fw-card h4 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+    .fw-card ul { padding-left: 18px; font-size: 15px; color: var(--text-secondary); line-height: 1.8; }
+
+    /* Arch diagram */
+    .arch { background: var(--bg-code); border-radius: 10px; padding: 24px 28px; margin: 20px 0; font-family: "SF Mono", "Fira Code", monospace; font-size: 15px; line-height: 2.1; overflow-x: auto; white-space: pre; color: var(--text-secondary); }
+    .arch .arrow { color: var(--accent); }
+    .arch .step { color: var(--orange); font-weight: 600; }
+    .arch .result { color: var(--green); font-weight: 600; }
+
+    /* Code comparison */
+    .code-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    @media (max-width: 640px) { .code-compare { grid-template-columns: 1fr; } }
+    .code-block-wrap { }
+    .code-block-label { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .code-block { background: #1e293b; color: #e2e8f0; padding: 20px 22px; border-radius: 10px; font-family: "SF Mono", "Fira Code", monospace; font-size: 14px; line-height: 1.8; overflow-x: auto; white-space: pre; }
+    .code-block .comment { color: #64748b; }
+    .code-block .kw { color: #7dd3fc; }
+    .code-block .str { color: #86efac; }
+
+    /* Callout */
+    .callout { border-radius: 10px; padding: 18px 22px; margin: 18px 0; font-size: 16px; display: flex; gap: 12px; align-items: flex-start; }
+    .callout.info { background: var(--accent-light); border: 1px solid #bfdbfe; color: #1e40af; }
+    .callout.success { background: var(--green-light); border: 1px solid #bbf7d0; color: #166534; }
+    .callout.warning { background: var(--orange-light); border: 1px solid #fed7aa; color: #9a3412; }
+    .callout .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .callout .content { flex: 1; }
+    .callout strong { display: block; margin-bottom: 2px; }
+
+    /* FAQ */
+    .faq-item { border-bottom: 1px solid var(--border); padding: 22px 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-item .faq-q { font-size: 17px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; display: flex; gap: 10px; align-items: flex-start; }
+    .faq-item .faq-q .q-badge { background: var(--accent-light); color: var(--accent); font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 6px; flex-shrink: 0; margin-top: 2px; }
+    .faq-item .faq-a { font-size: 16px; color: var(--text-secondary); line-height: 1.8; padding-left: 34px; }
+
+    .footer { text-align: center; padding: 40px 0 0; font-size: 15px; color: var(--text-muted); }
+    .footer a { color: var(--text-muted); text-decoration: none; }
+    .footer a:hover { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .container { padding: 32px 20px 60px; }
+      .header h1 { font-size: 26px; }
+      .section { padding: 24px 20px; }
+      .exec-summary { padding: 24px 20px; }
+      .dtree { font-size: 13px; padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <a class="back" href="index.html">← 返回 Comms Docs</a><br>
+    <span class="badge">Internal Knowledge</span>
+    <h1>小工具架構選型指南</h1>
+    <div class="subtitle">資料來源、框架、部署平台與資料庫的選擇邏輯</div>
+    <div class="date">2026-04-01</div>
+  </div>
+
+  <!-- Executive Summary -->
+  <div class="exec-summary">
+    <div class="es-label">TL;DR</div>
+    <h2>兩個問題決定一切</h2>
+    <p><strong>① API Key 需要保密嗎？</strong> → 是的話就需要後端（Next.js），否則純前端就夠。</p>
+    <p><strong>② 資料需要跨用戶共享或持久儲存嗎？</strong> → 是的話才需要資料庫（Supabase），否則不需要。</p>
+    <p>大多數內部小工具，這兩個問題的答案都是「否」，靜態網頁或純前端 SPA 完全夠用。</p>
+  </div>
+
+  <!-- 三種資料來源 -->
+  <div class="section">
+    <div class="section-label concept">資料來源</div>
+    <h2>三種常見情境</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>情境</th>
+            <th>說明</th>
+            <th>Key 需保密？</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><strong>自己上傳資料</strong></td>
+            <td>手動匯出 CSV/XLSX，前處理後嵌入工具顯示</td>
+            <td><span class="tag no">否</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><strong>串接第三方 API</strong></td>
+            <td>例如 Mailchimp、HubSpot，需要 API Key</td>
+            <td><span class="tag yes">是</span></td>
+          </tr>
+          <tr>
+            <td>3a</td>
+            <td><strong>Google Sheet（公開）</strong></td>
+            <td>Sheet 設為公開可讀，直接 fetch</td>
+            <td><span class="tag no">否</span></td>
+          </tr>
+          <tr>
+            <td>3b</td>
+            <td><strong>Google Sheet（私人）</strong></td>
+            <td>需要 OAuth / Service Account 認證</td>
+            <td><span class="tag yes">是</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 框架選擇 -->
+  <div class="section">
+    <div class="section-label concept">框架</div>
+    <h2>三種框架的定位</h2>
+
+    <div class="framework-grid">
+      <div class="fw-card">
+        <div class="fw-label">最輕量</div>
+        <h4>靜態 HTML</h4>
+        <ul>
+          <li>單一 .html 檔案</li>
+          <li>零 build step</li>
+          <li>資料內嵌在 JS</li>
+          <li>單人維護最省力</li>
+        </ul>
+      </div>
+      <div class="fw-card">
+        <div class="fw-label">純前端</div>
+        <h4>Vite + React SPA</h4>
+        <ul>
+          <li>元件化，邏輯清楚</li>
+          <li>需要 build 打包</li>
+          <li>適合互動複雜工具</li>
+          <li>多人協作更好維護</li>
+        </ul>
+      </div>
+      <div class="fw-card">
+        <div class="fw-label">需要後端</div>
+        <h4>Next.js</h4>
+        <ul>
+          <li>API Routes 藏住 Key</li>
+          <li>Vercel 原生整合</li>
+          <li>支援 SSR / 動態路由</li>
+          <li>適合需要保密憑證</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="icon">💡</span>
+      <div class="content">
+        <strong>靜態 HTML vs Vite + React SPA</strong>
+        兩者概念相同（純前端、零後端），差別在於有無框架帶來的元件化與自動 re-render。靜態 HTML 是「手工 SPA」，自己實作了狀態管理和畫面更新。
+      </div>
+    </div>
+  </div>
+
+  <!-- 決策樹 -->
+  <div class="section">
+    <div class="section-label decision">決策樹</div>
+    <h2>架構選型流程</h2>
+
+    <div class="two-questions">
+      <div class="question-card">
+        <div class="q-num">核心問題 ①</div>
+        <p>API Key 需要保密嗎？</p>
+      </div>
+      <div class="question-card">
+        <div class="q-num">核心問題 ②</div>
+        <p>資料需要跨用戶共享或持久儲存嗎？</p>
+      </div>
+    </div>
+
+    <div class="dtree"><span class="q">有 API Key 需要保密？</span>
+├── <span class="no">否</span> → <span class="result">純前端（靜態 HTML 或 Vite + React）</span>
+└── <span class="yes">是</span> → <span class="result">需要後端（Next.js / Vercel Serverless Function）</span>
+          │
+          <span class="q">資料需要持久儲存或跨用戶？</span>
+          ├── <span class="no">否</span> → <span class="result">只要後端 Function，不需要 DB</span>
+          └── <span class="yes">是</span> → <span class="result">加 Supabase（資料庫）</span></div>
+
+    <h3>情境對應表</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>情境</th>
+            <th>建議框架</th>
+            <th>需要後端</th>
+            <th>需要 DB</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>自己上傳資料</td>
+            <td>靜態 HTML</td>
+            <td><span class="tag no">❌</span></td>
+            <td><span class="tag no">❌</span></td>
+          </tr>
+          <tr>
+            <td>串接第三方 API（Key 需保密）</td>
+            <td>Next.js</td>
+            <td><span class="tag yes">✅ API Route</span></td>
+            <td><span class="tag no">❌</span></td>
+          </tr>
+          <tr>
+            <td>Google Sheet 公開可讀</td>
+            <td>Vite + React</td>
+            <td><span class="tag no">❌</span></td>
+            <td><span class="tag no">❌</span></td>
+          </tr>
+          <tr>
+            <td>Google Sheet 私人（需 OAuth）</td>
+            <td>Next.js</td>
+            <td><span class="tag yes">✅ API Route</span></td>
+            <td><span class="tag no">❌</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 什麼時候需要 DB -->
+  <div class="section">
+    <div class="section-label decision">資料庫</div>
+    <h2>什麼時候需要 Supabase？</h2>
+
+    <p>有「<strong>寫入</strong>」或「<strong>多用戶差異化</strong>」的需求才需要 DB。只是「讀取 + 顯示」通常不需要。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>需求</th><th>需要 DB？</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>只有自己或固定人員看，資料自己管理</td><td><span class="tag no">❌ 不需要</span></td></tr>
+          <tr><td>抓 API 資料即時顯示，不需留存</td><td><span class="tag no">❌ 不需要</span></td></tr>
+          <tr><td>「給同事看」但資料由你統一管理</td><td><span class="tag no">❌ 不需要</span></td></tr>
+          <tr><td>多個用戶各自有帳號和資料</td><td><span class="tag yes">✅ 需要</span></td></tr>
+          <tr><td>需要記錄歷史、累積用戶行為</td><td><span class="tag yes">✅ 需要</span></td></tr>
+          <tr><td>用戶可以寫入（留言、表單送出）</td><td><span class="tag yes">✅ 需要</span></td></tr>
+          <tr><td>不同用戶看到不同內容</td><td><span class="tag yes">✅ 需要</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warning">
+      <span class="icon">⚠️</span>
+      <div class="content">
+        <strong>常見誤解</strong>
+        「給多人看」不等於需要資料庫。「多人看」只是讀取，只要所有人看到同一份資料，靜態網頁完全夠用。需要 DB 的是「多人寫入」或「每個人看到不同資料」。
+      </div>
+    </div>
+  </div>
+
+  <!-- 部署平台 -->
+  <div class="section">
+    <div class="section-label concept">部署</div>
+    <h2>部署平台選擇</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>平台</th><th>最適合</th><th>特點</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Cloudflare Pages</strong></td>
+            <td>靜態 HTML、Vite SPA</td>
+            <td>免費、全球 CDN、無流量上限，純靜態首選</td>
+          </tr>
+          <tr>
+            <td><strong>Vercel</strong></td>
+            <td>Next.js、Vite SPA</td>
+            <td>Next.js 原生支援、Serverless Function 整合簡單</td>
+          </tr>
+          <tr>
+            <td><strong>GitHub Pages</strong></td>
+            <td>靜態 HTML</td>
+            <td>最簡單，功能最少</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout info">
+      <span class="icon">💡</span>
+      <div class="content">Vercel 的優勢是 Next.js 生態系。純靜態網頁不需要搬到 Vercel，Cloudflare Pages 無流量限制且速度更快。</div>
+    </div>
+  </div>
+
+  <!-- Git-based CMS -->
+  <div class="section">
+    <div class="section-label pattern">架構模式</div>
+    <h2>Git-based CMS</h2>
+
+    <p>當靜態網頁需要「可更新的資料」時，透過 GitHub API 寫入 commit 觸發自動部署，就是 Git-based CMS 模式。</p>
+
+    <div class="arch"><span class="step">Admin UI 操作資料</span>
+<span class="arrow">      ↓</span>
+GitHub API（Personal Access Token 認證）
+<span class="arrow">      ↓</span>
+push commit 到 repo
+<span class="arrow">      ↓</span>
+Cloudflare Pages 偵測變更自動部署
+<span class="arrow">      ↓</span>
+<span class="result">網站更新（約 30 秒）</span></div>
+
+    <h3>優缺點</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>優點</th><th>限制</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>零後端成本</td>
+            <td>PAT 若外洩有風險（存 sessionStorage 可降低風險）</td>
+          </tr>
+          <tr>
+            <td>每次更新都有 git commit，天然版本控制</td>
+            <td>更新速度取決於部署時間（約 30 秒）</td>
+          </tr>
+          <tr>
+            <td>可一鍵回滾資料</td>
+            <td>不適合高頻寫入（例如每分鐘更新）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 15px;">市場上的同類產品：Netlify CMS、Tina CMS、Forestry</p>
+  </div>
+
+  <!-- 資料獨立 -->
+  <div class="section">
+    <div class="section-label pattern">最佳實踐</div>
+    <h2>資料獨立成 data.js</h2>
+
+    <p>當靜態 HTML 隨著資料累積開始變得難以瀏覽時，最小改動是將資料拆分到獨立的 <code>data.js</code>，概念完全相同但關注點分離。</p>
+
+    <div class="code-compare">
+      <div class="code-block-wrap">
+        <div class="code-block-label">現在（資料混在一起）</div>
+        <div class="code-block"><span class="comment">// index.html</span>
+&lt;script&gt;
+<span class="kw">const</span> SEED_DATA = [
+  <span class="comment">/* 所有資料 */</span>
+];
+
+<span class="comment">// 幾千行 UI 邏輯...</span>
+&lt;/script&gt;</div>
+      </div>
+      <div class="code-block-wrap">
+        <div class="code-block-label">拆分後（更乾淨）</div>
+        <div class="code-block"><span class="comment">// data.js（只放資料）</span>
+<span class="kw">const</span> SEED_DATA = [
+  <span class="comment">/* 所有資料 */</span>
+];
+
+<span class="comment">// index.html 引入</span>
+&lt;script src=<span class="str">"data.js"</span>&gt;&lt;/script&gt;
+&lt;script&gt;
+  <span class="comment">// UI 邏輯，不動</span>
+&lt;/script&gt;</div>
+      </div>
+    </div>
+
+    <div class="callout success">
+      <span class="icon">✅</span>
+      <div class="content">不需要換任何框架或工具。改動極小，但讓「更新資料」和「修改邏輯」完全分開，Git diff 更清楚。</div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section">
+    <div class="section-label faq">FAQ</div>
+    <h2>常見問題</h2>
+
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-badge">Q</span>給同事看是不是就需要資料庫？</div>
+      <div class="faq-a">不需要。「多人看」只是讀取動作，只要所有人看到同一份資料，靜態網頁完全夠用。需要 DB 的是「多人寫入」或「每個人看到不同資料」的情境。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-badge">Q</span>一定要用 React/Vue 才算正規？</div>
+      <div class="faq-a">不是。框架是為了解決複雜度與團隊協作問題。單人維護、互動簡單的工具，手寫 JS 反而維護成本更低，不是「將就」，是正確選擇。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-badge">Q</span>Vercel 比 Cloudflare Pages 更好？</div>
+      <div class="faq-a">不是絕對的。Vercel 的優勢是 Next.js 生態系。純靜態網頁用 Cloudflare Pages 更合適（無流量限制、全球 CDN、速度也快）。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-badge">Q</span>資料內嵌在 JS 是標準做法嗎？</div>
+      <div class="faq-a">不算標準做法，但對「單人維護、資料量小、單一用途」的工具來說是最合適的做法。業界標準是為了解決團隊協作與大量資料的問題，在不符合這些前提時套用反而是過度設計。</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <a href="index.html">← 返回 Comms Docs</a><br><br>
+    Internal Knowledge — 2026-04-01
+  </div>
+
+</div>
+</body>
+</html>
