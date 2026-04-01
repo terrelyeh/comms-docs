@@ -72,17 +72,31 @@
     .section-label.concept { background: var(--accent-light); color: var(--accent); }
     .section-label.decision { background: var(--purple-light); color: var(--purple); }
     .section-label.pattern { background: var(--orange-light); color: var(--orange); }
+    .section-label.auth { background: #fdf2f8; color: #9d174d; }
     .section-label.faq { background: var(--green-light); color: var(--green); }
     .section h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.01em; }
     .section h3 { font-size: 18px; font-weight: 600; margin-top: 28px; margin-bottom: 12px; color: var(--text-primary); }
     .section p { font-size: 17px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.8; }
 
-    /* Two questions highlight */
-    .two-questions { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    /* Core questions highlight */
+    .two-questions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 20px 0; }
     @media (max-width: 640px) { .two-questions { grid-template-columns: 1fr; } }
     .question-card { background: var(--bg-page); border: 2px solid var(--accent); border-radius: 12px; padding: 20px 24px; }
     .question-card .q-num { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.04em; margin-bottom: 6px; }
     .question-card p { font-size: 17px; font-weight: 600; color: var(--text-primary); margin: 0; }
+
+    /* Auth method cards */
+    .auth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    @media (max-width: 640px) { .auth-grid { grid-template-columns: 1fr; } }
+    .auth-card { border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; }
+    .auth-card.danger { border-color: #fca5a5; background: var(--red-light); }
+    .auth-card .auth-level { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .auth-card h4 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+    .auth-card .auth-meta { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+    .auth-card .auth-meta span { font-size: 14px; color: var(--text-secondary); }
+    .auth-card .auth-meta strong { color: var(--text-primary); }
+    .auth-card .use-case { font-size: 14px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 4px; line-height: 1.7; }
+    .auth-card.danger .use-case { border-top-color: #fca5a5; }
 
     /* Decision tree */
     .dtree { background: var(--bg-code); border-radius: 10px; padding: 28px 32px; margin: 20px 0; font-family: "SF Mono", "Fira Code", monospace; font-size: 15px; line-height: 2.2; overflow-x: auto; white-space: pre; color: var(--text-secondary); }
@@ -283,6 +297,10 @@
         <div class="q-num">核心問題 ②</div>
         <p>資料需要跨用戶共享或持久儲存嗎？</p>
       </div>
+      <div class="question-card">
+        <div class="q-num">核心問題 ③</div>
+        <p>需要控制誰能存取這個工具嗎？</p>
+      </div>
     </div>
 
     <div class="dtree"><span class="q">有 API Key 需要保密？</span>
@@ -481,6 +499,155 @@ Cloudflare Pages 偵測變更自動部署
     <div class="callout success">
       <span class="icon">✅</span>
       <div class="content">不需要換任何框架或工具。改動極小，但讓「更新資料」和「修改邏輯」完全分開，Git diff 更清楚。</div>
+    </div>
+  </div>
+
+  <!-- 使用者管理 -->
+  <div class="section">
+    <div class="section-label auth">使用者管理</div>
+    <h2>五種存取控制方式</h2>
+    <p>選擇使用者管理方式的核心問題只有兩個：<strong>需要知道「誰」在登入嗎？</strong> 以及 <strong>不同人需要看到不同內容嗎？</strong></p>
+
+    <div class="auth-grid">
+      <div class="auth-card">
+        <div class="auth-level" style="color:#16a34a;">方式 1 — 最簡單</div>
+        <h4>🔑 共用密碼</h4>
+        <div class="auth-meta">
+          <span><strong>安全性：</strong>低</span>
+          <span><strong>開發成本：</strong>極低，30 分鐘內完成</span>
+          <span><strong>需要後端：</strong>否</span>
+        </div>
+        <div class="use-case">
+          <strong>適合情境</strong><br>
+          純內部工具，使用者都是你信任的同事，不需要知道「誰」在看，只要擋住外人。<br><br>
+          <strong>注意</strong>：密碼一旦外流就全完，且無法單獨撤銷某人的存取權。
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-level" style="color:#2563eb;">方式 2 — 推薦首選</div>
+        <h4>🛡️ 平台層保護</h4>
+        <div class="auth-meta">
+          <span><strong>代表工具：</strong>Cloudflare Access、Vercel Password</span>
+          <span><strong>安全性：</strong>中高</span>
+          <span><strong>開發成本：</strong>極低，不改任何 code</span>
+          <span><strong>需要後端：</strong>否</span>
+        </div>
+        <div class="use-case">
+          <strong>適合情境</strong><br>
+          靜態網頁想要加 Google Login + email 白名單，但不想動程式碼。Cloudflare Access 在流量進來前攔截，完全不改 app。<br><br>
+          <strong>限制</strong>：所有通過驗證的人看到的內容完全一樣，無法區分權限。
+        </div>
+      </div>
+
+      <div class="auth-card danger">
+        <div class="auth-level" style="color:#dc2626;">方式 3 — 不推薦</div>
+        <h4>⚠️ Social Login + 前端白名單</h4>
+        <div class="auth-meta">
+          <span><strong>安全性：</strong>低（假安全）</span>
+          <span><strong>開發成本：</strong>低</span>
+          <span><strong>需要後端：</strong>否</span>
+        </div>
+        <div class="use-case">
+          <strong>為何不推薦</strong><br>
+          白名單寫在 JS 裡，任何人打開 DevTools 都看得到，可以直接繞過。有 Google Login 的外觀，但沒有實質安全性。<br><br>
+          若一定要純前端實作，只適合「資料本身不敏感」的場景。
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-level" style="color:#7c3aed;">方式 4 — 正式做法</div>
+        <h4>✅ Social Login + 後端白名單</h4>
+        <div class="auth-meta">
+          <span><strong>代表工具：</strong>Supabase Auth、Firebase Auth</span>
+          <span><strong>安全性：</strong>高</span>
+          <span><strong>開發成本：</strong>中</span>
+          <span><strong>需要後端：</strong>是</span>
+        </div>
+        <div class="use-case">
+          <strong>適合情境</strong><br>
+          需要確保只有指定人員可以存取，且能動態新增 / 移除用戶。白名單在 server 端，無法被繞過。<br><br>
+          所有授權用戶看到的內容相同，適合「統一視圖」的工具。
+        </div>
+      </div>
+
+      <div class="auth-card" style="grid-column: span 2;">
+        <div class="auth-level" style="color:#ea580c;">方式 5 — 最完整</div>
+        <h4>👥 Social Login + 角色權限管理</h4>
+        <div class="auth-meta" style="flex-direction: row; flex-wrap: wrap; gap: 16px;">
+          <span><strong>代表工具：</strong>Next.js + Supabase（users + roles table）</span>
+          <span><strong>安全性：</strong>高</span>
+          <span><strong>開發成本：</strong>高</span>
+          <span><strong>需要後端：</strong>是</span>
+          <span><strong>需要 DB：</strong>是</span>
+        </div>
+        <div class="use-case">
+          <strong>適合情境</strong><br>
+          不同用戶有不同權限（管理員 vs 一般用戶）、不同部門看不同資料、需要精細控制誰能做什麼。這是 SaaS 產品的標準做法。<br><br>
+          <strong>何時才需要走到這一步</strong>：當「所有人看到同樣的東西」已經無法滿足需求時。
+        </div>
+      </div>
+    </div>
+
+    <h3>使用者管理決策樹</h3>
+    <div class="dtree"><span class="q">需要存取控制？</span>
+├── <span class="no">否</span> → <span class="result">不需要任何 auth，直接公開</span>
+└── <span class="yes">是</span> → <span class="q">需要知道「誰」在登入？</span>
+          ├── <span class="no">否（只要擋住陌生人）</span>
+          │     └── <span class="q">需要 Google Login 體驗？</span>
+          │           ├── <span class="no">否</span> → <span class="result">共用密碼</span>
+          │           └── <span class="yes">是</span> → <span class="result">平台層保護（Cloudflare Access）</span>
+          └── <span class="yes">是（需要識別用戶）</span>
+                └── <span class="q">不同人看到不同內容 / 不同權限？</span>
+                      ├── <span class="no">否</span> → <span class="result">Social Login + 後端白名單</span>
+                      └── <span class="yes">是</span> → <span class="result">Social Login + 角色權限 + DB</span></div>
+
+    <h3>框架 × 使用者管理組合表</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>工具情境</th>
+            <th>框架</th>
+            <th>推薦 Auth 方式</th>
+            <th>需要 DB</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>個人工具，不需要控制</td>
+            <td>靜態 HTML</td>
+            <td>無</td>
+            <td><span class="tag no">❌</span></td>
+          </tr>
+          <tr>
+            <td>內部工具，擋住外人即可</td>
+            <td>靜態 HTML</td>
+            <td>平台層保護（Cloudflare Access）</td>
+            <td><span class="tag no">❌</span></td>
+          </tr>
+          <tr>
+            <td>內部工具，需要知道誰在用</td>
+            <td>Next.js</td>
+            <td>Social Login + 後端白名單</td>
+            <td><span class="tag no">❌</span></td>
+          </tr>
+          <tr>
+            <td>多人工具，不同人看不同資料</td>
+            <td>Next.js + Supabase</td>
+            <td>Social Login + 角色權限</td>
+            <td><span class="tag yes">✅</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout info">
+      <span class="icon">💡</span>
+      <div class="content">
+        <strong>靜態網頁也能有 Google Login</strong>
+        透過 Cloudflare Access（免費，支援最多 50 位用戶），不需要改任何程式碼，就能在靜態網頁前面加上 Google OAuth + email 白名單驗證。這是靜態網頁存取控制的最佳解。
+      </div>
     </div>
   </div>
 
