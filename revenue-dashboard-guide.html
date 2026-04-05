@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MINGCHU 營收儀表板使用指南</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand-1: #F59E0B;
+      --brand-2: #F97316;
+      --brand-3: #EF4444;
+      --bg: #F5F3F0;
+      --card: #FFFFFF;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-tertiary: #64748B;
+      --ring: rgba(15, 23, 42, 0.06);
+      --teal: #0D9488;
+      --teal-light: #F0FDFA;
+      --teal-ring: rgba(13, 148, 136, 0.12);
+      --green: #16A34A;
+      --green-bg: #F0FDF4;
+      --red: #DC2626;
+      --red-bg: #FEF2F2;
+      --amber: #D97706;
+      --amber-bg: #FFFBEB;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Header ---- */
+    header { background: #0F172A; position: sticky; top: 0; z-index: 40; }
+    header .inner {
+      max-width: 1120px; margin: 0 auto;
+      padding: 0 32px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header .logo { display: flex; align-items: center; gap: 14px; }
+    header .logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+    }
+    header .logo-icon svg { width: 20px; height: 20px; color: white; }
+    header .brand-name { font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em; }
+    header .brand-sub {
+      font-size: 13px; font-weight: 600; color: var(--teal);
+      margin-left: 10px;
+      background: rgba(13, 148, 136, 0.1);
+      padding: 2px 10px; border-radius: 99px;
+    }
+    header .back-link {
+      font-size: 14px; font-weight: 500; color: #E2E8F0; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      transition: all 0.15s;
+    }
+    header .back-link:hover { background: rgba(255,255,255,0.12); color: #FFFFFF; }
+    .accent-line { height: 3px; background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3)); }
+
+    /* ---- Hero ---- */
+    .hero { max-width: 1120px; margin: 0 auto; padding: 64px 32px 48px; }
+    .hero h1 {
+      font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #c99700, #D97706);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      font-size: 19px; color: var(--text-secondary); max-width: 720px; line-height: 1.8;
+    }
+    .hero .meta {
+      font-size: 14px; color: var(--text-tertiary); margin-top: 12px;
+    }
+
+    /* ---- Sections ---- */
+    .section { max-width: 1120px; margin: 0 auto; padding: 0 32px 56px; }
+    .section-title {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 24px;
+    }
+
+    /* ---- Cards ---- */
+    .card {
+      background: var(--card); border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      outline: 1px solid var(--ring);
+      padding: 40px; margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 24px; font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .card h3 {
+      font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+      margin-bottom: 8px; margin-top: 32px;
+    }
+    .card h3:first-child { margin-top: 0; }
+    .card p { color: var(--text-secondary); margin-bottom: 14px; font-size: 17px; }
+    .card p:last-child { margin-bottom: 0; }
+    .card ul { list-style: none; padding: 0; margin: 14px 0; }
+    .card ul li {
+      font-size: 17px; color: var(--text-secondary); line-height: 1.7;
+      padding: 4px 0 4px 24px; position: relative;
+    }
+    .card ul li::before {
+      content: ""; position: absolute; left: 0;
+      color: var(--teal); font-weight: 700;
+    }
+
+    /* ---- Plan Header ---- */
+    .plan-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 20px;
+    }
+    .plan-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .plan-header h2 { margin-bottom: 0; }
+    .plan-header .plan-label {
+      font-size: 13px; font-weight: 600; margin-top: 2px;
+    }
+    .plan-blue .plan-icon { background: #EFF6FF; }
+    .plan-blue .plan-label { color: #1D4ED8; }
+    .plan-green .plan-icon { background: #F0FDFA; }
+    .plan-green .plan-label { color: #0D9488; }
+    .plan-amber .plan-icon { background: #FFFBEB; }
+    .plan-amber .plan-label { color: #B45309; }
+    .plan-indigo .plan-icon { background: #EEF2FF; }
+    .plan-indigo .plan-label { color: #4F46E5; }
+    .plan-red .plan-icon { background: #FEF2F2; }
+    .plan-red .plan-label { color: #DC2626; }
+    .plan-gold .plan-icon { background: #FFF8E1; }
+    .plan-gold .plan-label { color: #c99700; }
+
+    /* ---- Tables ---- */
+    .specs-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 20px 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden;
+      outline: 1px solid var(--ring);
+    }
+    .specs-table th {
+      background: #F8FAFC; text-align: left; padding: 14px 20px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .specs-table td {
+      padding: 14px 20px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .specs-table tr:last-child td { border-bottom: none; }
+    .specs-table td:first-child {
+      font-weight: 600; color: var(--text-primary); white-space: nowrap;
+    }
+
+    /* ---- Flow Diagram ---- */
+    .flow {
+      background: #F8FAFC; border-radius: 14px; padding: 24px 28px;
+      margin: 20px 0; font-size: 16px; line-height: 2;
+      color: var(--text-secondary);
+      border-left: 4px solid var(--teal);
+    }
+    .flow .arrow { color: var(--teal); font-weight: 700; margin: 0 4px; }
+
+    /* ---- Pipeline Visual ---- */
+    .pipeline {
+      display: flex; gap: 0; margin: 24px 0; flex-wrap: wrap;
+    }
+    .pipeline-stage {
+      flex: 1; min-width: 120px; padding: 16px 12px; text-align: center;
+      position: relative; font-size: 14px; font-weight: 600;
+    }
+    .pipeline-stage .num {
+      font-size: 28px; font-weight: 800; margin-bottom: 4px;
+      display: block;
+    }
+    .pipeline-stage .name { display: block; font-size: 15px; }
+    .pipeline-stage .tag {
+      display: inline-block; margin-top: 8px; padding: 2px 10px;
+      border-radius: 99px; font-size: 12px; font-weight: 700;
+    }
+    .stage-gray { background: #F1F5F9; color: var(--text-tertiary); }
+    .stage-gray .tag { background: #E2E8F0; color: #64748B; }
+    .stage-teal { background: var(--teal-light); color: var(--teal); }
+    .stage-teal .tag { background: rgba(13,148,136,0.15); color: var(--teal); }
+    .stage-green { background: var(--green-bg); color: var(--green); }
+    .stage-green .tag { background: rgba(22,163,74,0.15); color: var(--green); }
+    .stage-arrow {
+      width: 0; height: 0; border-top: 30px solid transparent;
+      border-bottom: 30px solid transparent; border-left: 16px solid;
+      align-self: center; flex-shrink: 0;
+    }
+
+    /* ---- Callout ---- */
+    .callout {
+      border-radius: 14px; padding: 20px 24px; margin: 20px 0;
+      font-size: 16px; line-height: 1.7;
+    }
+    .callout-green { background: var(--green-bg); border-left: 4px solid var(--green); color: #166534; }
+    .callout-red { background: var(--red-bg); border-left: 4px solid var(--red); color: #991B1B; }
+    .callout-amber { background: var(--amber-bg); border-left: 4px solid var(--amber); color: #92400E; }
+    .callout .callout-title { font-weight: 700; margin-bottom: 8px; font-size: 17px; }
+
+    /* ---- Footer ---- */
+    .footer {
+      max-width: 1120px; margin: 0 auto; padding: 48px 32px 64px;
+      text-align: center;
+    }
+    .footer a {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--teal); font-weight: 600; text-decoration: none;
+      padding: 8px 20px; border-radius: 99px;
+      background: var(--teal-light); transition: all 0.15s;
+    }
+    .footer a:hover { background: rgba(13,148,136,0.15); }
+
+    /* ---- RWD ---- */
+    @media (max-width: 640px) {
+      .hero { padding: 40px 20px 32px; }
+      .hero h1 { font-size: 28px; }
+      .hero .subtitle { font-size: 16px; }
+      .section { padding: 0 20px 40px; }
+      .section-title { font-size: 22px; }
+      .card { padding: 24px 20px; border-radius: 16px; }
+      .card h2 { font-size: 20px; }
+      .card h3 { font-size: 16px; }
+      header .inner { padding: 0 16px; }
+      header .brand-sub { display: none; }
+      .specs-table { font-size: 14px; }
+      .specs-table th, .specs-table td { padding: 10px 12px; }
+      .pipeline { flex-direction: column; }
+      .pipeline-stage { min-width: unset; }
+      .stage-arrow { display: none; }
+      .plan-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <span class="brand-name">MINGCHU Revenue</span>
+        <span class="brand-sub">使用指南</span>
+      </div>
+      <a href="index.html" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        返回目錄
+      </a>
+    </div>
+  </header>
+  <div class="accent-line"></div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>營收儀表板<br/><span class="gradient">使用指南</span></h1>
+    <p class="subtitle">資料填寫規則、KPI 計算邏輯、Best Practice — 讓每一筆資料都正確反映在業績數字上。</p>
+    <p class="meta">適用對象：業務、PM、管理者 &mdash; 2026-04-05</p>
+  </div>
+
+  <!-- Section 1: 專案階段 Pipeline -->
+  <div class="section">
+    <h2 class="section-title">專案階段 Pipeline</h2>
+    <div class="card">
+      <p>每個專案依進度選擇對應階段，階段決定是否計入業績 KPI。</p>
+      <div class="pipeline">
+        <div class="pipeline-stage stage-gray">
+          <span class="num">1</span>
+          <span class="name">需求溝通</span>
+          <span class="tag">不計業績</span>
+        </div>
+        <div class="pipeline-stage stage-gray">
+          <span class="num">2</span>
+          <span class="name">簡報提案</span>
+          <span class="tag">不計業績</span>
+        </div>
+        <div class="pipeline-stage stage-teal">
+          <span class="num">3</span>
+          <span class="name">報價提供</span>
+          <span class="tag">計入業績</span>
+        </div>
+        <div class="pipeline-stage stage-teal">
+          <span class="num">4</span>
+          <span class="name">合作確認</span>
+          <span class="tag">計入業績</span>
+        </div>
+        <div class="pipeline-stage stage-teal">
+          <span class="num">5</span>
+          <span class="name">報價簽回</span>
+          <span class="tag">計入業績</span>
+        </div>
+        <div class="pipeline-stage stage-green">
+          <span class="num">6</span>
+          <span class="name">結案</span>
+          <span class="tag">計入業績</span>
+        </div>
+      </div>
+      <p>階段定義儲存在「目標設定」Sheet 的 H / I / J 欄，可隨時新增或調整。修改後儀表板會自動更新。</p>
+    </div>
+  </div>
+
+  <!-- Section 2: 收入類型 -->
+  <div class="section">
+    <h2 class="section-title">收入類型</h2>
+    <div class="card">
+      <p>收入類型代表這筆錢的<strong>確定程度</strong>，與專案階段是獨立的兩個維度。</p>
+      <table class="specs-table">
+        <thead>
+          <tr><th>類型</th><th>代表意義</th><th>何時選用</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>現金收入</td><td>已確認的實際營收</td><td>合約已簽、發票已開、款項已收或確定會收</td></tr>
+          <tr><td>預計現金收入</td><td>高度可能的營收</td><td>報價已提供且客戶有明確意願</td></tr>
+          <tr><td>預估現金收入</td><td>尚在洽談的潛在營收</td><td>正在評估、客戶尚未明確回覆</td></tr>
+          <tr><td>資源交換</td><td>非現金的合作方式</td><td>以服務/資源互換，不涉及金流</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 3: KPI 計算邏輯 -->
+  <div class="section">
+    <h2 class="section-title">KPI 計算邏輯</h2>
+    <div class="card">
+      <div class="plan-header plan-gold">
+        <div class="plan-icon">📊</div>
+        <div>
+          <h2>兩個條件都要過</h2>
+          <div class="plan-label">計入 KPI 的判斷邏輯</div>
+        </div>
+      </div>
+      <div class="flow">
+        <strong>條件 1</strong>：專案階段的「計入業績」= 是（報價提供 以上）<br/>
+        <span class="arrow">+</span><br/>
+        <strong>條件 2</strong>：收入類型 &ne; 資源交換
+      </div>
+      <table class="specs-table">
+        <thead>
+          <tr><th>情境</th><th>專案階段</th><th>收入類型</th><th>計入 KPI？</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>已簽約確認</td><td>報價簽回</td><td>現金收入</td><td style="color:#16A34A;font-weight:700">&#10004; 是</td></tr>
+          <tr><td>已報價洽談中</td><td>報價提供</td><td>預估現金收入</td><td style="color:#16A34A;font-weight:700">&#10004; 是</td></tr>
+          <tr><td>階段太早</td><td>需求溝通</td><td>預估現金收入</td><td style="color:#DC2626;font-weight:700">&#10008; 否</td></tr>
+          <tr><td>資源交換</td><td>合作確認</td><td>資源交換</td><td style="color:#DC2626;font-weight:700">&#10008; 否</td></tr>
+        </tbody>
+      </table>
+
+      <h3>KPI 分類</h3>
+      <table class="specs-table">
+        <thead>
+          <tr><th>KPI 類別</th><th>包含的收入類型</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>確認營收</td><td>現金收入</td><td>已入袋或確定會入袋</td></tr>
+          <tr><td>預估 Pipeline</td><td>預計 + 預估現金收入</td><td>尚在推進中的潛在營收</td></tr>
+          <tr><td>達成率</td><td>確認營收 &divide; 目標</td><td>僅看已確認金額</td></tr>
+          <tr><td>含 Pipeline 達成率</td><td>(確認 + Pipeline) &divide; 目標</td><td>樂觀預估</td></tr>
+        </tbody>
+      </table>
+
+      <h3>目標體系</h3>
+      <p><strong>目標 L</strong>（保守）：基本應達標的水準<br/><strong>目標 H</strong>（積極）：挑戰目標</p>
+      <p>目標值在「目標設定」Sheet 的 A&ndash;F 欄設定，按年度 + 季度。</p>
+    </div>
+  </div>
+
+  <!-- Section 4: 類型與階段對應 -->
+  <div class="section">
+    <h2 class="section-title">類型與階段的合理對應</h2>
+    <div class="card">
+      <p>儀表板會在編輯時自動檢查，當類型與階段不一致時顯示 <span style="color:var(--amber);font-weight:600">&#9888;&#65039; 黃色提示</span>（不會擋住儲存）。</p>
+      <table class="specs-table">
+        <thead>
+          <tr><th>專案階段</th><th>建議收入類型</th><th>不建議</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>需求溝通</td><td>預估現金收入</td><td style="color:var(--red)">現金收入、預計現金收入</td></tr>
+          <tr><td>簡報提案</td><td>預估現金收入</td><td style="color:var(--red)">現金收入、預計現金收入</td></tr>
+          <tr><td>報價提供</td><td>預估 或 預計現金收入</td><td style="color:var(--red)">現金收入</td></tr>
+          <tr><td>合作確認</td><td>預計 或 現金收入</td><td style="color:var(--red)">預估現金收入</td></tr>
+          <tr><td>報價簽回</td><td>預計 或 現金收入</td><td style="color:var(--red)">預估現金收入</td></tr>
+          <tr><td>結案</td><td>現金收入</td><td style="color:var(--red)">預計、預估</td></tr>
+        </tbody>
+      </table>
+      <p><strong>資源交換</strong>可搭配任何階段，不受上述規則限制。</p>
+    </div>
+  </div>
+
+  <!-- Section 5: Best Practice -->
+  <div class="section">
+    <h2 class="section-title">Best Practice</h2>
+
+    <div class="card">
+      <div class="plan-header plan-green">
+        <div class="plan-icon">&#10004;</div>
+        <div>
+          <h2>正確做法</h2>
+          <div class="plan-label">請遵循</div>
+        </div>
+      </div>
+      <div class="callout callout-green">
+        <div class="callout-title">填寫原則</div>
+        <strong>一案一列、一期一列</strong> &mdash; 頭款尾款分開填，各自追蹤收款狀態<br/>
+        <strong>階段即時更新</strong> &mdash; 案子推進時立即更新階段<br/>
+        <strong>客戶名稱統一</strong> &mdash; 同一客戶永遠用同一名稱（否則樞紐分析會錯）<br/>
+        <strong>金額填未稅</strong> &mdash; 系統自動 &times;1.05 算含稅<br/>
+        <strong>報價提供以上一定要填金額</strong> &mdash; 系統會強制驗證<br/>
+        <strong>月份填 0 代表待定</strong> &mdash; 比留空白更好
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="plan-header plan-red">
+        <div class="plan-icon">&#10008;</div>
+        <div>
+          <h2>常見錯誤</h2>
+          <div class="plan-label">請避免</div>
+        </div>
+      </div>
+      <div class="callout callout-red">
+        <div class="callout-title">這些會導致數據失準</div>
+        <strong>一案只填一列但分多期</strong> &mdash; 無法追蹤各期收款狀態<br/>
+        <strong>階段和類型不一致</strong> &mdash; 例如已簽約但類型還是「預估」<br/>
+        <strong>客戶名稱不統一</strong> &mdash; 「ABC 公司」vs「ABC」會被當不同客戶<br/>
+        <strong>未稅欄填含稅金額</strong> &mdash; 會多乘一次 1.05<br/>
+        <strong>忘記更新階段</strong> &mdash; 案子已簽但階段還在「報價提供」
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 6: 目標設定 Sheet -->
+  <div class="section">
+    <h2 class="section-title">「目標設定」Sheet 總覽</h2>
+    <div class="card">
+      <p>「目標設定」是儀表板的設定中心，修改後儀表板下次載入就會自動套用。</p>
+      <table class="specs-table">
+        <thead>
+          <tr><th>欄位範圍</th><th>內容</th><th>用途</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>A&ndash;F 欄</td><td>年度目標（L / H &times; 四季）</td><td>計算達成率</td></tr>
+          <tr><td>H&ndash;J 欄</td><td>專案階段定義</td><td>控制階段選項、計入業績規則、排序</td></tr>
+        </tbody>
+      </table>
+      <h3>管理階段定義</h3>
+      <p>在 H、I、J 欄：</p>
+      <ul>
+        <li><strong>H 欄</strong>：階段名稱</li>
+        <li><strong>I 欄</strong>：是否計入業績（填「是」或「否」）</li>
+        <li><strong>J 欄</strong>：排序數字（決定先後順序）</li>
+      </ul>
+      <p>新增階段只要在這裡多加一列，儀表板會自動讀取並更新下拉選單。</p>
+    </div>
+  </div>
+
+  <!-- Section 7: 自動連動 -->
+  <div class="section">
+    <h2 class="section-title">自動連動的項目</h2>
+    <div class="card">
+      <p>以下項目由系統自動處理，<strong>不需手動維護</strong>：</p>
+      <table class="specs-table">
+        <thead>
+          <tr><th>項目</th><th>觸發條件</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>最後更新時間</td><td>透過儀表板編輯</td><td>自動寫入 S 欄</td></tr>
+          <tr><td>含稅金額</td><td>前端顯示時計算</td><td>未稅 &times; 1.05</td></tr>
+          <tr><td>季度歸屬</td><td>依月份自動分類</td><td>1&ndash;3月=Q1 &hellip; 10&ndash;12月=Q4</td></tr>
+          <tr><td>KPI 達成率</td><td>即時計算</td><td>依目標 L / H 自動計算</td></tr>
+          <tr><td>階段下拉選項</td><td>讀取「目標設定」</td><td>H&ndash;J 欄新增後自動出現</td></tr>
+          <tr><td>歷史年度樣式</td><td>切換非當年度時</td><td>灰色 KPI 卡片 + 標籤</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <a href="index.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      返回目錄
+    </a>
+  </div>
+</body>
+</html>
