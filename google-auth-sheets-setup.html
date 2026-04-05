@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google 登入 + Sheets API 設定指南</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand-1: #F59E0B;
+      --brand-2: #F97316;
+      --brand-3: #EF4444;
+      --bg: #F5F3F0;
+      --card: #FFFFFF;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-tertiary: #64748B;
+      --ring: rgba(15, 23, 42, 0.06);
+      --teal: #0D9488;
+      --teal-light: #F0FDFA;
+      --teal-ring: rgba(13, 148, 136, 0.12);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Header ---- */
+    header { background: #0F172A; position: sticky; top: 0; z-index: 40; }
+    header .inner {
+      max-width: 1120px; margin: 0 auto;
+      padding: 0 32px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header .logo { display: flex; align-items: center; gap: 14px; }
+    header .logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+    }
+    header .logo-icon svg { width: 20px; height: 20px; color: white; }
+    header .brand-name { font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em; }
+    header .brand-sub {
+      font-size: 13px; font-weight: 600; color: var(--teal);
+      margin-left: 10px;
+      background: rgba(13, 148, 136, 0.1);
+      padding: 2px 10px; border-radius: 99px;
+    }
+    header .back-link {
+      font-size: 14px; font-weight: 500; color: #E2E8F0; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      transition: all 0.15s;
+    }
+    header .back-link:hover { background: rgba(255,255,255,0.12); color: #FFFFFF; }
+    .accent-line { height: 3px; background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3)); }
+
+    /* ---- Hero ---- */
+    .hero { max-width: 1120px; margin: 0 auto; padding: 64px 32px 48px; }
+    .hero h1 {
+      font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #0D9488, #0891B2);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      font-size: 19px; color: var(--text-secondary); max-width: 720px; line-height: 1.8;
+    }
+    .hero .meta {
+      font-size: 14px; color: var(--text-tertiary); margin-top: 12px;
+    }
+
+    /* ---- Sections ---- */
+    .section { max-width: 1120px; margin: 0 auto; padding: 0 32px 56px; }
+    .section-title {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 24px;
+    }
+
+    /* ---- Cards ---- */
+    .card {
+      background: var(--card); border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      outline: 1px solid var(--ring);
+      padding: 40px; margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .card h3 {
+      font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+      margin-bottom: 8px; margin-top: 32px;
+    }
+    .card h3:first-child { margin-top: 0; }
+    .card p { color: var(--text-secondary); margin-bottom: 14px; font-size: 17px; }
+    .card p:last-child { margin-bottom: 0; }
+    .card ul { list-style: none; padding: 0; margin: 14px 0; }
+    .card ul li {
+      font-size: 17px; color: var(--text-secondary); line-height: 1.7;
+      padding: 4px 0 4px 24px; position: relative;
+    }
+    .card ul li::before {
+      content: "→"; position: absolute; left: 0;
+      color: var(--teal); font-weight: 700;
+    }
+    .card ol {
+      padding-left: 24px; margin: 14px 0;
+    }
+    .card ol li {
+      font-size: 17px; color: var(--text-secondary); line-height: 1.7;
+      padding: 3px 0;
+    }
+    .card code {
+      background: #F1F5F9; padding: 2px 8px; border-radius: 6px;
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      font-size: 15px; color: var(--text-primary);
+    }
+
+    /* ---- Plan Header ---- */
+    .plan-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 20px;
+    }
+    .plan-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .plan-header h2 { margin-bottom: 0; }
+    .plan-header .plan-label {
+      font-size: 13px; font-weight: 600; margin-top: 2px;
+    }
+    .plan-blue .plan-icon { background: #EFF6FF; color: #2563EB; }
+    .plan-blue .plan-label { color: #1D4ED8; }
+    .plan-green .plan-icon { background: #F0FDFA; color: #0D9488; }
+    .plan-green .plan-label { color: #0D9488; }
+    .plan-amber .plan-icon { background: #FFFBEB; color: #D97706; }
+    .plan-amber .plan-label { color: #B45309; }
+    .plan-indigo .plan-icon { background: #EEF2FF; color: #6366F1; }
+    .plan-indigo .plan-label { color: #4F46E5; }
+
+    /* ---- Architecture Diagram ---- */
+    .arch-diagram {
+      background: #0F172A; border-radius: 14px; padding: 32px;
+      margin: 24px 0; color: #E2E8F0;
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      font-size: 14px; line-height: 2;
+      overflow-x: auto;
+    }
+    .arch-diagram .comment { color: #64748B; }
+    .arch-diagram .highlight { color: #2DD4BF; font-weight: 600; }
+    .arch-diagram .str { color: #FCD34D; }
+
+    /* ---- Flow ---- */
+    .flow {
+      background: #F8FAFC; border-radius: 14px; padding: 24px 28px;
+      margin: 20px 0; font-size: 16px; line-height: 2;
+      color: var(--text-secondary);
+      border-left: 4px solid var(--teal);
+    }
+    .flow .arrow { color: var(--teal); font-weight: 700; margin: 0 4px; }
+
+    /* ---- Specs Table ---- */
+    .specs-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 20px 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden;
+      outline: 1px solid var(--ring);
+    }
+    .specs-table th {
+      background: #F8FAFC; text-align: left; padding: 14px 20px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .specs-table td {
+      padding: 14px 20px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .specs-table tr:last-child td { border-bottom: none; }
+    .specs-table td:first-child {
+      font-weight: 600; color: var(--text-primary); white-space: nowrap;
+    }
+
+    /* ---- Compare Table ---- */
+    .compare-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 20px 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden;
+      outline: 1px solid var(--ring);
+    }
+    .compare-table th {
+      background: #F8FAFC; text-align: left; padding: 14px 18px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .compare-table th:first-child { width: 140px; }
+    .compare-table td {
+      padding: 14px 18px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table td:first-child {
+      font-weight: 600; color: var(--text-primary);
+    }
+    .compare-table .highlight { color: var(--teal); font-weight: 600; }
+
+    /* ---- Note ---- */
+    .note {
+      background: var(--teal-light); border-radius: 12px; padding: 20px 24px;
+      outline: 1px solid var(--teal-ring);
+      font-size: 16px; color: #115E59; line-height: 1.7;
+      margin-top: 24px;
+    }
+    .note strong { font-weight: 700; }
+
+    /* ---- Warning ---- */
+    .warning {
+      background: #FFFBEB; border-radius: 12px; padding: 20px 24px;
+      outline: 1px solid rgba(245,158,11,0.15);
+      margin: 20px 0;
+    }
+    .warning .label {
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #B45309; margin-bottom: 8px;
+    }
+    .warning p { font-size: 16px; color: #92400E; margin-bottom: 0; }
+
+    /* ---- FAQ ---- */
+    .faq-item { margin-bottom: 20px; }
+    .faq-item .q {
+      font-size: 17px; font-weight: 700; color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .faq-item .a {
+      font-size: 17px; color: var(--text-secondary); line-height: 1.7;
+    }
+
+    /* ---- Checklist ---- */
+    .checklist { list-style: none; padding: 0; margin: 16px 0; }
+    .checklist li {
+      font-size: 17px; color: var(--text-secondary); line-height: 1.7;
+      padding: 6px 0 6px 32px; position: relative;
+    }
+    .checklist li::before {
+      content: "☐"; position: absolute; left: 0;
+      font-size: 18px; color: var(--teal);
+    }
+
+    /* ---- Divider ---- */
+    .divider {
+      height: 1px; background: rgba(15, 23, 42, 0.06);
+      max-width: 1120px; margin: 0 auto;
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      max-width: 1120px; margin: 0 auto; padding: 32px 32px 48px;
+      text-align: center; font-size: 14px; color: var(--text-tertiary);
+    }
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ---- Mobile RWD ---- */
+    @media (max-width: 640px) {
+      body { font-size: 16px; }
+
+      header .inner { padding: 0 16px; height: 52px; }
+      header .brand-name { font-size: 14px; }
+      header .brand-sub { font-size: 11px; margin-left: 6px; padding: 2px 8px; }
+      header .back-link { font-size: 13px; padding: 5px 12px; }
+
+      .hero { padding: 40px 20px 32px; }
+      .hero h1 { font-size: 28px; }
+      .hero .subtitle { font-size: 16px; }
+
+      .section { padding: 0 20px 40px; }
+      .section-title { font-size: 22px; margin-bottom: 16px; }
+
+      .card { padding: 24px 20px; border-radius: 16px; }
+      .card h2 { font-size: 22px; }
+      .card h3 { font-size: 17px; margin-top: 24px; }
+      .card p, .card ul li, .card ol li { font-size: 16px; }
+
+      .plan-header { gap: 12px; }
+      .plan-icon { width: 44px; height: 44px; border-radius: 12px; font-size: 20px; }
+
+      .arch-diagram { padding: 20px; font-size: 12px; line-height: 1.8; }
+      .flow { padding: 18px 20px; font-size: 15px; }
+
+      .specs-table { font-size: 15px; }
+      .specs-table th, .specs-table td { padding: 12px 16px; }
+
+      .card:has(.compare-table) { padding: 24px 12px; overflow-x: auto; }
+      .compare-table { font-size: 14px; min-width: 520px; }
+
+      .faq-item .q { font-size: 16px; }
+      .faq-item .a { font-size: 16px; }
+      .checklist li { font-size: 16px; }
+      .note { font-size: 15px; padding: 16px 20px; }
+      .warning p { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="brand-name">Comms Docs</span>
+        <span class="brand-sub">Internal</span>
+      </div>
+      <a href="index.html" class="back-link">← 返回列表</a>
+    </div>
+  </header>
+  <div class="accent-line"></div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>Google 登入 +<br><span class="gradient">Sheets API</span> 設定指南</h1>
+    <p class="subtitle">說明內部工具串接 Google Login（白名單制）與 Google Sheets API 時，需要在 Google Cloud Console 和 Vercel 做哪些設定。</p>
+    <p class="meta">2026-04-05 ・適用於 Next.js + Vercel 部署架構</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Section: 架構總覽 -->
+  <div class="section" style="padding-top: 56px;">
+    <h2 class="section-title">架構總覽</h2>
+
+    <div class="card">
+      <p>我們的營收儀表板需要兩種 Google 服務，用了<strong>兩套獨立的認證機制</strong>：</p>
+
+      <div class="arch-diagram">
+        <span class="comment">Google Cloud Console</span><br>
+        <span class="comment">├──</span> <span class="highlight">OAuth Client ID</span>（前端登入用）<br>
+        <span class="comment">│&nbsp;&nbsp;&nbsp;</span>使用者在瀏覽器登入 Google<br>
+        <span class="comment">│&nbsp;&nbsp;&nbsp;</span><span class="str">→ 取得 ID Token（證明「我是誰」）</span><br>
+        <span class="comment">│&nbsp;&nbsp;&nbsp;</span><span class="str">→ 後端驗證 + 白名單比對</span><br>
+        <span class="comment">│</span><br>
+        <span class="comment">└──</span> <span class="highlight">Service Account</span>（後端 API 用）<br>
+        <span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;</span>伺服器用 private key 取得 access token<br>
+        <span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="str">→ 直接呼叫 Sheets API 讀寫資料</span><br>
+        <span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="str">→ 不需要使用者介入</span>
+      </div>
+
+      <table class="compare-table">
+        <thead>
+          <tr><th></th><th>OAuth Client ID</th><th>Service Account</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>誰在用</td><td>使用者（前端瀏覽器）</td><td>伺服器（後端 API）</td></tr>
+          <tr><td>做什麼</td><td>驗證「這個人是誰」</td><td>讀寫 Google Sheet</td></tr>
+          <tr><td>是否 Secret</td><td>❌ 不是（前端公開）</td><td class="highlight">✅ 絕對保密</td></tr>
+          <tr><td>在哪裡設定</td><td>Credentials → OAuth</td><td>IAM → Service Accounts</td></tr>
+          <tr><td>互相依賴嗎</td><td>不依賴</td><td>不依賴</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <strong>兩者搭配的效果：</strong>OAuth 確保只有白名單的人能操作，Service Account 確保操作能實際寫進 Sheet。
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Section: OAuth Client ID -->
+  <div class="section" style="padding-top: 56px;">
+    <h2 class="section-title">Google Cloud Console 設定</h2>
+
+    <div class="card plan-blue">
+      <div class="plan-header">
+        <div class="plan-icon">🔑</div>
+        <div>
+          <h2>OAuth Client ID</h2>
+          <div class="plan-label">讓使用者用 Google 登入</div>
+        </div>
+      </div>
+
+      <p>OAuth Client ID 讓你的網站可以顯示「Sign in with Google」按鈕。使用者點擊後，Google 回傳一個 <strong>ID Token</strong>（JWT 格式），裡面包含 email、名字、頭像。</p>
+
+      <h3>設定步驟</h3>
+      <ol>
+        <li>進入 <a href="https://console.cloud.google.com/" target="_blank" style="color: var(--teal);">Google Cloud Console</a></li>
+        <li>選擇你的專案（或建立新專案）</li>
+        <li>前往 <strong>APIs &amp; Services → Credentials</strong></li>
+        <li>點 <strong>Create Credentials → OAuth client ID</strong></li>
+        <li>Application type 選 <strong>Web application</strong></li>
+        <li>在 <strong>Authorized JavaScript origins</strong> 加入你的網域</li>
+        <li>建立後取得 Client ID</li>
+      </ol>
+
+      <div class="warning">
+        <div class="label">注意：授權網域</div>
+        <p>本地開發和正式環境的網域都要加，例如 <code>http://localhost:3001</code> 和 <code>https://your-app.vercel.app</code>。</p>
+      </div>
+
+      <table class="specs-table">
+        <tbody>
+          <tr><td>是否為 Secret</td><td>❌ 不是。Client ID 會出現在前端程式碼中，本來就是公開的</td></tr>
+          <tr><td>後端也需要嗎</td><td>✅ 後端驗證 ID Token 時，需要 Client ID 來確認 token 是發給你的應用</td></tr>
+          <tr><td>白名單怎麼做</td><td>白名單不在 Google 設定，是在後端用 <code>ALLOWED_EMAILS</code> 環境變數控制</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Service Account -->
+    <div class="card plan-green">
+      <div class="plan-header">
+        <div class="plan-icon">🤖</div>
+        <div>
+          <h2>Service Account</h2>
+          <div class="plan-label">讓伺服器讀寫 Google Sheet</div>
+        </div>
+      </div>
+
+      <p>Service Account 是一個「機器人帳號」，有自己的 email 和 private key。伺服器用它來代表應用程式存取 Google API，完全不需要使用者登入或授權。</p>
+
+      <h3>設定步驟</h3>
+      <ol>
+        <li>前往 <strong>IAM &amp; Admin → Service Accounts</strong></li>
+        <li>點 <strong>Create Service Account</strong>，取名建立</li>
+        <li>進入該帳號 → <strong>Keys → Add Key → Create new key → JSON</strong></li>
+        <li>下載金鑰 JSON 檔案（妥善保管！）</li>
+      </ol>
+
+      <h3>還要做的事</h3>
+      <ul>
+        <li><strong>啟用 Google Sheets API</strong>：APIs &amp; Services → Library → 搜尋「Google Sheets API」→ Enable</li>
+        <li><strong>共用 Sheet 給 Service Account</strong>：打開 Google Sheet → 共用 → 貼上 Service Account email → 權限選「編輯者」</li>
+      </ul>
+
+      <div class="warning">
+        <div class="label">安全警告</div>
+        <p>Service Account 的 private key 等同密碼，外洩就等於任何人都能讀寫你的 Sheet。絕對不要 commit 到 Git 或分享給他人。</p>
+      </div>
+
+      <table class="specs-table">
+        <tbody>
+          <tr><td>是否為 Secret</td><td class="highlight">✅ 是！private key 絕對保密</td></tr>
+          <tr><td>跟使用者有關嗎</td><td>❌ 完全無關。是伺服器對伺服器的認證</td></tr>
+          <tr><td>需要使用者授權嗎</td><td>❌ 不需要。Sheet 有共用給 Service Account email 就能存取</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Section: Vercel 環境變數 -->
+  <div class="section" style="padding-top: 56px;">
+    <h2 class="section-title">Vercel 環境變數設定</h2>
+
+    <div class="card">
+      <p>在 Vercel Dashboard → 你的專案 → <strong>Settings → Environment Variables</strong> 設定以下變數：</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr><th>變數名</th><th>值</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>GOOGLE_SERVICE_ACCOUNT_KEY</code></td>
+            <td>整份 JSON 金鑰內容</td>
+            <td>下載的 JSON 檔全文貼上</td>
+          </tr>
+          <tr>
+            <td><code>GOOGLE_SHEET_ID</code></td>
+            <td>Sheet 網址中的 ID</td>
+            <td><code>/d/</code> 和 <code>/edit</code> 之間那段字串</td>
+          </tr>
+          <tr>
+            <td><code>GOOGLE_CLIENT_ID</code></td>
+            <td>OAuth Client ID</td>
+            <td>格式：<code>xxxxx.apps.googleusercontent.com</code></td>
+          </tr>
+          <tr>
+            <td><code>ALLOWED_EMAILS</code></td>
+            <td>email 清單</td>
+            <td>逗號分隔，例如 <code>alice@gmail.com,bob@gmail.com</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <strong>本地開發：</strong>在專案根目錄建立 <code>.env.local</code> 檔案，貼上同樣的變數。這個檔案已被 <code>.gitignore</code> 排除，不會被 commit。
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Section: FAQ -->
+  <div class="section" style="padding-top: 56px;">
+    <h2 class="section-title">常見問題</h2>
+
+    <div class="card">
+      <div class="faq-item">
+        <div class="q">Q：GOOGLE_SERVICE_ACCOUNT_KEY 太長，Vercel 貼得進去嗎？</div>
+        <div class="a">可以。Vercel 支援多行值，直接把整份 JSON 貼上即可。</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="q">Q：private_key 中的 \n 會不會有問題？</div>
+        <div class="a">有時候會。如果部署後 API 報錯 <code>error:0909006C:PEM routines</code>，通常是 <code>\n</code> 被 escape 成 <code>\\n</code>。確認 Vercel 環境變數中的換行是真正的換行。</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="q">Q：白名單要改怎麼辦？</div>
+        <div class="a">修改 Vercel 上的 <code>ALLOWED_EMAILS</code> 環境變數，然後 <strong>Redeploy</strong> 即可生效。不需要改程式碼。</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="q">Q：OAuth Client ID 和 Service Account 是同一個東西嗎？</div>
+        <div class="a">不是。它們是完全獨立的兩套認證機制。OAuth Client ID 負責使用者登入，Service Account 負責伺服器讀寫 API。兩者不互相依賴。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Section: Checklist -->
+  <div class="section" style="padding-top: 56px;">
+    <h2 class="section-title">設定清單</h2>
+
+    <div class="card plan-amber">
+      <div class="plan-header">
+        <div class="plan-icon">📋</div>
+        <div>
+          <h2>Google Cloud Console</h2>
+          <div class="plan-label">一次性設定</div>
+        </div>
+      </div>
+
+      <ul class="checklist">
+        <li>建立 GCP 專案（或使用既有專案）</li>
+        <li>啟用 Google Sheets API</li>
+        <li>建立 OAuth Client ID（Web application），加入授權網域</li>
+        <li>建立 Service Account，下載 JSON 金鑰</li>
+        <li>在 Google Sheet 共用設定中，加入 Service Account email 為編輯者</li>
+      </ul>
+    </div>
+
+    <div class="card plan-indigo">
+      <div class="plan-header">
+        <div class="plan-icon">▲</div>
+        <div>
+          <h2>Vercel</h2>
+          <div class="plan-label">環境變數設定</div>
+        </div>
+      </div>
+
+      <ul class="checklist">
+        <li>設定 <code>GOOGLE_SERVICE_ACCOUNT_KEY</code>（JSON 全文）</li>
+        <li>設定 <code>GOOGLE_SHEET_ID</code>（Sheet ID）</li>
+        <li>設定 <code>GOOGLE_CLIENT_ID</code>（OAuth Client ID）</li>
+        <li>設定 <code>ALLOWED_EMAILS</code>（白名單 email）</li>
+        <li>部署並測試登入和資料讀取</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <a href="index.html">← 返回文件列表</a>
+    <p style="margin-top: 16px;">EnGenius Technologies — Internal Documents</p>
+  </footer>
+</body>
+</html>
