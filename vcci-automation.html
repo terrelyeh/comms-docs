@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VCCI 日本認證登錄自動化</title>
+  <style>
+    :root {
+      --text-primary: #1a1a2e;
+      --text-secondary: #4a4a68;
+      --text-muted: #7a7a96;
+      --bg-page: #f5f6fa;
+      --bg-card: #ffffff;
+      --bg-code: #f0f1f5;
+      --border: #e2e4ea;
+      --accent: #2563eb;
+      --accent-light: #eff4ff;
+      --green: #16a34a;
+      --green-light: #f0fdf4;
+      --orange: #ea580c;
+      --orange-light: #fff7ed;
+      --red: #dc2626;
+      --red-light: #fef2f2;
+      --purple: #7c3aed;
+      --purple-light: #f5f3ff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      font-size: 17px;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 48px 32px 80px; }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header .back { display: inline-block; font-size: 14px; color: var(--text-muted); text-decoration: none; margin-bottom: 20px; }
+    .header .back:hover { color: var(--accent); }
+    .header .badge { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: 15px; font-weight: 600; padding: 6px 18px; border-radius: 100px; margin-bottom: 16px; }
+    .header h1 { font-size: 34px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em; }
+    .header .subtitle { font-size: 18px; color: var(--text-muted); }
+    .header .date { font-size: 15px; color: var(--text-muted); margin-top: 8px; }
+
+    /* Executive summary */
+    .exec-summary {
+      background: linear-gradient(135deg, #1e293b 0%, #1a1a2e 100%);
+      border-radius: 12px;
+      padding: 36px 40px;
+      margin-bottom: 24px;
+      color: #e2e8f0;
+    }
+    .exec-summary .es-label { display: inline-block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 14px; }
+    .exec-summary h2 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+    .exec-summary p { font-size: 16px; color: #cbd5e1; line-height: 1.8; margin-bottom: 10px; }
+    .exec-summary p:last-child { margin-bottom: 0; }
+    .exec-summary strong { color: #fff; }
+
+    /* Section */
+    .section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 36px 40px; margin-bottom: 24px; }
+    .section-label { display: inline-block; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 12px; border-radius: 100px; margin-bottom: 14px; }
+    .section-label.pain { background: var(--red-light); color: var(--red); }
+    .section-label.tech { background: var(--accent-light); color: var(--accent); }
+    .section-label.flow { background: var(--purple-light); color: var(--purple); }
+    .section-label.lessons { background: var(--green-light); color: var(--green); }
+    .section-label.ai { background: var(--orange-light); color: var(--orange); }
+    .section h2 { font-size: 24px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.01em; }
+    .section h3 { font-size: 18px; font-weight: 600; margin-top: 28px; margin-bottom: 12px; color: var(--text-primary); }
+    .section p { font-size: 17px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.8; }
+
+    /* Pain point card */
+    .pain-card { border: 1px solid var(--border); border-radius: 10px; padding: 22px 26px; margin: 16px 0; }
+    .pain-card .pain-title { font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; display: flex; gap: 10px; align-items: center; }
+    .pain-card .pain-title .icon { flex-shrink: 0; }
+    .pain-card p { font-size: 16px; color: var(--text-secondary); margin-bottom: 10px; }
+    .pain-card p:last-child { margin-bottom: 0; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 16px; }
+    th { text-align: left; padding: 12px 16px; background: var(--bg-code); font-weight: 600; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .tag { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .tag.yes { background: var(--green-light); color: var(--green); }
+    .tag.no { background: var(--red-light); color: var(--red); }
+    .tag.opt { background: var(--orange-light); color: var(--orange); }
+    .tag.auto { background: var(--accent-light); color: var(--accent); }
+    .tag.manual { background: var(--purple-light); color: var(--purple); }
+
+    /* Arch diagram */
+    .arch { background: var(--bg-code); border-radius: 10px; padding: 24px 28px; margin: 20px 0; font-family: "SF Mono", "Fira Code", monospace; font-size: 14px; line-height: 1.8; overflow-x: auto; white-space: pre; color: var(--text-secondary); }
+    .arch .arrow { color: var(--accent); }
+    .arch .step { color: var(--orange); font-weight: 600; }
+    .arch .result { color: var(--green); font-weight: 600; }
+
+    /* Code blocks */
+    .code-block-label { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; margin-top: 16px; }
+    .code-block { background: #1e293b; color: #e2e8f0; padding: 18px 22px; border-radius: 10px; font-family: "SF Mono", "Fira Code", monospace; font-size: 14px; line-height: 1.8; overflow-x: auto; white-space: pre; }
+    .code-block .comment { color: #64748b; }
+    .code-block .kw { color: #7dd3fc; }
+    .code-block .str { color: #86efac; }
+    .code-block .fn { color: #fbbf24; }
+
+    /* Callout */
+    .callout { border-radius: 10px; padding: 18px 22px; margin: 18px 0; font-size: 16px; display: flex; gap: 12px; align-items: flex-start; }
+    .callout.info { background: var(--accent-light); border: 1px solid #bfdbfe; color: #1e40af; }
+    .callout.success { background: var(--green-light); border: 1px solid #bbf7d0; color: #166534; }
+    .callout.warning { background: var(--orange-light); border: 1px solid #fed7aa; color: #9a3412; }
+    .callout.danger { background: var(--red-light); border: 1px solid #fca5a5; color: #991b1b; }
+    .callout .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .callout .content { flex: 1; }
+    .callout strong { display: block; margin-bottom: 2px; }
+
+    /* Lesson card */
+    .lesson-card { background: var(--bg-page); border-left: 4px solid var(--green); border-radius: 8px; padding: 22px 26px; margin: 16px 0; }
+    .lesson-card .lesson-num { font-size: 12px; font-weight: 700; color: var(--green); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+    .lesson-card h4 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+    .lesson-card p { font-size: 16px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.8; }
+    .lesson-card p:last-child { margin-bottom: 0; }
+
+    /* File tree */
+    .tree { background: var(--bg-code); border-radius: 10px; padding: 20px 24px; margin: 16px 0; font-family: "SF Mono", "Fira Code", monospace; font-size: 14px; line-height: 1.85; color: var(--text-secondary); overflow-x: auto; white-space: pre; }
+    .tree .dir { color: var(--accent); font-weight: 600; }
+    .tree .file { color: var(--text-secondary); }
+    .tree .comment { color: var(--text-muted); }
+
+    .footer { text-align: center; padding: 40px 0 0; font-size: 15px; color: var(--text-muted); }
+    .footer a { color: var(--text-muted); text-decoration: none; }
+    .footer a:hover { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .container { padding: 32px 20px 60px; }
+      .header h1 { font-size: 26px; }
+      .section { padding: 24px 20px; }
+      .exec-summary { padding: 24px 20px; }
+      .section h2 { font-size: 20px; }
+      .arch { font-size: 12px; padding: 16px 18px; }
+      .code-block { font-size: 13px; padding: 14px 16px; }
+      .tree { font-size: 12px; padding: 14px 16px; }
+      .pain-card { padding: 18px 20px; }
+      .lesson-card { padding: 18px 20px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <a class="back" href="index.html">← 返回 Comms Docs</a><br>
+    <span class="badge">Internal Knowledge</span>
+    <h1>VCCI 日本認證登錄自動化</h1>
+    <div class="subtitle">痛點、架構與可複用的學習</div>
+    <div class="date">2026-04-19</div>
+  </div>
+
+  <!-- Executive Summary -->
+  <div class="exec-summary">
+    <div class="es-label">TL;DR</div>
+    <h2>20–30 分鐘的申報 → 5 分鐘搞定</h2>
+    <p>EnGenius Networks Japan 每款新產品上市前都要在 VCCI 官網登錄。我們把 PDF 測試報告 → 自動填表 → 送出 → 歸檔的整條流程做成半自動工具。</p>
+    <p>過程中碰到很多官方 CGI 網站的反自動化機制 — <strong>合成事件被擋</strong>、<strong>AJAX 需要真實 blur</strong>、<strong>雙語 PDF 錯位</strong>。最終靠 <strong>Playwright 的 <code>page.mouse.click()</code></strong>（產生 OS 級真實滑鼠事件）+ <strong>Cookie 持久化 profile</strong> 繞過所有障礙。</p>
+    <p>整套架構可複用到 FCC / CE / KC 等其他國家認證送件，甚至政府申報、供應商入口等「無 API 的 UI 自動化」場景。</p>
+  </div>
+
+  <!-- Background -->
+  <div class="section">
+    <div class="section-label tech">背景</div>
+    <h2>為什麼要做這件事</h2>
+    <p>EnGenius Networks Japan K.K. 在日本販售網通商品，每一款新產品上市前必須在 <strong>VCCI（電波障害自主規制協議会）</strong>官網登錄產品符合性報告。流程雖然不複雜，但：</p>
+    <ul style="padding-left: 24px; font-size: 17px; color: var(--text-secondary); line-height: 2;">
+      <li>重複性高（每月 1–2 款）</li>
+      <li>欄位細碎（13 個必填欄位 + AJAX 聯動）</li>
+      <li>送錯難撤回（需要 VCCI 介入）</li>
+    </ul>
+    <p>是典型「低頻、高單筆成本、易出錯」的工作，非常適合 AI + 半自動化處理。</p>
+  </div>
+
+  <!-- Pain points -->
+  <div class="section">
+    <div class="section-label pain">痛點</div>
+    <h2>自動化碰到的技術障礙</h2>
+    <p>政府/法規類網站有很多反自動化機制，不像一般 SaaS 那樣 API-first。以下是我們實戰發現的主要障礙：</p>
+
+    <div class="pain-card">
+      <div class="pain-title"><span class="icon">🔒</span> 痛點 1：多層驗證（Basic Auth + Form Login）</div>
+      <p>官方網站常有兩層以上的驗證：第一層是瀏覽器級的 HTTP Basic Auth 彈窗，第二層才是網站內的 Email + Password 登入表單。Playwright 處理第一層靠 <code>http_credentials</code> 參數，但第二層才是真正難搞的地方。</p>
+    </div>
+
+    <div class="pain-card">
+      <div class="pain-title"><span class="icon">🚫</span> 痛點 2：合成事件不被信任（最大障礙）</div>
+      <p>VCCI 的 CGI 會靜默拒絕所有「非 OS 級」的 click 事件。以下四種方式測試結果：</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Click 方式</th>
+              <th>事件類型</th>
+              <th>VCCI 反應</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>element.click()</code>（JS 呼叫）</td>
+              <td>合成事件</td>
+              <td><span class="tag no">靜默忽略</span></td>
+            </tr>
+            <tr>
+              <td><code>page.locator(...).click()</code>（Playwright）</td>
+              <td>合成事件</td>
+              <td><span class="tag no">靜默忽略</span></td>
+            </tr>
+            <tr>
+              <td><code>page.keyboard.press('Enter')</code></td>
+              <td>合成事件</td>
+              <td><span class="tag opt">不穩定</span></td>
+            </tr>
+            <tr>
+              <td><strong><code>page.mouse.click(x, y)</code></strong>（OS 座標點擊）</td>
+              <td><strong>真實事件</strong></td>
+              <td><span class="tag yes">✅ 接受</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>關鍵發現</strong>：<code>page.mouse.click()</code> 直接移動指針到座標、按下、放開，產生的是作業系統 input event，VCCI 會當成真人點擊。這是 Playwright 的隱藏武器。</p>
+    </div>
+
+    <div class="pain-card">
+      <div class="pain-title"><span class="icon">🎯</span> 痛點 3：AJAX 聯動需要真實 blur 事件</div>
+      <p>「Test Lab Member No.」欄位填完後應該 AJAX 自動帶出公司名。但 <code>page.fill()</code>（直接 set value）不會觸發 AJAX，因為沒發 blur。解法是模擬真實打字 + Tab：</p>
+      <div class="code-block-label">Python / Playwright</div>
+      <div class="code-block"><span class="fn">field</span>.click()
+<span class="fn">field</span>.press_sequentially(value, delay=<span class="str">30</span>)
+<span class="fn">field</span>.press(<span class="str">"Tab"</span>)  <span class="comment"># 觸發 blur → 啟動 AJAX</span>
+page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
+    </div>
+
+    <div class="pain-card">
+      <div class="pain-title"><span class="icon">📑</span> 痛點 4：雙語 PDF 解析錯位</div>
+      <p>TÜV Rheinland 測試報告是<strong>德英雙語並列</strong>，兩個語言的 label 在文字流裡交替。用英文 label 當 regex anchor 會抓到<strong>下一個欄位的值</strong>（因為德文值先出現）。解法：改用德文 label 當 anchor，值就在同一行。</p>
+    </div>
+
+    <div class="pain-card">
+      <div class="pain-title"><span class="icon">🔀</span> 痛點 5：CGI 表單 — 一個 URL 多個狀態</div>
+      <p>VCCI 是老式 CGI 系統，所有頁面都是同一個 URL（<code>Manager.pl</code>），伺服器根據 POST 資料決定回哪個頁面。<strong>不能靠 URL 變化判斷進度</strong>，要 poll 下一個預期元素是否出現：</p>
+      <div class="code-block-label">偵測頁面轉換</div>
+      <div class="code-block">page.wait_for_selector(
+    <span class="str">"input[type='submit'][value='Report']"</span>,
+    timeout=<span class="str">30_000</span>
+)</div>
+    </div>
+
+    <div class="pain-card">
+      <div class="pain-title"><span class="icon">🤖</span> 痛點 6：Playwright 指紋被識別</div>
+      <p>VCCI 會檢測 Playwright 預設的 <code>navigator.webdriver</code> 等特徵拒絕登入。解法組合：真實 User-Agent + <code>launch_persistent_context</code> 真實 profile + 讓使用者<strong>手動登入一次</strong>，之後 cookie 持久化，繞過登入環節的 bot 檢測。</p>
+    </div>
+  </div>
+
+  <!-- Architecture -->
+  <div class="section">
+    <div class="section-label tech">架構</div>
+    <h2>技術選型</h2>
+
+    <div class="arch"><span class="step">┌────────────────────────────────────────────┐</span>
+<span class="step">│  Claude Code Skill (vcci-submit)           │</span>
+<span class="step">│  ─ 串聯整個 pipeline                       │</span>
+<span class="step">└──────────────┬─────────────────────────────┘</span>
+               │
+   ┌───────────┼────────────┬──────────────┐
+   ▼           ▼            ▼              ▼
+┌──────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+│ PDF  │<span class="arrow">→</span> │  YAML    │<span class="arrow">→</span> │Playwright│<span class="arrow">→</span> │  XLSX    │
+│ 報告 │  │  (草稿)  │  │  自動化  │  │ 追蹤表   │
+└──────┘  └──────────┘  └──────────┘  └──────────┘
+ pdfplumber   PyYAML      persistent   openpyxl
+                          _context
+                                            │
+                                            ▼
+                                    ┌──────────────┐
+                                    │ GitHub Private│
+                                    │ Repo（存證）  │
+                                    └──────────────┘</div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>層</th>
+            <th>選擇</th>
+            <th>為什麼</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Python 環境</td>
+            <td><strong>uv</strong></td>
+            <td>比 pip 快、lockfile 清楚、專案結構標準</td>
+          </tr>
+          <tr>
+            <td>PDF 萃取</td>
+            <td><strong>pdfplumber</strong></td>
+            <td>純 Python、無外部依賴、文字抽取品質好</td>
+          </tr>
+          <tr>
+            <td>瀏覽器自動化</td>
+            <td><strong>Playwright</strong></td>
+            <td>比 Selenium 新、API 乾淨、內建等待機制</td>
+          </tr>
+          <tr>
+            <td>Chromium 啟動模式</td>
+            <td><strong>launch_persistent_context</strong></td>
+            <td>Cookie 持久化、指紋穩定、避免每次登入</td>
+          </tr>
+          <tr>
+            <td>Excel 處理</td>
+            <td><strong>openpyxl</strong></td>
+            <td>純 Python、能讀寫 xlsx、格式控制精準</td>
+          </tr>
+          <tr>
+            <td>歸檔</td>
+            <td><strong>GitHub Private repo</strong></td>
+            <td>版本控管、異地備份、送件稽核可追溯</td>
+          </tr>
+          <tr>
+            <td>編排</td>
+            <td><strong>Claude Code Skill</strong></td>
+            <td>用自然語言觸發整條 pipeline</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>專案結構</h3>
+    <div class="tree"><span class="dir">VCCI Automation/</span>
+├── pyproject.toml              <span class="comment"># uv 管理</span>
+├── .env                        <span class="comment"># VCCI 帳密（gitignore）</span>
+├── <span class="dir">.playwright-profile/</span>        <span class="comment"># Chromium profile（cookie 留這）</span>
+├── <span class="dir">reports/</span>                    <span class="comment"># 原始測試報告 PDF</span>
+├── <span class="dir">products/</span>                   <span class="comment"># 產生的 YAML 草稿（gitignore）</span>
+├── <span class="dir">archive/</span>                    <span class="comment"># 每次送件的存證</span>
+│   └── <span class="dir">&lt;YYYYMMDD-HHMMSS&gt;-&lt;Model&gt;/</span>
+│       ├── 01_form_filled.png + .html
+│       ├── 02_confirmation.png + .html
+│       ├── 03_success.png + .html
+│       ├── 04_top_recent_status.png + .html
+│       ├── &lt;Model&gt;.yaml
+│       └── &lt;報告&gt;.pdf
+├── tracking.xlsx               <span class="comment"># 滾動送件紀錄表</span>
+└── <span class="dir">src/vcci_automation/</span>
+    ├── classification.py       <span class="comment"># 官方分類代碼表</span>
+    ├── extract.py              <span class="comment"># PDF → YAML</span>
+    ├── submit.py               <span class="comment"># YAML → Playwright → 送件</span>
+    └── tracking.py             <span class="comment"># Excel 追蹤表維護</span></div>
+  </div>
+
+  <!-- Workflow -->
+  <div class="section">
+    <div class="section-label flow">工作流程</div>
+    <h2>端到端 9 個階段</h2>
+    <p>從丟 PDF 到 GitHub 有紀錄。其中 5 個全自動、4 個半自動（保留關鍵決策給人）：</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>階段</th>
+            <th>做什麼</th>
+            <th>自動化</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>A. 準備</strong></td>
+            <td>把測試報告 PDF 丟進 <code>reports/</code></td>
+            <td><span class="tag manual">👤 人工</span></td>
+          </tr>
+          <tr>
+            <td><strong>B. 萃取</strong></td>
+            <td><code>vcci-extract</code>：PDF → YAML，自動帶分類代碼、N/A 理由</td>
+            <td><span class="tag auto">🤖 自動</span></td>
+          </tr>
+          <tr>
+            <td><strong>C. Review</strong></td>
+            <td>肉眼掃 YAML 對不對</td>
+            <td><span class="tag manual">👤 人工</span></td>
+          </tr>
+          <tr>
+            <td><strong>D. 登入</strong></td>
+            <td>有 cookie 跳過；沒有就讓使用者手動登入一次</td>
+            <td><span class="tag opt">🟡 半自動</span></td>
+          </tr>
+          <tr>
+            <td><strong>E. 填表</strong></td>
+            <td>用欄位 <code>name</code> 定位填完 13 個欄位、觸發 AJAX</td>
+            <td><span class="tag auto">🤖 自動</span></td>
+          </tr>
+          <tr>
+            <td><strong>F. Confirm</strong></td>
+            <td><code>page.mouse.click()</code> 自動按 Confirm、偵測 Report 出現</td>
+            <td><span class="tag auto">🤖 自動</span></td>
+          </tr>
+          <tr>
+            <td><strong>G. 最終確認</strong></td>
+            <td>AskUserQuestion：確認頁資料對嗎？要送嗎？</td>
+            <td><span class="tag manual">👤 人工</span></td>
+          </tr>
+          <tr>
+            <td><strong>H. Report + 歸檔</strong></td>
+            <td>按 Report → 成功頁 → 抓 Report No. → 截圖 → tracking.xlsx</td>
+            <td><span class="tag auto">🤖 自動</span></td>
+          </tr>
+          <tr>
+            <td><strong>I. Push</strong></td>
+            <td><code>git commit + push</code> 到 private repo</td>
+            <td><span class="tag auto">🤖 自動</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>每次送件的存證檔案</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>檔案</th>
+            <th>內容</th>
+            <th>重要性</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>01_form_filled</code></td>
+            <td>自動填完的表單</td>
+            <td>中</td>
+          </tr>
+          <tr>
+            <td><code>02_confirmation</code></td>
+            <td>VCCI 確認頁（每個欄位顯示什麼值）</td>
+            <td>⭐ 最重要</td>
+          </tr>
+          <tr>
+            <td><code>03_success</code></td>
+            <td>送出成功頁（"successfully completed"）</td>
+            <td>高</td>
+          </tr>
+          <tr>
+            <td><code>04_top_recent_status</code></td>
+            <td>Top 頁 Recent reporting status（含 Report No.）</td>
+            <td>⭐ 含 Report No.</td>
+          </tr>
+          <tr>
+            <td><code>&lt;Model&gt;.yaml</code></td>
+            <td>送出時的資料（可 diff）</td>
+            <td>高</td>
+          </tr>
+          <tr>
+            <td><code>&lt;測試報告&gt;.pdf</code></td>
+            <td>原始 PDF</td>
+            <td>高</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Lessons -->
+  <div class="section">
+    <div class="section-label lessons">可複用學習</div>
+    <h2>給其他自動化專案的 5 條教訓</h2>
+
+    <div class="lesson-card">
+      <div class="lesson-num">Lesson 01</div>
+      <h4>先確認「真人怎麼做」，再想「怎麼自動化」</h4>
+      <p>剛開始以為 form login 可以直接 <code>page.fill()</code> + <code>page.click()</code>。搞了兩小時才發現 VCCI 根本不接受合成 click。<strong>一定要先用 Chrome DevTools 或 Claude in Chrome 手動走一次流程、錄下真實 HTTP request 與事件</strong>，再設計自動化，才能避開誤入歧途。</p>
+    </div>
+
+    <div class="lesson-card">
+      <div class="lesson-num">Lesson 02</div>
+      <h4>page.mouse.click() 是 Playwright 的隱藏武器</h4>
+      <p>大多數教學只講 <code>locator.click()</code>。但當遇到「合成事件被擋」的老舊 CGI 時，<code>page.mouse.click(x, y)</code> 才是真正產生 OS 級事件的方法。步驟是：scroll_into_view → bounding_box 算座標 → mouse.move → mouse.down → mouse.up。</p>
+    </div>
+
+    <div class="lesson-card">
+      <div class="lesson-num">Lesson 03</div>
+      <h4>Cookie 持久化比「每次登入」更穩</h4>
+      <p><code>launch_persistent_context</code> + 固定 <code>user_data_dir</code> 讓 cookie 跨執行保留。好處：只要手動登入一次（繞過登入環節的 bot 偵測）→ 後續 run 全自動 → Profile 有真實瀏覽指紋，比 fresh context 更不像機器人。</p>
+    </div>
+
+    <div class="lesson-card">
+      <div class="lesson-num">Lesson 04</div>
+      <h4>半自動 &gt; 全自動（對高成本、低頻的操作）</h4>
+      <p><strong>全自動化不是終點，正確的操作才是。</strong> 送錯不能撤回的場景，保留 1–2 個人工 checkpoint 反而降低整體風險。填表機械性交給機器，最終送出與 Git push 保留給人。</p>
+    </div>
+
+    <div class="lesson-card">
+      <div class="lesson-num">Lesson 05</div>
+      <h4>存證 &gt; 快速</h4>
+      <p>每次送件留 4 張截圖 + HTML + YAML + PDF，單筆約 1–2 MB。日後稽核（VCCI 回報問題、PM 想知道當時填了什麼）就有得追。Git + GitHub private repo 是「版本控管 + 異地備份 + 追溯性」一次解決的最便宜方案。</p>
+    </div>
+  </div>
+
+  <!-- AI-era workflow -->
+  <div class="section">
+    <div class="section-label ai">AI 時代</div>
+    <h2>與 AI Agent 協作的新工作模式</h2>
+    <p>整個工具從無到有建置約花 <strong>2 個工作日</strong>，全程用 Claude Code 對話式開發。觀察到幾個值得推廣的做法：</p>
+
+    <div class="callout info">
+      <span class="icon">⚡</span>
+      <div class="content">
+        <strong>讓 AI 直接執行、不要只給建議</strong>
+        以前用 ChatGPT 要複製貼上程式碼。Claude Code 可以直接執行 <code>uv run</code>、<code>git commit</code>、開瀏覽器測試。一個 bug 從發現到修好通常 &lt; 2 分鐘，迭代速度快 10x。
+      </div>
+    </div>
+
+    <div class="callout success">
+      <span class="icon">📦</span>
+      <div class="content">
+        <strong>用 Skill 封裝重複性任務</strong>
+        <code>~/.claude/skills/vcci-submit/SKILL.md</code> 寫好一次，之後每次要送件只要說「幫我跑 VCCI 登錄」就會執行完整 pipeline。等於把「資深員工的操作知識」文件化 + 可執行化。
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="icon">🔗</span>
+      <div class="content">
+        <strong>Private repo 作為協作介面</strong>
+        跟 Claude 的對話不會自動變成團隊資產。把完成的工具放 GitHub private repo、每次送件自動 commit + push → 變成<strong>團隊隨時可以看、可以接手</strong>的實作成果。
+      </div>
+    </div>
+
+    <div class="callout warning">
+      <span class="icon">🛡️</span>
+      <div class="content">
+        <strong>人工 checkpoint 就像 code review</strong>
+        半自動的「最終確認」步驟，等同於真人對 AI 做的 code review。保留這個步驟讓我們對工具有信心 — 知道最壞情況人還能擋下來。
+      </div>
+    </div>
+  </div>
+
+  <!-- Extensions -->
+  <div class="section">
+    <div class="section-label flow">延伸應用</div>
+    <h2>同一套架構還能做什麼</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>潛在應用</th>
+            <th>類似點</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>其他國家認證送件（FCC, CE, KC）</td>
+            <td>官方表單自動化</td>
+          </tr>
+          <tr>
+            <td>政府補助/申報系統填表</td>
+            <td>反自動化機制、老舊 CGI</td>
+          </tr>
+          <tr>
+            <td>供應商入口網站的訂單輸入</td>
+            <td>多層驗證 + 表單</td>
+          </tr>
+          <tr>
+            <td>內部 ERP 批次操作</td>
+            <td>無 API、只能 UI 自動化</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>核心能力可以直接重用：PDF 萃取模組、Playwright persistent context 架構、Excel 追蹤表、Git 歸檔 + skill 編排。</p>
+  </div>
+
+  <!-- Summary -->
+  <div class="section">
+    <div class="section-label lessons">總結</div>
+    <h2>成果</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>收穫</th>
+            <th>成果</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>單款產品送件時間</td>
+            <td>從 20-30 分鐘 → <strong>5 分鐘</strong>（含人工確認）</td>
+          </tr>
+          <tr>
+            <td>送錯風險</td>
+            <td>低（YAML review + 確認頁 + 截圖存證）</td>
+          </tr>
+          <tr>
+            <td>知識資產化</td>
+            <td>公司 VCCI 流程有完整程式碼 + 送件紀錄可查</td>
+          </tr>
+          <tr>
+            <td>可複製性</td>
+            <td>架構可套用到其他法規申報系統</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>更重要的是，這個專案證明了 <strong>AI + 半自動化</strong> 是處理這類「低頻、高精確度需求」業務的好方法 — 不要求 100% 自動，但把 80% 機械性工作交給機器、保留關鍵決策給人。</p>
+  </div>
+
+  <div class="footer">
+    <a href="index.html">← 返回 Comms Docs</a>
+  </div>
+
+</div>
+</body>
+</html>
