@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UTM 參數使用指南</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand-1: #6366F1;
+      --brand-2: #8B5CF6;
+      --brand-3: #EC4899;
+      --bg: #F5F3F0;
+      --card: #FFFFFF;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-tertiary: #64748B;
+      --ring: rgba(15, 23, 42, 0.06);
+      --teal: #0D9488;
+      --teal-light: #F0FDFA;
+      --green: #16A34A;
+      --green-bg: #F0FDF4;
+      --red: #DC2626;
+      --red-bg: #FEF2F2;
+      --amber: #D97706;
+      --amber-bg: #FFFBEB;
+      --indigo: #4F46E5;
+      --indigo-bg: #EEF2FF;
+      --violet: #7C3AED;
+      --violet-bg: #F5F3FF;
+      --pink: #DB2777;
+      --pink-bg: #FDF2F8;
+      --sky: #0284C7;
+      --sky-bg: #F0F9FF;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    code, .mono {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.92em;
+    }
+    p code, li code, td code {
+      background: #F1F5F9;
+      padding: 2px 7px; border-radius: 6px;
+      color: var(--indigo);
+      font-weight: 600;
+    }
+
+    /* ---- Header ---- */
+    header { background: #0F172A; position: sticky; top: 0; z-index: 40; }
+    header .inner {
+      max-width: 1120px; margin: 0 auto;
+      padding: 0 32px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header .logo { display: flex; align-items: center; gap: 14px; }
+    header .logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+    }
+    header .logo-icon svg { width: 20px; height: 20px; color: white; }
+    header .brand-name { font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em; }
+    header .brand-sub {
+      font-size: 13px; font-weight: 600; color: var(--brand-2);
+      margin-left: 10px;
+      background: rgba(139, 92, 246, 0.15);
+      padding: 2px 10px; border-radius: 99px;
+    }
+    header .back-link {
+      font-size: 14px; font-weight: 500; color: #E2E8F0; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      transition: all 0.15s;
+    }
+    header .back-link:hover { background: rgba(255,255,255,0.12); color: #FFFFFF; }
+    .accent-line { height: 3px; background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3)); }
+
+    /* ---- Hero ---- */
+    .hero { max-width: 1120px; margin: 0 auto; padding: 64px 32px 48px; }
+    .hero h1 {
+      font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      font-size: 19px; color: var(--text-secondary); max-width: 720px; line-height: 1.8;
+    }
+    .hero .meta {
+      font-size: 14px; color: var(--text-tertiary); margin-top: 12px;
+    }
+
+    /* ---- TOC ---- */
+    .toc {
+      max-width: 1120px; margin: 0 auto; padding: 0 32px 32px;
+    }
+    .toc-card {
+      background: var(--card); border-radius: 16px;
+      outline: 1px solid var(--ring);
+      padding: 20px 24px;
+    }
+    .toc-card .toc-label {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+      color: var(--text-tertiary); text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .toc-list {
+      display: flex; flex-wrap: wrap; gap: 8px 16px;
+      list-style: none;
+    }
+    .toc-list a {
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 15px; font-weight: 500;
+      padding: 4px 10px; border-radius: 8px;
+      transition: all 0.15s;
+    }
+    .toc-list a:hover { background: var(--violet-bg); color: var(--violet); }
+
+    /* ---- Sections ---- */
+    .section { max-width: 1120px; margin: 0 auto; padding: 0 32px 56px; scroll-margin-top: 80px; }
+    .section-title {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 24px;
+    }
+
+    /* ---- Cards ---- */
+    .card {
+      background: var(--card); border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      outline: 1px solid var(--ring);
+      padding: 40px; margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 24px; font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .card h3 {
+      font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+      margin-bottom: 8px; margin-top: 32px;
+    }
+    .card h3:first-child { margin-top: 0; }
+    .card p { color: var(--text-secondary); margin-bottom: 14px; font-size: 17px; }
+    .card p:last-child { margin-bottom: 0; }
+    .card ul, .card ol {
+      margin: 14px 0 14px 20px;
+    }
+    .card ul li, .card ol li {
+      font-size: 17px; color: var(--text-secondary); line-height: 1.8;
+      padding: 2px 0;
+    }
+    .card strong { color: var(--text-primary); }
+
+    /* ---- Field Header (numbered, colored) ---- */
+    .field-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 20px;
+    }
+    .field-num {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 800;
+      flex-shrink: 0;
+    }
+    .field-header h2 { margin-bottom: 0; }
+    .field-header .field-label {
+      font-size: 13px; font-weight: 600; margin-top: 2px;
+    }
+    .field-indigo .field-num { background: var(--indigo-bg); color: var(--indigo); }
+    .field-indigo .field-label { color: var(--indigo); }
+    .field-violet .field-num { background: var(--violet-bg); color: var(--violet); }
+    .field-violet .field-label { color: var(--violet); }
+    .field-pink .field-num { background: var(--pink-bg); color: var(--pink); }
+    .field-pink .field-label { color: var(--pink); }
+    .field-amber .field-num { background: var(--amber-bg); color: var(--amber); }
+    .field-amber .field-label { color: var(--amber); }
+    .field-sky .field-num { background: var(--sky-bg); color: var(--sky); }
+    .field-sky .field-label { color: var(--sky); }
+
+    /* ---- Tables ---- */
+    .specs-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 20px 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden;
+      outline: 1px solid var(--ring);
+    }
+    .specs-table th {
+      background: #F8FAFC; text-align: left; padding: 14px 20px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .specs-table td {
+      padding: 14px 20px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .specs-table tr:last-child td { border-bottom: none; }
+    .specs-table td:first-child {
+      font-weight: 600; color: var(--text-primary); white-space: nowrap;
+    }
+    .specs-table td.wrap:first-child { white-space: normal; }
+
+    /* ---- Code block ---- */
+    .code-block {
+      background: #0F172A; color: #E2E8F0;
+      border-radius: 14px; padding: 20px 24px; margin: 16px 0;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 14px; line-height: 1.8; overflow-x: auto;
+    }
+    .code-block .k { color: #F0ABFC; }
+    .code-block .v { color: #93C5FD; }
+    .code-block .c { color: #64748B; }
+
+    /* ---- Callout ---- */
+    .callout {
+      border-radius: 14px; padding: 20px 24px; margin: 20px 0;
+      font-size: 16px; line-height: 1.7;
+    }
+    .callout-green { background: var(--green-bg); border-left: 4px solid var(--green); color: #166534; }
+    .callout-red { background: var(--red-bg); border-left: 4px solid var(--red); color: #991B1B; }
+    .callout-amber { background: var(--amber-bg); border-left: 4px solid var(--amber); color: #92400E; }
+    .callout-violet { background: var(--violet-bg); border-left: 4px solid var(--violet); color: #5B21B6; }
+    .callout .callout-title { font-weight: 700; margin-bottom: 8px; font-size: 17px; }
+
+    /* ---- Pill / badge ---- */
+    .pill {
+      display: inline-block; padding: 3px 10px; border-radius: 99px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.02em;
+    }
+    .pill-required { background: var(--red-bg); color: var(--red); }
+    .pill-optional { background: var(--amber-bg); color: var(--amber); }
+    .pill-recommended { background: var(--green-bg); color: var(--green); }
+
+    /* ---- Checklist ---- */
+    .checklist {
+      list-style: none; margin: 0; padding: 0;
+    }
+    .checklist li {
+      font-size: 17px; padding: 10px 0 10px 36px;
+      position: relative; color: var(--text-secondary);
+      border-bottom: 1px solid rgba(15,23,42,0.04);
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li::before {
+      content: "☐"; position: absolute; left: 4px; top: 8px;
+      font-size: 20px; color: var(--violet);
+    }
+
+    /* ---- Common Mistakes ---- */
+    .mistake-list {
+      list-style: none; margin: 0; padding: 0;
+    }
+    .mistake-list li {
+      padding: 14px 16px; margin-bottom: 8px;
+      background: var(--red-bg); border-radius: 12px;
+      border-left: 4px solid var(--red);
+      font-size: 16px; color: #7F1D1D; line-height: 1.7;
+    }
+    .mistake-list li strong { color: var(--red); font-weight: 700; }
+
+    /* ---- Good vs Bad ---- */
+    .gvb {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0;
+    }
+    .gvb > div { border-radius: 14px; padding: 16px 18px; }
+    .gvb .good { background: var(--green-bg); border: 1px solid rgba(22,163,74,0.2); }
+    .gvb .bad { background: var(--red-bg); border: 1px solid rgba(220,38,38,0.2); }
+    .gvb h4 {
+      font-size: 13px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; margin-bottom: 10px;
+    }
+    .gvb .good h4 { color: var(--green); }
+    .gvb .bad h4 { color: var(--red); }
+    .gvb p { font-size: 15px; margin: 0; color: var(--text-secondary); }
+    .gvb p + p { margin-top: 6px; }
+
+    /* ---- Footer ---- */
+    .footer {
+      max-width: 1120px; margin: 0 auto; padding: 48px 32px 64px;
+      text-align: center;
+    }
+    .footer a {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--violet); font-weight: 600; text-decoration: none;
+      padding: 8px 20px; border-radius: 99px;
+      background: var(--violet-bg); transition: all 0.15s;
+    }
+    .footer a:hover { background: rgba(124,58,237,0.15); }
+
+    /* ---- RWD ---- */
+    @media (max-width: 640px) {
+      body { font-size: 16px; }
+      .hero { padding: 40px 20px 32px; }
+      .hero h1 { font-size: 28px; }
+      .hero .subtitle { font-size: 16px; }
+      .toc { padding: 0 20px 24px; }
+      .toc-list { gap: 6px 10px; }
+      .section { padding: 0 20px 40px; }
+      .section-title { font-size: 22px; }
+      .card { padding: 24px 20px; border-radius: 16px; }
+      .card h2 { font-size: 20px; }
+      .card h3 { font-size: 16px; }
+      header .inner { padding: 0 16px; }
+      header .brand-sub { display: none; }
+      .specs-table { font-size: 14px; }
+      .specs-table th, .specs-table td { padding: 10px 12px; }
+      .specs-table td:first-child { white-space: normal; }
+      .field-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .field-num { width: 44px; height: 44px; font-size: 20px; }
+      .gvb { grid-template-columns: 1fr; }
+      .code-block { font-size: 13px; padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/></svg>
+        </div>
+        <span class="brand-name">UTM Guide</span>
+        <span class="brand-sub">行銷團隊</span>
+      </div>
+      <a href="index.html" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        返回目錄
+      </a>
+    </div>
+  </header>
+  <div class="accent-line"></div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>UTM 參數<br/><span class="gradient">使用指南</span></h1>
+    <p class="subtitle">統一團隊 UTM 填寫規範，讓 GA4、分析工具能精確歸因每一筆流量。這份文件是所有行銷連結建立的共同依據。</p>
+    <p class="meta">適用對象：行銷、內容編輯、合作夥伴管理者 &mdash; 2026-04-18</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-card">
+      <div class="toc-label">快速跳轉</div>
+      <ul class="toc-list">
+        <li><a href="#what-is-utm">什麼是 UTM</a></li>
+        <li><a href="#medium">1. 媒介 (Medium)</a></li>
+        <li><a href="#source">2. 來源 (Source)</a></li>
+        <li><a href="#campaign">3. 活動 (Campaign)</a></li>
+        <li><a href="#content">4. 內容 (Content)</a></li>
+        <li><a href="#term">5. 關鍵字 (Term)</a></li>
+        <li><a href="#examples">實際範例</a></li>
+        <li><a href="#mistakes">常見錯誤</a></li>
+        <li><a href="#best-practice">最佳實務</a></li>
+        <li><a href="#checklist">檢核表</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- What is UTM -->
+  <div class="section" id="what-is-utm">
+    <h2 class="section-title">什麼是 UTM？為什麼要用？</h2>
+    <div class="card">
+      <p>UTM（Urchin Tracking Module）是加在 URL 後面的<strong>追蹤參數</strong>，讓 GA4、HubSpot 等分析工具能精確辨識：這個訪客是從哪來的？哪個活動帶來的？什麼素材吸引到他的？</p>
+
+      <div class="code-block">
+<span class="v">https://engenius.ai/</span>?<span class="k">utm_source</span>=<span class="v">google</span>&amp;<span class="k">utm_medium</span>=<span class="v">cpc</span>&amp;<span class="k">utm_campaign</span>=<span class="v">spring_sale_2026</span>
+<span class="c">                      └────────────── UTM 參數 ──────────────┘</span>
+      </div>
+
+      <div class="gvb">
+        <div class="bad">
+          <h4>沒有 UTM</h4>
+          <p>GA 只會說「有人來自 Google」</p>
+          <p>無法分辨來源、活動、素材</p>
+        </div>
+        <div class="good">
+          <h4>有 UTM</h4>
+          <p>能知道「來自 Google 付費廣告的『春季特賣』活動」</p>
+          <p>可追蹤 ROI、A/B 測試、成效歸因</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Field 1: Medium -->
+  <div class="section" id="medium">
+    <h2 class="section-title">五大欄位逐個說明</h2>
+
+    <div class="card">
+      <div class="field-header field-indigo">
+        <div class="field-num">1</div>
+        <div>
+          <h2>媒介 (utm_medium) <span class="pill pill-required">必填</span></h2>
+          <div class="field-label">流量的「類型」— 先選這個</div>
+        </div>
+      </div>
+
+      <p><strong>定義：</strong>流量是透過什麼<strong>渠道類型</strong>帶來的？</p>
+      <p><strong>為什麼要先選？</strong>Medium 決定 Source 的下拉範圍 — 選 <code>social</code> 會列 FB/IG/LinkedIn；選 <code>cpc</code> 會列 Google Ads、Meta Ads。</p>
+
+      <table class="specs-table">
+        <thead>
+          <tr><th>值</th><th>使用情境</th><th>範例</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>cpc</code></td><td>付費廣告（per-click 計費）</td><td>Google Ads、Bing Ads</td></tr>
+          <tr><td><code>social</code></td><td>社群自然貼文（免費的 post）</td><td>FB/IG/LinkedIn 粉專發文</td></tr>
+          <tr><td><code>organic</code></td><td>自然搜尋（SEO）</td><td>Google 搜尋結果</td></tr>
+          <tr><td><code>email</code></td><td>Email 行銷</td><td>EDM、電子報、交易通知信</td></tr>
+          <tr><td><code>referral</code></td><td>其他網站的推薦連結</td><td>合作夥伴網站、媒體報導</td></tr>
+          <tr><td><code>affiliate</code></td><td>聯盟行銷</td><td>分潤合作、推薦碼</td></tr>
+          <tr><td><code>display</code></td><td>展示型廣告</td><td>Banner 廣告、Google Display Network</td></tr>
+          <tr><td><code>video</code></td><td>影片廣告</td><td>YouTube Ads、TikTok Ads</td></tr>
+          <tr><td><code>qr</code></td><td>QR Code 掃描</td><td>實體傳單、名片、產品包裝</td></tr>
+          <tr><td><code>offline</code></td><td>線下行銷</td><td>印刷品、展覽、活動</td></tr>
+          <tr><td><code>influencer</code></td><td>KOL / 網紅合作</td><td>Instagram 業配、YouTuber 開箱</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Field 2: Source -->
+  <div class="section" id="source">
+    <div class="card">
+      <div class="field-header field-violet">
+        <div class="field-num">2</div>
+        <div>
+          <h2>來源 (utm_source) <span class="pill pill-required">必填</span></h2>
+          <div class="field-label">具體的「平台或網站名稱」</div>
+        </div>
+      </div>
+
+      <p><strong>定義：</strong>是<strong>誰</strong>具體帶你來的？平台名、網站名、KOL 名稱。</p>
+
+      <table class="specs-table">
+        <thead>
+          <tr><th>Medium</th><th>Source 範例</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>cpc</code></td><td><code>google</code>, <code>bing</code>, <code>meta</code>（Meta Ads）</td></tr>
+          <tr><td><code>social</code></td><td><code>facebook</code>, <code>instagram</code>, <code>linkedin</code>, <code>twitter</code>, <code>threads</code></td></tr>
+          <tr><td><code>organic</code></td><td><code>google</code>, <code>bing</code>, <code>yahoo</code>, <code>duckduckgo</code></td></tr>
+          <tr><td><code>email</code></td><td><code>newsletter_weekly</code>, <code>edm_2026q2</code>, <code>hubspot_nurture</code></td></tr>
+          <tr><td><code>referral</code></td><td class="wrap">對方網站名（例：<code>techcrunch</code>, <code>partner_xyz</code>）</td></tr>
+          <tr><td><code>qr</code></td><td class="wrap">實體位置（例：<code>flyer_taipei</code>, <code>booth_computex</code>）</td></tr>
+          <tr><td><code>influencer</code></td><td class="wrap">KOL 帳號名（例：<code>ig_userabc</code>, <code>yt_channelxyz</code>）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Field 3: Campaign -->
+  <div class="section" id="campaign">
+    <div class="card">
+      <div class="field-header field-pink">
+        <div class="field-num">3</div>
+        <div>
+          <h2>活動 (utm_campaign) <span class="pill pill-required">必填</span></h2>
+          <div class="field-label">這個連結屬於哪場行銷活動</div>
+        </div>
+      </div>
+
+      <div class="callout callout-violet">
+        <div class="callout-title">最重要的欄位</div>
+        GA 報表會以 campaign 為單位彙總。所有同一活動的連結 <strong>必須共用同一個 campaign 名</strong>，否則數據會被當成不同活動切開。
+      </div>
+
+      <h3>命名規則（強制要求）</h3>
+      <ul>
+        <li>全小寫</li>
+        <li>用底線 <code>_</code> 分隔</li>
+        <li>格式建議：<code>[主題]_[時期]_[對象]</code></li>
+        <li>不能用空格、中文、大小寫混用、特殊符號</li>
+      </ul>
+
+      <table class="specs-table">
+        <thead>
+          <tr><th>好範例</th><th>壞範例</th><th>原因</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>spring_sale_2026</code></td><td><code>Spring Sale!</code></td><td>大寫 + 空格 + 符號</td></tr>
+          <tr><td><code>product_launch_eap_q2</code></td><td><code>春季特賣</code></td><td class="wrap">GA 會顯示亂碼 <code>%E6%98%A5</code>&hellip;</td></tr>
+          <tr><td><code>webinar_2026_jun</code></td><td><code>webinar</code></td><td>太籠統、無法區分不同場</td></tr>
+          <tr><td><code>computex_2026</code></td><td><code>展覽</code></td><td>分類太抽象</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Field 4: Content -->
+  <div class="section" id="content">
+    <div class="card">
+      <div class="field-header field-amber">
+        <div class="field-num">4</div>
+        <div>
+          <h2>內容 (utm_content) <span class="pill pill-recommended">選填但強烈建議</span></h2>
+          <div class="field-label">區分素材、版位、A/B 對照</div>
+        </div>
+      </div>
+
+      <p><strong>定義：</strong>同一個活動內，用來<strong>區分不同素材或版位</strong>。</p>
+
+      <h3>最常見的兩個用途</h3>
+      <ul>
+        <li><strong>A/B 測試</strong>：比較哪個素材效果好（cta_red vs cta_blue）</li>
+        <li><strong>多版位追蹤</strong>：首頁 banner vs 側邊欄 vs EDM 按鈕</li>
+      </ul>
+
+      <div class="code-block">
+<span class="c"># 同一個 campaign，多個 content</span>
+<span class="k">campaign</span>: <span class="v">spring_sale_2026</span>
+├─ <span class="k">content</span>: <span class="v">banner_top</span>       <span class="c">← 網頁頂部 banner</span>
+├─ <span class="k">content</span>: <span class="v">banner_sidebar</span>   <span class="c">← 側邊欄</span>
+├─ <span class="k">content</span>: <span class="v">cta_red</span>          <span class="c">← 紅色 CTA 按鈕</span>
+├─ <span class="k">content</span>: <span class="v">cta_blue</span>         <span class="c">← 藍色 CTA 按鈕（A/B 對照）</span>
+└─ <span class="k">content</span>: <span class="v">video_30s</span>        <span class="c">← 30 秒版影片</span>
+      </div>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">新人常犯錯</div>
+        以為 content 沒用。實際上這是判斷「哪個素材 ROI 最高」的關鍵。<strong>花錢做 A/B 但沒填 content，等於白花錢</strong>，因為事後無法區分哪個版本效果好。
+      </div>
+    </div>
+  </div>
+
+  <!-- Field 5: Term -->
+  <div class="section" id="term">
+    <div class="card">
+      <div class="field-header field-sky">
+        <div class="field-num">5</div>
+        <div>
+          <h2>關鍵字 (utm_term) <span class="pill pill-optional">選填</span></h2>
+          <div class="field-label">付費搜尋廣告的關鍵字</div>
+        </div>
+      </div>
+
+      <p><strong>定義：</strong>主要用於<strong>付費搜尋廣告</strong>記錄使用者搜尋的關鍵字。</p>
+
+      <ul>
+        <li>Google Ads 會<strong>自動帶入</strong>，不用手動設（用 <code>{keyword}</code> 動態變數）</li>
+        <li>只有手動建非 Google Ads 的付費搜尋連結才會用到</li>
+        <li>一般社群、Email、QR 都不用填</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Real Examples -->
+  <div class="section" id="examples">
+    <h2 class="section-title">實際範例（可直接套用）</h2>
+
+    <div class="card">
+      <h3>情境 1：EDM 電子報</h3>
+      <div class="code-block">
+<span class="k">medium</span>:   <span class="v">email</span>
+<span class="k">source</span>:   <span class="v">newsletter_weekly</span>
+<span class="k">campaign</span>: <span class="v">product_update_2026_q2</span>
+<span class="k">content</span>:  <span class="v">top_banner</span>
+      </div>
+
+      <h3>情境 2：Facebook 付費廣告</h3>
+      <div class="code-block">
+<span class="k">medium</span>:   <span class="v">cpc</span>
+<span class="k">source</span>:   <span class="v">facebook</span>
+<span class="k">campaign</span>: <span class="v">spring_sale_2026</span>
+<span class="k">content</span>:  <span class="v">video_30s_version_a</span>   <span class="c">← 另一版叫 version_b，方便 A/B 比較</span>
+      </div>
+
+      <h3>情境 3：QR Code 印在展場傳單</h3>
+      <div class="code-block">
+<span class="k">medium</span>:   <span class="v">qr</span>
+<span class="k">source</span>:   <span class="v">flyer_computex_2026</span>
+<span class="k">campaign</span>: <span class="v">booth_demo_2026</span>
+<span class="k">content</span>:  <span class="v">discount_20_off</span>
+      </div>
+
+      <h3>情境 4：合作網紅 Instagram 限動</h3>
+      <div class="code-block">
+<span class="k">medium</span>:   <span class="v">influencer</span>
+<span class="k">source</span>:   <span class="v">ig_userxyz</span>
+<span class="k">campaign</span>: <span class="v">launch_new_product_q2</span>
+<span class="k">content</span>:  <span class="v">story_swipeup</span>
+      </div>
+
+      <h3>情境 5：LinkedIn 自然貼文</h3>
+      <div class="code-block">
+<span class="k">medium</span>:   <span class="v">social</span>
+<span class="k">source</span>:   <span class="v">linkedin</span>
+<span class="k">campaign</span>: <span class="v">thought_leadership_2026</span>
+<span class="k">content</span>:  <span class="v">article_feature_ai</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Common Mistakes -->
+  <div class="section" id="mistakes">
+    <h2 class="section-title">新人常見 7 大錯誤</h2>
+    <div class="card">
+      <ol class="mistake-list">
+        <li><strong>每次取不同活動名</strong>：<code>spring_sale</code> / <code>Spring-Sales</code> / <code>springSale</code> → GA 會當成 3 個活動，無法彙總。</li>
+        <li><strong>用中文</strong>：<code>春季特賣</code> → GA 會顯示 <code>%E6%98%A5%E5%AD%A3</code>&hellip; 亂碼。</li>
+        <li><strong>把活動名塞到 source</strong>：<code>source=spring_sale_fb</code> → 應拆成 <code>source=facebook</code>, <code>campaign=spring_sale</code>。</li>
+        <li><strong>medium 亂填或自創</strong>：有人寫 <code>fb</code>、有人寫 <code>facebook</code>、有人寫 <code>social</code> → 無法跨活動比較。</li>
+        <li><strong>空白欄位</strong>：campaign 空著，GA 會歸類成 <code>(not set)</code>，等於白追蹤。</li>
+        <li><strong>只做一次就改名</strong>：活動進行中改 campaign 名 → 前後數據分裂，報表兜不起來。</li>
+        <li><strong>不用 content</strong>：失去 A/B 對比能力，花錢做廣告但看不出哪個版本好。</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Best Practice -->
+  <div class="section" id="best-practice">
+    <h2 class="section-title">團隊最佳實務</h2>
+
+    <div class="card">
+      <h3>1. 善用短網址工具的下拉選單</h3>
+      <p>工具的 <strong>Medium / Source 下拉選單</strong>就是公司 UTM Cheatsheet — 用下拉選單優先，避免手動打字造成的拼字不一致。</p>
+
+      <h3>2. Campaign 命名規範</h3>
+      <p>先定好格式：<code>{主題}_{時期}_{對象}</code></p>
+      <ul>
+        <li><code>launch_2026q2_emea</code>（2026 Q2 歐洲區新品發表）</li>
+        <li><code>webinar_2026jun_smb</code>（2026 六月中小企業 webinar）</li>
+      </ul>
+      <p>放共用文件讓大家照抄，避免命名風格分歧。</p>
+
+      <h3>3. 善用工具的「Campaign 資產」功能</h3>
+      <p>短網址工具的 Campaign Model 能統一管理：</p>
+      <ul>
+        <li>活動生命週期（草稿 / 進行中 / 結束）</li>
+        <li>活動標籤分類</li>
+        <li>一次設定，多連結共用 — 不用每次都自己打 campaign 名</li>
+      </ul>
+
+      <h3>4. 用 UTM Template</h3>
+      <p>把常用組合存成 template：</p>
+      <ul>
+        <li><strong>EDM 電子報</strong> → 自動帶 <code>medium=email</code>, <code>source=newsletter_weekly</code></li>
+        <li><strong>展場 QR</strong> → 自動帶 <code>medium=qr</code></li>
+      </ul>
+
+      <h3>5. 每月 UTM Audit</h3>
+      <ul>
+        <li>看 GA 有沒有出現 typo（<code>spring_sal</code> 之類）</li>
+        <li>有 typo 就回溯修正 + 提醒同事</li>
+        <li>檢查有沒有 <code>(not set)</code> 或 <code>(none)</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Checklist -->
+  <div class="section" id="checklist">
+    <h2 class="section-title">快速檢核表（建連結前跑一遍）</h2>
+    <div class="card">
+      <ul class="checklist">
+        <li>medium 有用標準值（<code>cpc</code> / <code>social</code> / <code>organic</code> / <code>email</code> / <code>referral</code> / <code>affiliate</code> / <code>display</code> / <code>video</code> / <code>qr</code> / <code>offline</code> / <code>influencer</code>）</li>
+        <li>source 是具體平台名，不是活動名</li>
+        <li>campaign 是「主題_時期_對象」格式，全小寫 + 底線</li>
+        <li>同一活動所有連結共用同一個 campaign 名</li>
+        <li>有做 A/B 或多版位 → 有填 content</li>
+        <li>沒用中文、沒用空格、沒用 <code>!@#</code> 特殊符號</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Medium Cheat Card -->
+  <div class="section">
+    <h2 class="section-title">附錄：Medium 對照小卡</h2>
+    <div class="card">
+      <p>用白話理解每個 medium 在問什麼：</p>
+      <table class="specs-table">
+        <thead>
+          <tr><th>Medium</th><th>問自己</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>cpc</code></td><td>這是花錢買的點擊嗎？</td></tr>
+          <tr><td><code>social</code></td><td>這是社群的自然發文嗎？</td></tr>
+          <tr><td><code>organic</code></td><td>這是搜尋引擎自然搜到的嗎？</td></tr>
+          <tr><td><code>email</code></td><td>這是從信裡點過來的嗎？</td></tr>
+          <tr><td><code>referral</code></td><td>這是別的網站掛我們連結過來的嗎？</td></tr>
+          <tr><td><code>affiliate</code></td><td>這是有分潤合約的夥伴嗎？</td></tr>
+          <tr><td><code>display</code></td><td>這是 banner 廣告嗎？</td></tr>
+          <tr><td><code>video</code></td><td>這是影片廣告嗎？</td></tr>
+          <tr><td><code>qr</code></td><td>這是掃 QR Code 進來的嗎？</td></tr>
+          <tr><td><code>offline</code></td><td>這是實體活動或印刷品嗎？</td></tr>
+          <tr><td><code>influencer</code></td><td>這是 KOL 業配嗎？</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <a href="index.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      返回目錄
+    </a>
+  </div>
+</body>
+</html>
