@@ -248,32 +248,52 @@
     .pill-optional { background: var(--amber-bg); color: var(--amber); }
     .pill-recommended { background: var(--green-bg); color: var(--green); }
 
-    /* ---- Checklist ---- */
-    .checklist {
+    /* ---- Checklist (same specificity trick as .mistake-list) ---- */
+    .card .checklist {
       list-style: none; margin: 0; padding: 0;
     }
-    .checklist li {
+    .card .checklist li {
       font-size: 17px; padding: 10px 0 10px 36px;
+      margin: 0;
       position: relative; color: var(--text-secondary);
       border-bottom: 1px solid rgba(15,23,42,0.04);
+      line-height: 1.7;
     }
-    .checklist li:last-child { border-bottom: none; }
-    .checklist li::before {
+    .card .checklist li:last-child { border-bottom: none; }
+    .card .checklist li::before {
       content: "☐"; position: absolute; left: 4px; top: 8px;
       font-size: 20px; color: var(--violet);
     }
 
-    /* ---- Common Mistakes ---- */
-    .mistake-list {
+    /* ---- Common Mistakes ----
+       Higher specificity (.card .mistake-list) so it overrides the
+       generic .card ol/ul rules declared earlier. */
+    .card .mistake-list {
       list-style: none; margin: 0; padding: 0;
+      counter-reset: mistake;
     }
-    .mistake-list li {
-      padding: 14px 16px; margin-bottom: 8px;
-      background: var(--red-bg); border-radius: 12px;
+    .card .mistake-list li {
+      position: relative;
+      padding: 16px 20px 16px 54px;
+      margin: 0 0 10px 0;
+      background: var(--red-bg);
+      border-radius: 12px;
       border-left: 4px solid var(--red);
       font-size: 16px; color: #7F1D1D; line-height: 1.7;
+      counter-increment: mistake;
     }
-    .mistake-list li strong { color: var(--red); font-weight: 700; }
+    .card .mistake-list li::before {
+      content: counter(mistake);
+      position: absolute;
+      left: 14px; top: 14px;
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--red); color: #FFFFFF;
+      font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .card .mistake-list li:last-child { margin-bottom: 0; }
+    .card .mistake-list li strong { color: var(--red); font-weight: 700; }
 
     /* ---- Good vs Bad ---- */
     .gvb {
