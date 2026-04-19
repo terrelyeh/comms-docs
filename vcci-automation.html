@@ -152,17 +152,17 @@
     <a class="back" href="index.html">← 返回 Comms Docs</a><br>
     <span class="badge">Internal Knowledge</span>
     <h1>VCCI 日本認證登錄自動化</h1>
-    <div class="subtitle">痛點、架構與可複用的學習</div>
-    <div class="date">2026-04-19</div>
+    <div class="subtitle">送件 × 狀態同步 × 線上 Dashboard 的完整生命週期工具</div>
+    <div class="date">建立 2026-04-19 · 更新 2026-04-19（加入狀態同步 + Dashboard）</div>
   </div>
 
   <!-- Executive Summary -->
   <div class="exec-summary">
     <div class="es-label">TL;DR</div>
-    <h2>20–30 分鐘的申報 → 5 分鐘搞定</h2>
-    <p>EnGenius Networks Japan 每款新產品上市前都要在 VCCI 官網登錄。我們把 PDF 測試報告 → 自動填表 → 送出 → 歸檔的整條流程做成半自動工具。</p>
+    <h2>從「20–30 分鐘送件」到「完整生命週期自動化」</h2>
+    <p>EnGenius Networks Japan 每款新產品上市前都要在 VCCI 官網登錄。我們做了兩個半自動工具：<strong>vcci-submit</strong>（PDF → 自動填表 → 送出 → 歸檔）和 <strong>vcci-status-sync</strong>（每週抓 VCCI 官網狀態 → 回填 Acceptance No.），外加一個密碼保護的線上 Dashboard。</p>
     <p>過程中碰到很多官方 CGI 網站的反自動化機制 — <strong>合成事件被擋</strong>、<strong>AJAX 需要真實 blur</strong>、<strong>雙語 PDF 錯位</strong>。最終靠 <strong>Playwright 的 <code>page.mouse.click()</code></strong>（產生 OS 級真實滑鼠事件）+ <strong>Cookie 持久化 profile</strong> 繞過所有障礙。</p>
-    <p>整套架構可複用到 FCC / CE / KC 等其他國家認證送件，甚至政府申報、供應商入口等「無 API 的 UI 自動化」場景。</p>
+    <p>關鍵商業洞察：<strong>Report No. ≠ 可販售</strong>，要等 VCCI 4–5 天審核完發 Acceptance No. 才能合法出貨。所以「追蹤循環」和「送件」一樣重要。整套架構可複用到 FCC / CE / KC 等其他長週期認證送件、政府申報系統。</p>
   </div>
 
   <!-- Background -->
@@ -174,8 +174,9 @@
       <li>重複性高（每月 1–2 款）</li>
       <li>欄位細碎（13 個必填欄位 + AJAX 聯動）</li>
       <li>送錯難撤回（需要 VCCI 介入）</li>
+      <li><strong>送出去只是第一步</strong>：要等 4–5 個工作日核發 Acceptance No. 才能合法貼標販售</li>
     </ul>
-    <p>是典型「低頻、高單筆成本、易出錯」的工作，非常適合 AI + 半自動化處理。</p>
+    <p>是典型「低頻、長週期、高單筆成本、易出錯」的工作，非常適合 AI + 半自動化處理。除了送件本身，還需要一個<strong>狀態追蹤循環</strong>來管理等待期。</p>
   </div>
 
   <!-- Pain points -->
@@ -257,6 +258,35 @@ page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
       <div class="pain-title"><span class="icon">🤖</span> 痛點 6：Playwright 指紋被識別</div>
       <p>VCCI 會檢測 Playwright 預設的 <code>navigator.webdriver</code> 等特徵拒絕登入。解法組合：真實 User-Agent + <code>launch_persistent_context</code> 真實 profile + 讓使用者<strong>手動登入一次</strong>，之後 cookie 持久化，繞過登入環節的 bot 檢測。</p>
     </div>
+
+    <div class="pain-card">
+      <div class="pain-title"><span class="icon">⏳</span> 痛點 7：非同步核發 — Report No. ≠ 可販售</div>
+      <p>這是<strong>商業面</strong>的痛點：VCCI 送件後<strong>不是立刻就能賣</strong>。</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>欄位</th>
+              <th>核發時機</th>
+              <th>意義</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Report No.</strong></td>
+              <td>送件當下</td>
+              <td>只代表「我送出去了」</td>
+            </tr>
+            <tr>
+              <td><strong>Acceptance No.</strong></td>
+              <td>4–5 個工作日後</td>
+              <td>真正能貼 VCCI 標、合法販售</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>如果沒做狀態追蹤，很容易「以為送了就能賣 → 實際上還在審核」。所以這類認證自動化專案，<strong>追蹤循環和送件本身一樣重要</strong>。</p>
+    </div>
   </div>
 
   <!-- Architecture -->
@@ -264,25 +294,39 @@ page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
     <div class="section-label tech">架構</div>
     <h2>技術選型</h2>
 
-    <div class="arch"><span class="step">┌────────────────────────────────────────────┐</span>
-<span class="step">│  Claude Code Skill (vcci-submit)           │</span>
-<span class="step">│  ─ 串聯整個 pipeline                       │</span>
-<span class="step">└──────────────┬─────────────────────────────┘</span>
-               │
-   ┌───────────┼────────────┬──────────────┐
-   ▼           ▼            ▼              ▼
-┌──────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
-│ PDF  │<span class="arrow">→</span> │  YAML    │<span class="arrow">→</span> │Playwright│<span class="arrow">→</span> │  XLSX    │
-│ 報告 │  │  (草稿)  │  │  自動化  │  │ 追蹤表   │
-└──────┘  └──────────┘  └──────────┘  └──────────┘
- pdfplumber   PyYAML      persistent   openpyxl
-                          _context
-                                            │
-                                            ▼
-                                    ┌──────────────┐
-                                    │ GitHub Private│
-                                    │ Repo（存證）  │
-                                    └──────────────┘</div>
+    <div class="arch">送件循環（每月 1–2 次）                    狀態同步循環（每週 1 次）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━            ━━━━━━━━━━━━━━━━━━━━━━━━━━
+┌──────┐   ┌──────────┐                     ┌──────────────────────┐
+│ PDF  │ <span class="arrow">→</span> │  YAML    │                     │  VCCI Top 頁         │
+│ 報告 │   │  (草稿)  │                     │  Recent Reporting    │
+└──────┘   └──────────┘                     │  Status 表           │
+               │                             └──────────┬───────────┘
+               ▼                                        │
+         ┌──────────┐                                   ▼
+         │Playwright│   <span class="comment">◄── 順手抓 ──</span>            ┌──────────┐
+         │  自動化  │                             │ parse +  │
+         └──────────┘                             │ snapshot │
+               │                                  └──────────┘
+               ▼                                        │
+    ┌──────────┬──────────┬──────────┐                 ▼
+    ▼          ▼          ▼          ▼            ┌──────────────┐
+ ┌─────┐   ┌─────┐    ┌─────┐   ┌──────┐          │ Acceptance   │
+ │XLSX │   │截圖 │    │歸檔 │   │sync ◄│──────────┤ No. 回填     │
+ │表  │    │存證 │    │yaml │   │舊品  │          └──────────────┘
+ └─────┘   └─────┘    │+pdf │   └──────┘                │
+    │                  └─────┘                          │
+    └────────────────┬────────────────────────────┬─────┘
+                     ▼                            ▼
+             ┌─────────────────────────────────────────┐
+             │  靜態 Dashboard (index + submissions/)  │
+             │  ← 每次送件 / sync 都會重生、git push   │
+             └─────────────────────────────────────────┘
+                                 │
+                                 ▼
+                      ┌────────────────────┐
+                      │  Vercel + 密碼登入 │
+                      │  團隊可分享的網址  │
+                      └────────────────────┘</div>
 
     <div class="table-wrap">
       <table>
@@ -320,14 +364,24 @@ page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
             <td>純 Python、能讀寫 xlsx、格式控制精準</td>
           </tr>
           <tr>
+            <td>Dashboard</td>
+            <td><strong>靜態 HTML</strong>（無前端框架）</td>
+            <td>送件才重生、讀取快、易部署</td>
+          </tr>
+          <tr>
+            <td>部署</td>
+            <td><strong>Vercel + Edge Middleware</strong></td>
+            <td>自動部署、自訂密碼登入頁、HttpOnly cookie</td>
+          </tr>
+          <tr>
             <td>歸檔</td>
             <td><strong>GitHub Private repo</strong></td>
             <td>版本控管、異地備份、送件稽核可追溯</td>
           </tr>
           <tr>
             <td>編排</td>
-            <td><strong>Claude Code Skill</strong></td>
-            <td>用自然語言觸發整條 pipeline</td>
+            <td><strong>Claude Code Skill × 2</strong></td>
+            <td>送件與狀態同步分開成兩個 skill，職責清楚</td>
           </tr>
         </tbody>
       </table>
@@ -341,26 +395,37 @@ page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
 ├── <span class="dir">reports/</span>                    <span class="comment"># 原始測試報告 PDF</span>
 ├── <span class="dir">products/</span>                   <span class="comment"># 產生的 YAML 草稿（gitignore）</span>
 ├── <span class="dir">archive/</span>                    <span class="comment"># 每次送件的存證</span>
-│   └── <span class="dir">&lt;YYYYMMDD-HHMMSS&gt;-&lt;Model&gt;/</span>
-│       ├── 01_form_filled.png + .html
-│       ├── 02_confirmation.png + .html
-│       ├── 03_success.png + .html
-│       ├── 04_top_recent_status.png + .html
-│       ├── &lt;Model&gt;.yaml
-│       └── &lt;報告&gt;.pdf
+│   ├── <span class="dir">&lt;YYYYMMDD-HHMMSS&gt;-&lt;Model&gt;/</span>   <span class="comment"># 每筆送件</span>
+│   │   ├── 01_form_filled.png + .html
+│   │   ├── 02_confirmation.png + .html
+│   │   ├── 03_success.png + .html
+│   │   ├── 04_top_recent_status.png + .html
+│   │   ├── &lt;Model&gt;.yaml
+│   │   └── &lt;報告&gt;.pdf
+│   └── <span class="dir">status-snapshots/</span>            <span class="comment"># 每次狀態同步的快照</span>
+│       └── <span class="dir">&lt;YYYYMMDD-HHMMSS&gt;/</span>
+│           ├── top_recent_status.png + .html
+│           └── models.json           <span class="comment"># 這張快照涵蓋哪些型號</span>
 ├── tracking.xlsx               <span class="comment"># 滾動送件紀錄表</span>
+├── index.html                  <span class="comment"># Dashboard 首頁（生成）</span>
+├── <span class="dir">submissions/</span>                <span class="comment"># 每筆 detail 頁（生成）</span>
+├── middleware.ts               <span class="comment"># Vercel 密碼登入頁 + cookie</span>
+├── vercel.json                 <span class="comment"># 靜態部署設定</span>
 └── <span class="dir">src/vcci_automation/</span>
     ├── classification.py       <span class="comment"># 官方分類代碼表</span>
     ├── extract.py              <span class="comment"># PDF → YAML</span>
-    ├── submit.py               <span class="comment"># YAML → Playwright → 送件</span>
+    ├── submit.py               <span class="comment"># YAML → Playwright → 送件 + 順手 sync</span>
+    ├── status_sync.py          <span class="comment"># Top 頁 parser + 回填 tracking.xlsx</span>
+    ├── update.py               <span class="comment"># 獨立 vcci-update CLI</span>
+    ├── dashboard.py            <span class="comment"># archive + xlsx → HTML</span>
     └── tracking.py             <span class="comment"># Excel 追蹤表維護</span></div>
   </div>
 
   <!-- Workflow -->
   <div class="section">
-    <div class="section-label flow">工作流程</div>
-    <h2>端到端 9 個階段</h2>
-    <p>從丟 PDF 到 GitHub 有紀錄。其中 5 個全自動、4 個半自動（保留關鍵決策給人）：</p>
+    <div class="section-label flow">送件流程</div>
+    <h2>送件端到端 11 個階段</h2>
+    <p>從丟 PDF 到 GitHub 有紀錄、Vercel 上線。自動化佔主體，人工只在「關鍵決策點」介入：</p>
 
     <div class="table-wrap">
       <table>
@@ -413,8 +478,18 @@ page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
             <td><span class="tag auto">🤖 自動</span></td>
           </tr>
           <tr>
-            <td><strong>I. Push</strong></td>
-            <td><code>git commit + push</code> 到 private repo</td>
+            <td><strong>I. Piggyback sync</strong></td>
+            <td><strong>順手把 Top 頁所有其他 pending 型號的 Acceptance No. 回填</strong></td>
+            <td><span class="tag auto">🤖 自動（新增）</span></td>
+          </tr>
+          <tr>
+            <td><strong>J. Dashboard 重生</strong></td>
+            <td><code>vcci-dashboard</code>：從 tracking.xlsx + archive 重建靜態 HTML</td>
+            <td><span class="tag auto">🤖 自動</span></td>
+          </tr>
+          <tr>
+            <td><strong>K. Push</strong></td>
+            <td><code>git commit + push</code> → Vercel 自動部署</td>
             <td><span class="tag auto">🤖 自動</span></td>
           </tr>
         </tbody>
@@ -465,12 +540,167 @@ page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
         </tbody>
       </table>
     </div>
+
+    <div class="callout info" style="margin-top: 24px;">
+      <span class="icon">🎁</span>
+      <div class="content">
+        <strong>Bonus — Piggyback sync</strong>
+        送新品時 Playwright 本來就會去 Top 頁抓自己的 Report No.，順手把<strong>所有其他 pending 型號</strong>的狀態也一併同步。等於「上架一款新品，自動幫你檢查一次所有在審的舊品」，零額外 HTTP request。
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Sync Loop -->
+  <div class="section">
+    <div class="section-label flow">狀態同步循環</div>
+    <h2>送件後：每週一鍵同步 Acceptance No.</h2>
+    <p>VCCI 4–5 個工作日才核發 Acceptance No.。這段等待期需要自動追蹤，不能靠人工記得定期登入查狀態。</p>
+
+    <h3>為什麼要獨立成一個 skill</h3>
+    <p>送件 skill 負責「送新的」，狀態同步 skill 負責「看已送的」— 職責分開，Claude 觸發也準確：</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th><code>vcci-submit</code></th>
+            <th><code>vcci-status-sync</code></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>觸發語</strong></td>
+            <td>「幫我 VCCI 登錄 ECW230」</td>
+            <td>「查 VCCI 狀態 / 批下來了沒」</td>
+          </tr>
+          <tr>
+            <td><strong>輸入</strong></td>
+            <td>PDF + model no.</td>
+            <td>無</td>
+          </tr>
+          <tr>
+            <td><strong>動作</strong></td>
+            <td>送件 + 順手 sync + push</td>
+            <td>純 sync + dashboard 重生</td>
+          </tr>
+          <tr>
+            <td><strong>頻率</strong></td>
+            <td>每月 1–2 次</td>
+            <td>每週 1 次</td>
+          </tr>
+          <tr>
+            <td><strong>人工介入</strong></td>
+            <td>最終確認送出</td>
+            <td>基本不用</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>同步流程</h3>
+    <div class="code-block-label">One command</div>
+    <div class="code-block">uv run vcci-update --push</div>
+
+    <p>背後執行：</p>
+    <ol style="padding-left: 24px; font-size: 17px; color: var(--text-secondary); line-height: 2;">
+      <li><strong>開 Chromium + 持久化 profile</strong> — cookie 還有效就直接進，否則手動登入一次</li>
+      <li><strong>造訪 VCCI Top 頁</strong>（ME02），parse Recent reporting status 表格</li>
+      <li><strong>存 snapshot</strong> 到 <code>archive/status-snapshots/&lt;timestamp&gt;/</code>（PNG + HTML + <code>models.json</code>）</li>
+      <li><strong>比對 tracking.xlsx</strong>：pending 列若 portal 有 Acceptance No. 就回填、Status 改成 <code>Accepted</code></li>
+      <li><strong>重生 Dashboard</strong>，新狀態立刻反映到每個型號的 detail page</li>
+      <li><strong>Git commit + push</strong> → Vercel 自動重新部署</li>
+    </ol>
+
+    <div class="callout warning" style="margin-top: 20px;">
+      <span class="icon">🎯</span>
+      <div class="content">
+        <strong>謹慎原則：status 只寫 terminal 狀態</strong>
+        Portal 的 <code>in progress</code> 和 tracking.xlsx 的 <code>Submitted</code> 是同義詞，不該互相覆蓋。同步邏輯只在真正變成 <strong>Accepted / Rejected</strong> 時才寫 Status cell，避免每週 sync 都製造 diff noise。
+      </div>
+    </div>
+
+    <div class="callout success" style="margin-top: 16px;">
+      <span class="icon">📸</span>
+      <div class="content">
+        <strong>Snapshot 累積，但頁面長度不變</strong>
+        每次同步都產生新的 snapshot 資料夾（完整 audit trail），但 dashboard 每個型號的 detail page <strong>只顯示一張</strong>「最新一張含該型號」的 snapshot。還 pending 的型號永遠指向最新 snapshot；被 Accept 的型號會自動 freeze 在「消失前最後那張」。累積多週也不會讓頁面變長。
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="section">
+    <div class="section-label tech">Dashboard</div>
+    <h2>從 Excel 到線上分享</h2>
+    <p>有了 <code>tracking.xlsx</code> 後，內部想知道狀態還得開 Excel — 對非開發同事、外部合作方都不友善。所以做了一個簡單的線上 Dashboard。</p>
+
+    <h3>功能一覽</h3>
+    <ul style="padding-left: 24px; font-size: 17px; color: var(--text-secondary); line-height: 2;">
+      <li><strong>首頁</strong>：所有送件的 rolling table、客戶端搜尋、統計 KPI</li>
+      <li><strong>每個型號的 detail page</strong>：狀態 banner、送件資訊、<strong>PDF 萃取出來用於填表的 YAML 資料</strong>、4 張送件截圖（04 自動更新到最新 sync）、原始 PDF + YAML 下載</li>
+      <li><strong>密碼保護</strong>：自訂 HTML 登入頁（純密碼、無 username 欄），cookie 記 30 天</li>
+      <li><strong>部署</strong>：Vercel 自動部署，每次 push 後 ~1 分鐘生效</li>
+    </ul>
+
+    <h3>生命週期視角：每個型號的「履歷表」</h3>
+    <p>每個型號的 detail page 從送件當下開始累積：</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>時間點</th>
+            <th>detail page 看得到什麼</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>送件當天</td>
+            <td>完整表單截圖、確認頁、成功頁、送件當下的 Top 頁狀態</td>
+          </tr>
+          <tr>
+            <td>週期 sync 期間</td>
+            <td>04 截圖自動更新到最新 Top 頁 snapshot（in progress / Acceptance No. 已發）</td>
+          </tr>
+          <tr>
+            <td>Accept 後</td>
+            <td>04 截圖 freeze 在「Accept 前最後一張快照」，整頁變永久 audit</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>這是把「靜態送件紀錄」升級成「產品的認證履歷表」。</p>
+
+    <h3>技術細節</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>環節</th>
+            <th>實作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>生成</td>
+            <td><code>uv run vcci-dashboard</code>，讀 <code>tracking.xlsx</code> + <code>archive/</code>，產出 <code>index.html</code> + <code>submissions/*.html</code> + <code>assets/style.css</code></td>
+          </tr>
+          <tr>
+            <td>登入</td>
+            <td><code>middleware.ts</code> 是 Vercel Edge Middleware，攔截所有 request；POST <code>/__auth</code> 驗密碼後 Set-Cookie</td>
+          </tr>
+          <tr>
+            <td>密碼</td>
+            <td>存於 Vercel env var <code>DASHBOARD_PASSWORD</code>，設定時要用 <code>printf</code>（不能用 <code>echo</code>，會多塞 <code>\n</code>）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Lessons -->
   <div class="section">
     <div class="section-label lessons">可複用學習</div>
-    <h2>給其他自動化專案的 5 條教訓</h2>
+    <h2>給其他自動化專案的 7 條教訓</h2>
 
     <div class="lesson-card">
       <div class="lesson-num">Lesson 01</div>
@@ -501,13 +731,25 @@ page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
       <h4>存證 &gt; 快速</h4>
       <p>每次送件留 4 張截圖 + HTML + YAML + PDF，單筆約 1–2 MB。日後稽核（VCCI 回報問題、PM 想知道當時填了什麼）就有得追。Git + GitHub private repo 是「版本控管 + 異地備份 + 追溯性」一次解決的最便宜方案。</p>
     </div>
+
+    <div class="lesson-card">
+      <div class="lesson-num">Lesson 06</div>
+      <h4>生命週期 &gt; 單次操作</h4>
+      <p>第一版只做送件，結果送完後不知道哪款已 Accept、哪款還在審、什麼時候能賣。<strong>補上「狀態同步循環」才完整</strong>。對任何「送出 ≠ 生效」的申報系統，永遠要再問：送完後怎麼知道狀態？狀態改變了我要不要做什麼？有沒有辦法把這個週期也自動化？把「單次操作」擴大到「生命週期追蹤」，工具的價值會翻倍。</p>
+    </div>
+
+    <div class="lesson-card">
+      <div class="lesson-num">Lesson 07</div>
+      <h4>Piggyback — 零成本的附加動作</h4>
+      <p>需要的資料「正好在你已經打開的頁面上」時，<strong>順手做是最划算的</strong>：送件流程本來就會去 Top 頁抓 Report No.，這張頁面就有所有 pending 送件的狀態。多一個 parse 呼叫，零額外 HTTP request，就等於每次送新品都順便幫所有舊品做一次狀態同步。設計任何 workflow 時都可以問一次：<em>「我這趟還在這裡，還能順手抓什麼？」</em></p>
+    </div>
   </div>
 
   <!-- AI-era workflow -->
   <div class="section">
     <div class="section-label ai">AI 時代</div>
     <h2>與 AI Agent 協作的新工作模式</h2>
-    <p>整個工具從無到有建置約花 <strong>2 個工作日</strong>，全程用 Claude Code 對話式開發。觀察到幾個值得推廣的做法：</p>
+    <p>整套工具（送件 + 狀態同步 + dashboard）從無到有建置約花 <strong>3 個工作日</strong>，全程用 Claude Code 對話式開發。觀察到幾個值得推廣的做法：</p>
 
     <div class="callout info">
       <span class="icon">⚡</span>
@@ -521,15 +763,23 @@ page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
       <span class="icon">📦</span>
       <div class="content">
         <strong>用 Skill 封裝重複性任務</strong>
-        <code>~/.claude/skills/vcci-submit/SKILL.md</code> 寫好一次，之後每次要送件只要說「幫我跑 VCCI 登錄」就會執行完整 pipeline。等於把「資深員工的操作知識」文件化 + 可執行化。
+        <code>vcci-submit</code> 和 <code>vcci-status-sync</code> 兩個 skill 寫好一次，之後要送件只要說「幫我跑 VCCI」、要查狀態只要說「查 VCCI 狀態」。等於把「資深員工的操作知識」文件化 + 可執行化。
+      </div>
+    </div>
+
+    <div class="callout success">
+      <span class="icon">🧩</span>
+      <div class="content">
+        <strong>一個專案、多個 skill（職責分離）</strong>
+        送件跟查狀態是<strong>不同使用情境</strong>，混成一個 skill 會讓 Claude 誤判。拆成兩個 skill，共用同一個 Python 專案的底層工具（兩邊都用 <code>status_sync.py</code>），各自的 SKILL.md 寫清楚觸發條件與邊界。
       </div>
     </div>
 
     <div class="callout info">
       <span class="icon">🔗</span>
       <div class="content">
-        <strong>Private repo 作為協作介面</strong>
-        跟 Claude 的對話不會自動變成團隊資產。把完成的工具放 GitHub private repo、每次送件自動 commit + push → 變成<strong>團隊隨時可以看、可以接手</strong>的實作成果。
+        <strong>Private repo + Vercel 作為協作介面</strong>
+        跟 Claude 的對話不會自動變成團隊資產。把完成的工具放 GitHub private repo、每次送件 / sync 自動 commit + push、生成的 Dashboard 經 Vercel 上線、密碼分享給團隊 → 變成<strong>團隊隨時可以看、可以接手</strong>的實作成果。
       </div>
     </div>
 
@@ -557,24 +807,28 @@ page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
         <tbody>
           <tr>
             <td>其他國家認證送件（FCC, CE, KC）</td>
-            <td>官方表單自動化</td>
+            <td>官方表單自動化 + 審核週期追蹤</td>
           </tr>
           <tr>
             <td>政府補助/申報系統填表</td>
-            <td>反自動化機制、老舊 CGI</td>
+            <td>反自動化機制、老舊 CGI、送件後要等通過</td>
           </tr>
           <tr>
             <td>供應商入口網站的訂單輸入</td>
-            <td>多層驗證 + 表單</td>
+            <td>多層驗證 + 表單 + 訂單狀態追蹤</td>
           </tr>
           <tr>
             <td>內部 ERP 批次操作</td>
             <td>無 API、只能 UI 自動化</td>
           </tr>
+          <tr>
+            <td>商標 / 專利送件追蹤</td>
+            <td>送件 + 長週期審核 + Dashboard 可視化</td>
+          </tr>
         </tbody>
       </table>
     </div>
-    <p>核心能力可以直接重用：PDF 萃取模組、Playwright persistent context 架構、Excel 追蹤表、Git 歸檔 + skill 編排。</p>
+    <p>核心能力可以直接重用：PDF 萃取模組、Playwright persistent context 架構、Excel 追蹤表 + 靜態 Dashboard、狀態同步循環 + snapshot 機制、Git 歸檔 + skill 編排。</p>
   </div>
 
   <!-- Summary -->
@@ -592,15 +846,23 @@ page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
         <tbody>
           <tr>
             <td>單款產品送件時間</td>
-            <td>從 20-30 分鐘 → <strong>5 分鐘</strong>（含人工確認）</td>
+            <td>從 20–30 分鐘 → <strong>5 分鐘</strong>（含人工確認）</td>
+          </tr>
+          <tr>
+            <td>狀態追蹤</td>
+            <td>從「每週自己登入查」→ <strong>每週一鍵同步、自動更新 dashboard</strong></td>
           </tr>
           <tr>
             <td>送錯風險</td>
             <td>低（YAML review + 確認頁 + 截圖存證）</td>
           </tr>
           <tr>
+            <td>團隊可見度</td>
+            <td>Excel 自用 → <strong>密碼保護的線上 Dashboard，團隊任何人都能查</strong></td>
+          </tr>
+          <tr>
             <td>知識資產化</td>
-            <td>公司 VCCI 流程有完整程式碼 + 送件紀錄可查</td>
+            <td>公司 VCCI 流程有完整程式碼 + 送件紀錄 + 每週狀態快照</td>
           </tr>
           <tr>
             <td>可複製性</td>
@@ -609,7 +871,7 @@ page.wait_for_function(<span class="str">"...CompanyName 有值"</span>)</div>
         </tbody>
       </table>
     </div>
-    <p>更重要的是，這個專案證明了 <strong>AI + 半自動化</strong> 是處理這類「低頻、高精確度需求」業務的好方法 — 不要求 100% 自動，但把 80% 機械性工作交給機器、保留關鍵決策給人。</p>
+    <p>更重要的是，這個專案證明了 <strong>AI + 半自動化 + 生命週期視角</strong> 是處理這類「低頻、長週期、高精確度需求」業務的好方法 — 不要求 100% 自動，但把 80% 機械性工作交給機器、保留關鍵決策給人，並且<strong>把「送件」擴大到「追蹤到結案」的完整循環</strong>。</p>
   </div>
 
   <div class="footer">
