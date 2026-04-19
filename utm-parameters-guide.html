@@ -326,6 +326,60 @@
     .gvb p { font-size: 15px; margin: 0; color: var(--text-secondary); }
     .gvb p + p { margin-top: 6px; }
 
+    /* ---- Flow diagram ---- */
+    .flow { margin: 20px 0 4px; }
+    .flow-step {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: #F8FAFC; border: 1px solid var(--ring);
+      border-radius: 12px; padding: 14px 18px;
+    }
+    .flow-step .num {
+      flex-shrink: 0;
+      width: 30px; height: 30px; border-radius: 8px;
+      background: var(--indigo); color: #fff;
+      font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .flow-step .body { flex: 1; font-size: 15px; color: var(--text-primary); line-height: 1.6; }
+    .flow-step .body .hint {
+      display: block; font-size: 13px; color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+    .flow-arrow {
+      text-align: center; color: var(--text-tertiary);
+      font-size: 18px; line-height: 1;
+      padding: 6px 0;
+    }
+    .flow-arrow .label {
+      display: inline-block; margin-left: 10px;
+      font-size: 13px; color: var(--text-tertiary); font-weight: 500;
+    }
+    .flow-capture {
+      display: flex; align-items: center; gap: 14px;
+      border-radius: 12px; padding: 14px 18px;
+      border: 1px solid;
+    }
+    .flow-capture .tag {
+      flex-shrink: 0;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 10px; border-radius: 99px;
+    }
+    .flow-capture .body { flex: 1; font-size: 15px; line-height: 1.6; }
+    .flow-capture .body strong { color: var(--text-primary); }
+    .flow-capture .body .hint {
+      display: block; font-size: 13px; color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+    .flow-capture.pre {
+      background: var(--sky-bg); border-color: rgba(2,132,199,0.25);
+    }
+    .flow-capture.pre .tag { background: var(--sky); color: #fff; }
+    .flow-capture.post {
+      background: var(--violet-bg); border-color: rgba(124,58,237,0.25);
+    }
+    .flow-capture.post .tag { background: var(--violet); color: #fff; }
+
     /* ---- Footer ---- */
     .footer {
       max-width: 1120px; margin: 0 auto; padding: 48px 32px 64px;
@@ -488,22 +542,52 @@
       </table>
 
       <h3>工作流程：兩邊怎麼串起來</h3>
-      <div class="code-block">
-<span class="c">① 短網址工具建 link + 填 UTM     ← 你在這裡定義規範</span>
-        ↓
-<span class="c">② 把短網址貼到 EDM / 社群 / QR</span>
-        ↓
-<span class="c">③ 使用者點擊</span>
-        ↓
-<span class="v">  ┌──────────────────────────────────┐</span>
-<span class="v">  │ 短網址工具記錄 click               │</span>  <span class="c">← 點擊前：來源、裝置、地區、variant</span>
-<span class="v">  └──────────────────────────────────┘</span>
-        ↓  <span class="c">轉址 + 帶 UTM 參數</span>
-<span class="k">  ┌──────────────────────────────────┐</span>
-<span class="k">  │ Landing page + GA4                │</span>  <span class="c">← 點擊後：頁面行為、轉換、營收</span>
-<span class="k">  └──────────────────────────────────┘</span>
-        ↓
-<span class="c">④ 兩邊用「同一組 utm_campaign」對上</span>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="num">1</div>
+          <div class="body">
+            在短網址工具建 link + 填 UTM
+            <span class="hint">你在這裡定義規範（source / medium / campaign）</span>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">
+          <div class="num">2</div>
+          <div class="body">
+            把短網址貼到 EDM / 社群 / QR code
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">
+          <div class="num">3</div>
+          <div class="body">
+            使用者點擊短網址
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-capture pre">
+          <span class="tag">點擊前</span>
+          <div class="body">
+            <strong>短網址工具記錄 click</strong>
+            <span class="hint">來源、裝置、地區、時段、A/B variant</span>
+          </div>
+        </div>
+        <div class="flow-arrow">↓ <span class="label">轉址 + 帶 UTM 參數</span></div>
+        <div class="flow-capture post">
+          <span class="tag">點擊後</span>
+          <div class="body">
+            <strong>Landing page + GA4 接手</strong>
+            <span class="hint">頁面行為、停留時間、轉換、營收</span>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">
+          <div class="num">4</div>
+          <div class="body">
+            兩邊用「同一組 <code>utm_campaign</code>」對上
+            <span class="hint">前段點擊 × 後段轉換 = 完整 ROI</span>
+          </div>
+        </div>
       </div>
 
       <div class="callout callout-violet">
