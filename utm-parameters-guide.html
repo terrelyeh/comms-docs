@@ -380,6 +380,7 @@
       <div class="toc-label">快速跳轉</div>
       <ul class="toc-list">
         <li><a href="#what-is-utm">什麼是 UTM</a></li>
+        <li><a href="#tool-vs-ga">短網址工具 vs GA</a></li>
         <li><a href="#medium">1. 媒介 (Medium)</a></li>
         <li><a href="#source">2. 來源 (Source)</a></li>
         <li><a href="#campaign">3. 活動 (Campaign)</a></li>
@@ -415,6 +416,99 @@
           <p>能知道「來自 Google 付費廣告的『春季特賣』活動」</p>
           <p>可追蹤 ROI、A/B 測試、成效歸因</p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tool vs GA -->
+  <div class="section" id="tool-vs-ga">
+    <h2 class="section-title">短網址工具 vs GA：分工定位</h2>
+    <div class="card">
+      <p>很多人第一次用會搞混「那我為什麼不直接看 GA 就好？」兩套工具的定位其實<strong>完全不重疊</strong> — 一個看「點擊前」，一個看「點擊後」。UTM 是它們的共同語言。</p>
+
+      <div class="gvb">
+        <div class="good">
+          <h4>短網址工具（此平台）</h4>
+          <p><strong>Landing page 之前</strong>的流量分析</p>
+          <p>「誰點了我的連結？從哪點的？哪個素材贏？」</p>
+        </div>
+        <div class="good" style="background: var(--sky-bg); border-color: rgba(2,132,199,0.2);">
+          <h4 style="color: var(--sky);">GA4 / HubSpot</h4>
+          <p><strong>Landing page 之後</strong>的行為分析</p>
+          <p>「進站後做了什麼？有沒有轉換？」</p>
+        </div>
+      </div>
+
+      <h3>分工對照表</h3>
+      <table class="specs-table">
+        <thead>
+          <tr><th>維度</th><th>短網址工具（此平台）</th><th>GA4 / HubSpot</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="wrap">時機</td><td>使用者<strong>點擊連結那一刻</strong></td><td>使用者<strong>抵達網站之後</strong></td></tr>
+          <tr><td class="wrap">回答的問題</td><td>哪條連結、哪個素材、哪個通路帶來最多點擊？</td><td>進站後看了幾頁？待多久？有沒有註冊 / 下單？</td></tr>
+          <tr><td class="wrap">資料單位</td><td>一次點擊 (click)</td><td>一次工作階段 (session) + 事件 (event)</td></tr>
+          <tr><td class="wrap">管理對象</td><td>連結、活動、UTM 規範、QR code、A/B 變體</td><td>頁面、事件、轉換、使用者屬性</td></tr>
+          <tr><td class="wrap">核心指標</td><td>點擊數、獨立點擊、地區、裝置、時段、變體勝出率</td><td>跳出率、停留時間、轉換率、漏斗、LTV</td></tr>
+          <tr><td class="wrap">需要網站程式碼？</td><td>❌ 不需要，連結掛出去就開始追蹤</td><td>✅ 需要埋 GA tag / 事件</td></tr>
+          <tr><td class="wrap">能追非自家網站？</td><td>✅ 可以（合作夥伴網站、YouTube、表單都行）</td><td>❌ 只能追自己埋 tag 的網站</td></tr>
+        </tbody>
+      </table>
+
+      <h3>工作流程：兩邊怎麼串起來</h3>
+      <div class="code-block">
+<span class="c">① 短網址工具建 link + 填 UTM     ← 你在這裡定義規範</span>
+        ↓
+<span class="c">② 把短網址貼到 EDM / 社群 / QR</span>
+        ↓
+<span class="c">③ 使用者點擊</span>
+        ↓
+<span class="v">  ┌──────────────────────────────────┐</span>
+<span class="v">  │ 短網址工具記錄 click               │</span>  <span class="c">← 點擊前：來源、裝置、地區、variant</span>
+<span class="v">  └──────────────────────────────────┘</span>
+        ↓  <span class="c">轉址 + 帶 UTM 參數</span>
+<span class="k">  ┌──────────────────────────────────┐</span>
+<span class="k">  │ Landing page + GA4                │</span>  <span class="c">← 點擊後：頁面行為、轉換、營收</span>
+<span class="k">  └──────────────────────────────────┘</span>
+        ↓
+<span class="c">④ 兩邊用「同一組 utm_campaign」對上</span>
+      </div>
+
+      <div class="callout callout-violet">
+        <div class="callout-title">關鍵</div>
+        <p>兩邊用同一個 <code>utm_campaign</code> 值 → 在短網址工具看「哪個通路點最多」，在 GA4 看「哪個通路轉換最好」，合起來才是完整的 ROI 判斷。</p>
+      </div>
+
+      <h3>什麼時候看哪邊？</h3>
+      <table class="specs-table">
+        <thead>
+          <tr><th>你想知道的事</th><th>去哪看</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="wrap">這條短網址今天被點幾次？</td><td><strong>短網址工具</strong></td></tr>
+          <tr><td class="wrap">Facebook vs LinkedIn 哪個通路點擊率高？</td><td><strong>短網址工具</strong></td></tr>
+          <tr><td class="wrap">紅色 CTA vs 藍色 CTA 誰贏？（A/B 變體點擊）</td><td><strong>短網址工具</strong></td></tr>
+          <tr><td class="wrap">QR code 在哪個城市被掃最多？</td><td><strong>短網址工具</strong></td></tr>
+          <tr><td class="wrap">連結是否還沒過期、是否要排程啟用？</td><td><strong>短網址工具</strong></td></tr>
+          <tr><td class="wrap">訪客進站後看了幾頁才離開？</td><td><strong>GA4</strong></td></tr>
+          <tr><td class="wrap">春季活動最後帶來多少註冊 / 下單？</td><td><strong>GA4</strong></td></tr>
+          <tr><td class="wrap">某個 UTM campaign 的實際營收？</td><td><strong>GA4</strong>（接電商模組）</td></tr>
+          <tr><td class="wrap">Landing page 到結帳的漏斗轉換率？</td><td><strong>GA4</strong></td></tr>
+        </tbody>
+      </table>
+
+      <h3>常見誤解</h3>
+      <div class="callout callout-amber">
+        <div class="callout-title">「GA4 也能看點擊來源啊？」</div>
+        <p>GA4 只能看「進到你網站」之後的來源。還沒進站（點了但跳離、載入失敗、去了第三方頁）你完全看不到。短網址工具看的是<strong>原始點擊事件</strong>本身。</p>
+      </div>
+      <div class="callout callout-amber">
+        <div class="callout-title">「那我建連結時不填 UTM，GA4 也抓得到吧？」</div>
+        <p>抓得到 referrer（粗略），但精細度遠不如 UTM。而且<strong>跨不同 domain 的 campaign 對不起來</strong> — 同一場活動導去 A 網站和 B 網站時，GA 會視為兩筆獨立流量。</p>
+      </div>
+      <div class="callout callout-amber">
+        <div class="callout-title">「我只看點擊數就夠了吧？」</div>
+        <p>點擊 ≠ 轉換。點 1000 次但沒人下單的素材不值得投。所以還是要搭 GA4 看後段轉換。</p>
       </div>
     </div>
   </div>
