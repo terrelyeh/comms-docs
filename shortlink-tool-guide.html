@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EnGenius ShortLink 操作指南</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand-1: #6366F1;
+      --brand-2: #8B5CF6;
+      --brand-3: #EC4899;
+      --bg: #F5F3F0;
+      --card: #FFFFFF;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-tertiary: #64748B;
+      --ring: rgba(15, 23, 42, 0.06);
+      --teal: #0D9488;
+      --teal-light: #F0FDFA;
+      --green: #16A34A;
+      --green-bg: #F0FDF4;
+      --red: #DC2626;
+      --red-bg: #FEF2F2;
+      --amber: #D97706;
+      --amber-bg: #FFFBEB;
+      --indigo: #4F46E5;
+      --indigo-bg: #EEF2FF;
+      --violet: #7C3AED;
+      --violet-bg: #F5F3FF;
+      --pink: #DB2777;
+      --pink-bg: #FDF2F8;
+      --sky: #0284C7;
+      --sky-bg: #F0F9FF;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    code, .mono {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.92em;
+    }
+    p code, li code, td code {
+      background: #F1F5F9;
+      padding: 2px 7px; border-radius: 6px;
+      color: var(--indigo);
+      font-weight: 600;
+    }
+
+    header { background: #0F172A; position: sticky; top: 0; z-index: 40; }
+    header .inner {
+      max-width: 1120px; margin: 0 auto;
+      padding: 0 32px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header .logo { display: flex; align-items: center; gap: 14px; }
+    header .logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+    }
+    header .logo-icon svg { width: 20px; height: 20px; color: white; }
+    header .brand-name { font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em; }
+    header .brand-sub {
+      font-size: 13px; font-weight: 600; color: var(--brand-2);
+      margin-left: 10px;
+      background: rgba(139, 92, 246, 0.15);
+      padding: 2px 10px; border-radius: 99px;
+    }
+    header .back-link {
+      font-size: 14px; font-weight: 500; color: #E2E8F0; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      transition: all 0.15s;
+    }
+    header .back-link:hover { background: rgba(255,255,255,0.12); color: #FFFFFF; }
+    .accent-line { height: 3px; background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3)); }
+
+    .hero { max-width: 1120px; margin: 0 auto; padding: 64px 32px 48px; }
+    .hero h1 {
+      font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      font-size: 19px; color: var(--text-secondary); max-width: 720px; line-height: 1.8;
+    }
+    .hero .meta {
+      font-size: 14px; color: var(--text-tertiary); margin-top: 12px;
+    }
+
+    .toc {
+      position: fixed;
+      top: 60px; left: 0; bottom: 0;
+      width: 260px;
+      background: var(--card);
+      border-right: 1px solid var(--ring);
+      overflow-y: auto;
+      padding: 28px 20px 40px;
+      z-index: 20;
+    }
+    .toc-card { background: transparent; padding: 0; outline: none; }
+    .toc-card .toc-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      color: var(--text-tertiary); text-transform: uppercase;
+      margin-bottom: 14px; padding: 0 10px;
+    }
+    .toc-list {
+      display: flex; flex-direction: column; gap: 2px;
+      list-style: none;
+    }
+    .toc-list a {
+      display: block;
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 14px; font-weight: 500;
+      padding: 8px 12px; border-radius: 8px;
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+    .toc-list a:hover { background: var(--violet-bg); color: var(--violet); }
+    .toc-list a.active {
+      background: var(--violet-bg);
+      color: var(--violet);
+      border-left-color: var(--violet);
+      font-weight: 600;
+    }
+
+    .hero, .section, .footer { margin-left: 260px; }
+
+    .section { max-width: 960px; margin-right: auto; padding: 0 32px 56px; scroll-margin-top: 80px; }
+    .section-title {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--card); border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      outline: 1px solid var(--ring);
+      padding: 40px; margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 24px; font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .card h3 {
+      font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+      margin-bottom: 8px; margin-top: 32px;
+    }
+    .card h3:first-child { margin-top: 0; }
+    .card p { color: var(--text-secondary); margin-bottom: 14px; font-size: 17px; }
+    .card p:last-child { margin-bottom: 0; }
+    .card ul, .card ol {
+      margin: 14px 0 14px 20px;
+    }
+    .card ul li, .card ol li {
+      font-size: 17px; color: var(--text-secondary); line-height: 1.8;
+      padding: 2px 0;
+    }
+    .card strong { color: var(--text-primary); }
+
+    .specs-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 20px 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden;
+      outline: 1px solid var(--ring);
+    }
+    .specs-table th {
+      background: #F8FAFC; text-align: left; padding: 14px 20px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .specs-table td {
+      padding: 14px 20px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .specs-table tr:last-child td { border-bottom: none; }
+    .specs-table td:first-child {
+      font-weight: 600; color: var(--text-primary); white-space: nowrap;
+    }
+    .specs-table td.wrap:first-child { white-space: normal; }
+
+    .code-block {
+      background: #0F172A; color: #E2E8F0;
+      border-radius: 14px; padding: 20px 24px; margin: 16px 0;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 14px; line-height: 1.8; overflow-x: auto;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .code-block .k { color: #F0ABFC; }
+    .code-block .v { color: #93C5FD; }
+    .code-block .c { color: #64748B; }
+
+    .callout {
+      border-radius: 14px; padding: 20px 24px; margin: 20px 0;
+      font-size: 16px; line-height: 1.7;
+    }
+    .callout-green { background: var(--green-bg); border-left: 4px solid var(--green); color: #166534; }
+    .callout-red { background: var(--red-bg); border-left: 4px solid var(--red); color: #991B1B; }
+    .callout-amber { background: var(--amber-bg); border-left: 4px solid var(--amber); color: #92400E; }
+    .callout-violet { background: var(--violet-bg); border-left: 4px solid var(--violet); color: #5B21B6; }
+    .callout .callout-title { font-weight: 700; margin-bottom: 8px; font-size: 17px; }
+
+    .pill {
+      display: inline-block; padding: 3px 10px; border-radius: 99px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.02em;
+    }
+
+    .step-list { list-style: none !important; margin: 0 !important; padding: 0 !important; counter-reset: step; }
+    .step-list > li {
+      position: relative;
+      padding: 14px 20px 14px 56px !important;
+      margin: 0 0 10px 0 !important;
+      background: #F8FAFC;
+      border-radius: 12px;
+      border-left: 4px solid var(--indigo);
+      counter-increment: step;
+      font-size: 16px !important;
+      color: var(--text-secondary) !important;
+      line-height: 1.7;
+    }
+    .step-list > li::before {
+      content: counter(step);
+      position: absolute;
+      left: 14px; top: 14px;
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--indigo); color: #FFFFFF;
+      font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .step-list > li strong { color: var(--text-primary); font-weight: 700; }
+    .step-list > li:last-child { margin-bottom: 0 !important; }
+
+    .qa-list { list-style: none !important; margin: 0 !important; padding: 0 !important; }
+    .qa-list > li {
+      padding: 16px 20px !important;
+      margin: 0 0 10px 0 !important;
+      background: #F8FAFC;
+      border: 1px solid var(--ring);
+      border-radius: 12px;
+      font-size: 16px !important;
+      line-height: 1.7;
+    }
+    .qa-list > li strong { color: var(--text-primary); display: block; margin-bottom: 6px; }
+    .qa-list > li:last-child { margin-bottom: 0 !important; }
+
+    .footer {
+      max-width: 1120px; margin: 0 auto; padding: 48px 32px 64px;
+      text-align: center;
+    }
+    .footer a {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--violet); font-weight: 600; text-decoration: none;
+      padding: 8px 20px; border-radius: 99px;
+      background: var(--violet-bg); transition: all 0.15s;
+    }
+    .footer a:hover { background: rgba(124,58,237,0.15); }
+
+    @media (max-width: 960px) {
+      .toc {
+        position: static;
+        width: auto; height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--ring);
+        padding: 16px 24px;
+        overflow-y: visible;
+      }
+      .toc-card .toc-label { padding: 0; margin-bottom: 10px; }
+      .toc-list { flex-direction: row; flex-wrap: wrap; gap: 6px 8px; }
+      .toc-list a { padding: 4px 10px; border-left: none; font-size: 13px; }
+      .toc-list a.active { border-left: none; }
+      .hero, .section, .footer { margin-left: 0; }
+    }
+
+    @media (max-width: 640px) {
+      body { font-size: 16px; }
+      .hero { padding: 40px 20px 32px; }
+      .hero h1 { font-size: 28px; }
+      .hero .subtitle { font-size: 16px; }
+      .toc { padding: 12px 20px; }
+      .toc-list { gap: 6px 10px; }
+      .section { padding: 0 20px 40px; }
+      .section-title { font-size: 22px; }
+      .card { padding: 24px 20px; border-radius: 16px; }
+      .card h2 { font-size: 20px; }
+      .card h3 { font-size: 16px; }
+      header .inner { padding: 0 16px; }
+      header .brand-sub { display: none; }
+      .specs-table { font-size: 14px; }
+      .specs-table th, .specs-table td { padding: 10px 12px; }
+      .specs-table td:first-child { white-space: normal; }
+      .code-block { font-size: 13px; padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <span class="brand-name">ShortLink Tool</span>
+        <span class="brand-sub">操作指南</span>
+      </div>
+      <a href="index.html" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        返回目錄
+      </a>
+    </div>
+  </header>
+  <div class="accent-line"></div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>EnGenius ShortLink<br/><span class="gradient">操作指南</span></h1>
+    <p class="subtitle">短網址 + UTM + 點擊分析，三件事在一個工具裡。這份文件從零上手、教你建第一條連結、管理活動、看成效，並解答常見疑問。</p>
+    <p class="meta">適用對象：行銷、內容編輯、合作夥伴管理者 &mdash; 2026-04-20</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-card">
+      <div class="toc-label">目錄</div>
+      <ul class="toc-list">
+        <li><a href="#overview">工具定位</a></li>
+        <li><a href="#quickstart">5 分鐘上手</a></li>
+        <li><a href="#links">連結管理</a></li>
+        <li><a href="#advanced">進階選項</a></li>
+        <li><a href="#campaigns">Campaign 管理</a></li>
+        <li><a href="#templates">UTM 模板</a></li>
+        <li><a href="#analytics">數據分析</a></li>
+        <li><a href="#qr">QR Code</a></li>
+        <li><a href="#csv">CSV 批次匯入</a></li>
+        <li><a href="#share">公開分享報告</a></li>
+        <li><a href="#team">團隊與權限</a></li>
+        <li><a href="#governance">UTM 白名單治理</a></li>
+        <li><a href="#faq">常見問題</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Overview -->
+  <div class="section" id="overview">
+    <h2 class="section-title">工具定位</h2>
+    <div class="card">
+      <p><strong>一句話：</strong>短網址 + UTM + 點擊分析，三件事揉在一個工具裡，讓行銷團隊不用翻 Bitly + Google UTM Builder + GA 三個地方才能追蹤一條活動連結。</p>
+
+      <h3>跟 Bitly 的差別</h3>
+      <ul>
+        <li>用自家網域 <code>go.engenius.ai</code>（不是 <code>bit.ly</code>），對外更可信</li>
+        <li>UTM 規範內建 + 白名單強制（避免同事各打各的 <code>facebook / Facebook / FB</code>）</li>
+        <li>Campaign 是一級公民（不只是 UTM 字串），可以群組、設目標、看時序</li>
+        <li>免費且無連結上限</li>
+      </ul>
+
+      <h3>跟 GA4 的差別</h3>
+      <div class="gvb" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0;">
+        <div style="border-radius: 14px; padding: 16px 18px; background: var(--sky-bg); border: 1px solid rgba(2,132,199,0.2);">
+          <h4 style="font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 10px; color: var(--sky);">此工具</h4>
+          <p style="font-size: 15px; margin: 0; color: var(--text-secondary);"><strong>Landing page 之前</strong>的流量分析</p>
+          <p style="font-size: 15px; margin: 6px 0 0; color: var(--text-secondary);">「誰點了連結？從哪點？哪個素材贏？」</p>
+        </div>
+        <div style="border-radius: 14px; padding: 16px 18px; background: var(--violet-bg); border: 1px solid rgba(124,58,237,0.2);">
+          <h4 style="font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 10px; color: var(--violet);">GA4</h4>
+          <p style="font-size: 15px; margin: 0; color: var(--text-secondary);"><strong>Landing page 之後</strong>的行為分析</p>
+          <p style="font-size: 15px; margin: 6px 0 0; color: var(--text-secondary);">「進站後做了什麼？有沒有轉換？」</p>
+        </div>
+      </div>
+      <p>詳細分工定位見 <a href="utm-parameters-guide.html#tool-vs-ga" style="color: var(--violet); font-weight: 600;">UTM 指南 → 短網址工具 vs GA 分工</a>。</p>
+    </div>
+  </div>
+
+  <!-- Quickstart -->
+  <div class="section" id="quickstart">
+    <h2 class="section-title">5 分鐘上手：建你的第一條連結</h2>
+    <div class="card">
+      <ol class="step-list">
+        <li><strong>登入</strong>：Google OAuth 用公司 email。如果被擋，代表不在白名單，跟管理員要求加入。</li>
+        <li><strong>左側 Sidebar → 連結管理</strong></li>
+        <li><strong>右上角「+ 建立連結」</strong></li>
+        <li><strong>填三個核心欄位</strong>：目的地網址、標題（例：<code>Spring 2026 EDM top banner</code>）、UTM 活動（Campaign）。剩下的 source/medium/content 按模板或下拉選單填。</li>
+        <li><strong>儲存 → 自動回到列表 → 複製短網址</strong>：列表右邊 <code>⧉</code> 一鍵複製 <code>https://go.engenius.ai/&lt;code&gt;</code>。</li>
+        <li><strong>貼到你的通路</strong>（EDM / FB / IG / LinkedIn / QR 傳單皆可）</li>
+        <li><strong>24 小時後看數據</strong>：Sidebar → 數據分析 → 篩選這條連結 → 看點擊來源、裝置、時段。</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Links -->
+  <div class="section" id="links">
+    <h2 class="section-title">連結管理（/links）</h2>
+    <div class="card">
+      <p>列出所有你建的連結，這頁是最常來的地方。</p>
+
+      <h3>表格欄位</h3>
+      <table class="specs-table">
+        <thead><tr><th>欄位</th><th>說明</th></tr></thead>
+        <tbody>
+          <tr><td class="wrap">標題 + OG 縮圖</td><td>hover 看完整目的地 URL</td></tr>
+          <tr><td>Campaign</td><td>這條屬於哪一場活動</td></tr>
+          <tr><td class="wrap">媒介 (Medium)</td><td>UTM medium 值</td></tr>
+          <tr><td class="wrap">來源 (Source)</td><td>UTM source 值</td></tr>
+          <tr><td>短網址</td><td>點 <code>⧉</code> 複製</td></tr>
+          <tr><td>標籤</td><td>自由分類</td></tr>
+          <tr><td>狀態</td><td>啟用 / 暫停 / 已封存</td></tr>
+          <tr><td>點擊數</td><td>累積總數 + 7 天 ↑↓%</td></tr>
+        </tbody>
+      </table>
+
+      <h3>列尾 ⋮ 選單</h3>
+      <ul>
+        <li><strong>編輯連結</strong> — 改目的地、UTM、限制條件</li>
+        <li><strong>數據分析</strong> — 跳到該連結的分析頁</li>
+        <li><strong>QR Code</strong> — 下載 PNG / SVG</li>
+        <li><strong>建立副本</strong> — 複製一條同設定的新連結（用 A/B 或跨通路很方便）</li>
+        <li><strong>暫停</strong> — 短網址暫時不能用（點了導到「連結已停用」頁）</li>
+        <li><strong>刪除</strong> — 永久失效</li>
+      </ul>
+
+      <h3>搜尋與篩選</h3>
+      <ul>
+        <li>搜尋框：打字即時過濾，右邊 X 可清空</li>
+        <li>Campaign 下拉：只看某活動的連結</li>
+        <li>狀態 Chip：啟用 / 暫停 / 已封存</li>
+      </ul>
+
+      <div class="callout callout-violet">
+        <div class="callout-title">為什麼要按「同步」按鈕？</div>
+        <p>這個工具用 client-side cache — 切頁不重新抓 DB，所以極快。代價是<strong>建立 / 修改後要手動按同步</strong>才會看到最新列表。頁首右上角淡藍色「同步」鍵旁邊會顯示「最後同步於 X 分鐘前」。</p>
+        <p style="margin-top: 6px;">建立 / 複製 / 暫停 / 刪除等操作已內建強制同步，不用手動按；但如果你另外開分頁操作，回來這頁就需要按一下。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced -->
+  <div class="section" id="advanced">
+    <h2 class="section-title">建立連結進階選項</h2>
+    <div class="card">
+      <p>除了基本三欄，展開進階可看到以下選項。</p>
+
+      <h3>標籤 (Tags)</h3>
+      <p>自由分類。建議先跟團隊對齊一組核心標籤（例：<code>常態 / 節慶 / KOL / 展場</code>），避免每個人自創。</p>
+
+      <h3>UTM 模板</h3>
+      <p>下拉選一個既有模板，source / medium / content 會自動帶入，你只需填 campaign。省重複打字。</p>
+
+      <h3>自訂短碼 (custom code)</h3>
+      <p>想要 <code>/spring-2026</code> 而不是隨機 <code>/Ab3xK9p</code>：</p>
+      <ul>
+        <li>3–50 字元</li>
+        <li>只能用英文字母、數字、<code>-</code>、<code>_</code></li>
+        <li>系統即時查重</li>
+      </ul>
+      <p>不填就會自動產 7 碼隨機碼。</p>
+
+      <h3>排程啟用 (startsAt)</h3>
+      <p>「幾月幾日幾點才開始生效」。之前點會導到「尚未開始」頁。用途：EDM 提前埋好連結，排程當天自動生效。</p>
+
+      <h3>過期時間 (expiresAt)</h3>
+      <p>「幾月幾日後失效」。過期點擊會導到「連結已過期」頁。用途：限時活動、優惠碼。</p>
+
+      <h3>點擊上限 (maxClicks)</h3>
+      <p>超過指定次數後連結失效。用途：限量優惠、內測名額。</p>
+
+      <h3>允許國家 (allowedCountries)</h3>
+      <p>多選列表，只允許這些國家的流量進來。其他國家導到「地區不允許」頁。用途：地區限定活動、版權限制。</p>
+
+      <h3>A/B 變體</h3>
+      <p>一條短網址後掛多個目的地 URL 加權重：</p>
+      <div class="code-block"><span class="c">code: spring-26</span>
+  variant A: landing-v1.html  <span class="v">weight: 50</span>
+  variant B: landing-v2.html  <span class="v">weight: 50</span></div>
+      <p>使用者點時加權隨機分流。後台看「哪個 variant 贏」。</p>
+
+      <h3>302 vs 301 轉址</h3>
+      <ul>
+        <li><strong>302（預設，暫時轉址）</strong> — <strong>行銷連結就用這個</strong>，SEO 不會傳遞</li>
+        <li><strong>301（永久轉址）</strong> — 只在做永久網站搬家時用</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Campaigns -->
+  <div class="section" id="campaigns">
+    <h2 class="section-title">Campaign 管理（/campaigns）</h2>
+    <div class="card">
+      <h3>什麼是 Campaign？</h3>
+      <p><strong>一場行銷活動</strong> — 例如「2026 春季新品發表」。一場活動會有多條連結（EDM、FB 廣告、KOL 貼文、QR 傳單…），都指到同一個 <code>utm_campaign</code> 值。</p>
+
+      <h3>Campaigns 頁做什麼？</h3>
+      <ul>
+        <li><strong>Leaderboard</strong>：所有活動的績效排行 — 點擊數、7 天趨勢、最後活動時間、目標達成率</li>
+        <li><strong>勾選 2–4 個活動</strong>：overlay 折線圖比較 / 進入 side-by-side 比較頁</li>
+        <li><strong>Orphan Links</strong>：有 <code>utm_campaign</code> 值但還沒綁到任何 Campaign 的連結（通常是舊資料）</li>
+      </ul>
+
+      <h3>單活動駕駛艙 <code>/campaigns/[name]</code></h3>
+      <p>點活動名稱進入該活動的指揮中心，有 3 個 tab：</p>
+      <ul>
+        <li><strong>Overview</strong> — KPI + 30 天趨勢折線</li>
+        <li><strong>Traffic</strong> — 這場活動的 top sources / mediums / 裝置 / 國家</li>
+        <li><strong>Links</strong> — 這場活動底下的所有連結 + 每條的獨立 / 共享比</li>
+      </ul>
+
+      <div class="callout callout-violet">
+        <div class="callout-title">Campaign 自動建立</div>
+        <p>填 <code>utm_campaign = "spring-sale"</code> → 系統自動 upsert 一筆 Campaign row（<code>status=ACTIVE</code>）。不用先跑去 Campaigns 頁手動建才能填 UTM。直接建連結，Campaign 會自己出現在列表。</p>
+      </div>
+
+      <h3>目標 (Goal)</h3>
+      <p>可以幫 Campaign 設「目標點擊數」，Leaderboard 的 <code>goal%</code> 欄會顯示達成率。</p>
+    </div>
+  </div>
+
+  <!-- Templates -->
+  <div class="section" id="templates">
+    <h2 class="section-title">UTM 模板</h2>
+    <div class="card">
+      <h3>設計理念：通路預設</h3>
+      <p>一個模板 = 某個通路 / 素材類型的 UTM 預設組合：</p>
+
+      <table class="specs-table">
+        <thead><tr><th>模板名稱</th><th>source</th><th>medium</th><th>content</th></tr></thead>
+        <tbody>
+          <tr><td class="wrap">EDM 電子報</td><td><code>newsletter_weekly</code></td><td><code>email</code></td><td><code>top_banner</code></td></tr>
+          <tr><td class="wrap">FB 付費廣告</td><td><code>facebook</code></td><td><code>cpc</code></td><td>—</td></tr>
+          <tr><td class="wrap">展場 QR</td><td><code>flyer_computex</code></td><td><code>qr</code></td><td>—</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">刻意沒有 campaign 欄位</div>
+        <p>因為同一個通路會橫跨多個活動使用，campaign 每次建連結時現填。</p>
+      </div>
+
+      <h3>使用流程</h3>
+      <ol>
+        <li>建連結時 → 選模板</li>
+        <li>系統自動帶入 source / medium / content / term</li>
+        <li>你只需填 campaign</li>
+        <li>儲存</li>
+      </ol>
+
+      <h3>模板管理</h3>
+      <p>Sidebar → <strong>UTM 模板</strong> → 新增 / 編輯 / 刪除。建議先盤點團隊常用的通路（EDM、FB 廣告、IG 自然貼文、展場 QR…），每個建一個模板。</p>
+    </div>
+  </div>
+
+  <!-- Analytics -->
+  <div class="section" id="analytics">
+    <h2 class="section-title">數據分析（/analytics）</h2>
+    <div class="card">
+      <h3>定位</h3>
+      <p>這頁是<strong>全站跨維度分析</strong>，不是活動級排行（那是 Campaigns 頁的事）。</p>
+
+      <h3>主要分析維度</h3>
+      <ul>
+        <li><strong>時間軸</strong> — 每日 / 小時的點擊趨勢</li>
+        <li><strong>裝置 / 瀏覽器 / OS</strong> — 流量組成</li>
+        <li><strong>地區 / 城市</strong> — 地理分佈</li>
+        <li><strong>來源 / 媒介 / Referrer</strong> — 流量來源</li>
+        <li><strong>UTM 交叉表</strong> — 例如 <code>source × medium</code> 組合，哪組帶最多量</li>
+      </ul>
+
+      <h3>篩選器</h3>
+      <ul>
+        <li>時段：7d / 14d / 30d / 90d</li>
+        <li>指定單一連結（從連結管理頁 ⋮ → 數據分析可直接帶入）</li>
+        <li>指定單一 Campaign</li>
+      </ul>
+
+      <h3>點擊熱度圖</h3>
+      <p>星期 × 小時的熱度分佈，找使用者最常點擊的時段，排 EDM 發送時間或社群貼文時間用。</p>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">為什麼沒有轉換率 / CVR 欄位？</div>
+        <p>團隊目前不用轉換追蹤 snippet。DB 與 API 都還在，哪天要啟用，把 UI 加回即可。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR -->
+  <div class="section" id="qr">
+    <h2 class="section-title">QR Code</h2>
+    <div class="card">
+      <p>每條連結都能產 QR code。步驟：</p>
+      <ol>
+        <li>連結管理 → 該列 ⋮ → <strong>QR Code</strong></li>
+        <li>下載 PNG（列印用）或 SVG（向量，印刷用）</li>
+        <li>中央嵌入 EnGenius 品牌 logo</li>
+      </ol>
+
+      <p>QR 跟短網址綁定 — 之後改目的地，原本掃出來的人也會跟著去新目的地。</p>
+
+      <h3>適用場景</h3>
+      <ul>
+        <li>實體傳單 / DM</li>
+        <li>展場 KV 海報 / 拉頁</li>
+        <li>名片</li>
+        <li>產品包裝導流</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CSV -->
+  <div class="section" id="csv">
+    <h2 class="section-title">CSV 批次匯入</h2>
+    <div class="card">
+      <p>一次建幾十上百條連結（例：展場活動發給各國代理商）。</p>
+
+      <p>Sidebar → <strong>連結管理</strong> → 右上角下拉 → <strong>批次匯入</strong> → 上傳 CSV → 預覽 → 確認。</p>
+
+      <h3>CSV 欄位格式</h3>
+      <div class="code-block"><span class="k">originalUrl,title,utmSource,utmMedium,utmCampaign,utmContent,tags</span>
+https://...,Spring EDM Top,newsletter,email,spring-sale,top_banner,EDM
+https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費</div>
+
+      <p>每列都是獨立 UTM（不共用 template），因為同一批通常是同通路不同素材。</p>
+    </div>
+  </div>
+
+  <!-- Share -->
+  <div class="section" id="share">
+    <h2 class="section-title">公開分享報告</h2>
+    <div class="card">
+      <p>想把活動成效報告分享給沒有登入權限的人（主管、合作夥伴、客戶）？</p>
+
+      <ol>
+        <li>進入 Campaign 詳情頁</li>
+        <li>右上角 <strong>產生分享連結</strong></li>
+        <li>拿到 <code>https://&lt;app-url&gt;/share/&lt;token&gt;</code></li>
+        <li>這個連結可以給任何人看該活動的 Overview + Traffic + Links，但無法編輯、也看不到其他活動</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Team -->
+  <div class="section" id="team">
+    <h2 class="section-title">團隊 &amp; 權限</h2>
+    <div class="card">
+      <h3>角色</h3>
+      <table class="specs-table">
+        <thead><tr><th>角色</th><th>權限</th></tr></thead>
+        <tbody>
+          <tr><td><strong>OWNER</strong></td><td>全權限</td></tr>
+          <tr><td><strong>ADMIN</strong></td><td>可管成員、可刪連結</td></tr>
+          <tr><td><strong>MEMBER</strong></td><td>可建自己的連結、編輯自己的</td></tr>
+          <tr><td><strong>VIEWER</strong></td><td>唯讀</td></tr>
+        </tbody>
+      </table>
+
+      <h3>工作區 (Workspace)</h3>
+      <p>一個工作區 = 一組連結 + 活動 + 成員 + UTM 規範。</p>
+      <p>大部分團隊只需要一個（例：<code>HQ MKT</code>）。如果之後要分區（台灣 / 日本）或跨團隊（行銷 / 客服），再開新工作區。</p>
+      <p>切換工作區在左上角的選擇器。</p>
+    </div>
+  </div>
+
+  <!-- Governance -->
+  <div class="section" id="governance">
+    <h2 class="section-title">UTM 白名單治理</h2>
+    <div class="card">
+      <p><strong>設定 → 工作區 → UTM Governance</strong>（只有 ADMIN / OWNER 能改）</p>
+
+      <h3>可設定的項目</h3>
+      <ul>
+        <li><strong>Approved Sources</strong> — 允許的 source 值清單</li>
+        <li><strong>Approved Mediums</strong> — 允許的 medium 值清單</li>
+      </ul>
+
+      <h3>設定後的效果</h3>
+      <ul>
+        <li>團隊成員建連結時輸入非白名單值 → 即時 amber warning</li>
+        <li>仍然可以送（不強制擋），但 server 端會拒絕明顯 invalid 的輸入</li>
+      </ul>
+
+      <div class="callout callout-green">
+        <div class="callout-title">目的</div>
+        <p>避免同一個來源 10 個人寫出 10 種拼法（<code>facebook</code> / <code>Facebook</code> / <code>FB</code> / <code>fb</code> / <code>meta</code>…）導致 GA 報表無法彙總。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section" id="faq">
+    <h2 class="section-title">常見問題</h2>
+    <div class="card">
+      <ul class="qa-list">
+        <li><strong>Q. 短網址會失效嗎？</strong>不會 — 除非你主動刪除、設過期時間、或設點擊上限。</li>
+        <li><strong>Q. 我可以換短網址的目的地嗎？</strong>可以。編輯連結 → 改 <code>originalUrl</code> → 儲存。原本分享出去的短網址下次點擊會去新目的地。</li>
+        <li><strong>Q. 為什麼建完連結、回到列表看不到？</strong>曾經有這個 bug，現在修好了 — 建立 / 複製 / 刪除等操作都會強制同步。如果偶爾還是遇到，按頁首淡藍色「同步」按鈕。</li>
+        <li><strong>Q.「建立副本」跟「複製短網址」差別？</strong>建立副本 = 在 DB 新增一條同設定的連結（不同 short code），用於 A/B 測試或跨通路重用；複製短網址 = 把短網址複製到剪貼簿，用於貼到 EDM / 社群。</li>
+        <li><strong>Q. 我建的連結同事看得到嗎？</strong>同工作區的成員都看得到（協作用）。需要私人連結目前不支援。</li>
+        <li><strong>Q. 怎麼撤銷一個已發出去的短網址？</strong>暫時撤銷 → 編輯 → 狀態改「暫停」（點擊會導到「連結已停用」頁）；永久撤銷 → 刪除。</li>
+        <li><strong>Q. 可以追蹤 landing page 之後的行為嗎？</strong>不行 — 這工具只追「點擊前」。Landing 後用 GA4。見 <a href="utm-parameters-guide.html#tool-vs-ga" style="color: var(--violet); font-weight: 600;">UTM 指南的分工定位章節</a>。</li>
+        <li><strong>Q. 輸入非白名單的 source / medium 會怎樣？</strong>會跳 amber warning，但可以送出（除非明顯 invalid 格式被擋）。之後 ADMIN 會被通知、可以把它加入白名單或跟你討論改用別的值。</li>
+        <li><strong>Q. 有點擊是 bot / 爬蟲嗎？會影響統計嗎？</strong>系統有基本去重（2 秒內同 IP 同連結算一次），但不做 UA 分類。社群平台的 link preview 爬蟲會產生點擊，這個比例通常小，可忽略。</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <a href="index.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      返回目錄
+    </a>
+  </div>
+
+  <script>
+    (function () {
+      const links = Array.from(document.querySelectorAll('.toc-list a[href^="#"]'));
+      const map = new Map();
+      links.forEach(a => {
+        const id = a.getAttribute('href').slice(1);
+        const el = document.getElementById(id);
+        if (el) map.set(el, a);
+      });
+      if (!map.size) return;
+
+      const setActive = (entry) => {
+        links.forEach(a => a.classList.remove('active'));
+        entry.classList.add('active');
+      };
+
+      const io = new IntersectionObserver((entries) => {
+        const visible = entries
+          .filter(e => e.isIntersecting)
+          .sort((a, b) => a.target.offsetTop - b.target.offsetTop);
+        if (visible.length) {
+          const link = map.get(visible[0].target);
+          if (link) setActive(link);
+        }
+      }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+
+      map.forEach((_link, section) => io.observe(section));
+    })();
+  </script>
+</body>
+</html>
