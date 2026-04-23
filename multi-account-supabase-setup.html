@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>多個 Supabase 帳號共存的開發環境設定</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand-1: #10B981;
+      --brand-2: #0D9488;
+      --brand-3: #0891B2;
+      --bg: #F5F3F0;
+      --card: #FFFFFF;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-tertiary: #64748B;
+      --ring: rgba(15, 23, 42, 0.06);
+      --teal: #0D9488;
+      --teal-light: #F0FDFA;
+      --teal-ring: rgba(13, 148, 136, 0.12);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Header ---- */
+    header { background: #0F172A; position: sticky; top: 0; z-index: 40; }
+    header .inner {
+      max-width: 1120px; margin: 0 auto;
+      padding: 0 32px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header .logo { display: flex; align-items: center; gap: 14px; }
+    header .logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35);
+    }
+    header .logo-icon svg { width: 20px; height: 20px; color: white; }
+    header .brand-name { font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em; }
+    header .brand-sub {
+      font-size: 13px; font-weight: 600; color: var(--teal);
+      margin-left: 10px;
+      background: rgba(13, 148, 136, 0.1);
+      padding: 2px 10px; border-radius: 99px;
+    }
+    header .back-link {
+      font-size: 14px; font-weight: 500; color: #E2E8F0; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      transition: all 0.15s;
+    }
+    header .back-link:hover { background: rgba(255,255,255,0.12); color: #FFFFFF; }
+    .accent-line { height: 3px; background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3)); }
+
+    /* ---- Hero ---- */
+    .hero { max-width: 1120px; margin: 0 auto; padding: 64px 32px 48px; }
+    .hero h1 {
+      font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--brand-2), var(--brand-3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      font-size: 19px; color: var(--text-secondary); max-width: 720px; line-height: 1.8;
+    }
+    .hero .meta {
+      margin-top: 20px; font-size: 14px; color: var(--text-tertiary);
+      display: flex; gap: 18px; flex-wrap: wrap;
+    }
+    .hero .meta span::before { content: "·"; margin-right: 18px; color: var(--text-tertiary); opacity: 0.4; }
+    .hero .meta span:first-child::before { content: ""; margin: 0; }
+
+    /* ---- Sections ---- */
+    .section { max-width: 1120px; margin: 0 auto; padding: 0 32px 56px; }
+    .section-title {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 24px;
+    }
+
+    /* ---- Cards ---- */
+    .card {
+      background: var(--card); border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      outline: 1px solid var(--ring);
+      padding: 40px; margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .card h3 {
+      font-size: 20px; font-weight: 700; letter-spacing: -0.01em;
+      margin-bottom: 10px; margin-top: 32px;
+    }
+    .card h3:first-child { margin-top: 0; }
+    .card h4 {
+      font-size: 17px; font-weight: 700; letter-spacing: -0.005em;
+      margin-bottom: 8px; margin-top: 24px;
+    }
+    .card p { color: var(--text-secondary); margin-bottom: 14px; font-size: 17px; }
+    .card p:last-child { margin-bottom: 0; }
+    .card ul, .card ol { padding-left: 24px; margin-bottom: 14px; color: var(--text-secondary); }
+    .card ul li, .card ol li { margin-bottom: 6px; }
+    .card strong { color: var(--text-primary); font-weight: 700; }
+    .card code {
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      background: #F1F5F9; color: #0F172A;
+      padding: 2px 8px; border-radius: 6px;
+      font-size: 14px; font-weight: 500;
+    }
+
+    /* ---- Compare table ---- */
+    .compare-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 20px 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden;
+      outline: 1px solid var(--ring);
+    }
+    .compare-table th {
+      background: #F8FAFC; text-align: left; padding: 14px 18px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .compare-table td {
+      padding: 14px 18px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table td:first-child {
+      font-weight: 600; color: var(--text-primary);
+    }
+    .compare-table .highlight { color: var(--teal); font-weight: 600; }
+
+    /* ---- Code block ---- */
+    .code-block {
+      background: #0F172A; color: #E2E8F0;
+      border-radius: 14px; padding: 22px 26px;
+      margin: 16px 0;
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      font-size: 14px; line-height: 1.85;
+      overflow-x: auto;
+    }
+    .code-block .comment { color: #64748B; }
+    .code-block .keyword { color: #8B5CF6; }
+    .code-block .string { color: #FCD34D; }
+    .code-block .fn { color: #2DD4BF; }
+    .code-block .num { color: #F472B6; }
+
+    /* ---- Step blocks ---- */
+    .step {
+      background: #F8FAFC; border-radius: 14px; padding: 24px 28px;
+      margin: 20px 0;
+      outline: 1px solid var(--ring);
+    }
+    .step .step-num {
+      display: inline-block;
+      background: var(--teal);
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 3px 12px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+    }
+    .step h4 {
+      font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+      margin-bottom: 10px; margin-top: 0;
+    }
+
+    /* ---- Note / Warning ---- */
+    .note {
+      background: var(--teal-light); border-radius: 12px; padding: 20px 24px;
+      outline: 1px solid var(--teal-ring);
+      font-size: 16px; color: #115E59; line-height: 1.7;
+      margin: 20px 0;
+    }
+    .note strong { color: #115E59; font-weight: 700; }
+    .warning {
+      background: #FFFBEB; border-radius: 12px; padding: 20px 24px;
+      outline: 1px solid rgba(245,158,11,0.15);
+      font-size: 16px; color: #92400E; line-height: 1.7;
+      margin: 20px 0;
+    }
+    .warning strong { color: #78350F; font-weight: 700; }
+
+    /* ---- Method list ---- */
+    .flow-chart {
+      background: #0F172A; color: #E2E8F0;
+      border-radius: 14px; padding: 22px 26px;
+      margin: 16px 0;
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      font-size: 13px; line-height: 1.8;
+      overflow-x: auto;
+    }
+    .flow-chart .highlight { color: #2DD4BF; }
+    .flow-chart .dim { color: #64748B; }
+
+    /* ---- Terminal mock ---- */
+    .terminals {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+      margin: 20px 0;
+    }
+    .terminal-mock {
+      background: #0F172A; border-radius: 12px;
+      padding: 18px 20px;
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      font-size: 13px; line-height: 1.8;
+      color: #E2E8F0;
+    }
+    .terminal-mock .title {
+      font-size: 11px; color: #64748B; text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .terminal-mock .prompt { color: #64748B; }
+    .terminal-mock .cmd { color: #2DD4BF; }
+    .terminal-mock .out { color: #FCD34D; }
+    .terminal-mock .token { color: #94A3B8; font-size: 12px; margin-top: 8px; }
+
+    /* ---- TL;DR Summary Grid ---- */
+    .summary-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+      margin: 16px 0;
+    }
+    .summary-item {
+      background: #F8FAFC; border-radius: 12px; padding: 18px 20px;
+      outline: 1px solid var(--ring);
+    }
+    .summary-item .key {
+      font-size: 13px; font-weight: 700; color: var(--teal);
+      margin-bottom: 4px;
+    }
+    .summary-item .val {
+      font-size: 15px; color: var(--text-secondary); line-height: 1.6;
+    }
+
+    /* ---- Divider ---- */
+    .divider {
+      height: 1px; background: rgba(15, 23, 42, 0.06);
+      max-width: 1120px; margin: 0 auto;
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      max-width: 1120px; margin: 0 auto; padding: 32px 32px 48px;
+      text-align: center; font-size: 14px; color: var(--text-tertiary);
+    }
+    footer a { color: var(--teal); text-decoration: none; font-weight: 600; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ---- Mobile RWD ---- */
+    @media (max-width: 640px) {
+      body { font-size: 16px; }
+
+      /* Header */
+      header .inner { padding: 0 16px; height: 52px; }
+      header .brand-name { font-size: 14px; }
+      header .brand-sub { font-size: 11px; margin-left: 6px; padding: 2px 8px; }
+      header .back-link { font-size: 13px; padding: 5px 12px; }
+
+      /* Hero */
+      .hero { padding: 40px 20px 32px; }
+      .hero h1 { font-size: 28px; }
+      .hero .subtitle { font-size: 16px; }
+
+      /* Sections */
+      .section { padding: 0 20px 40px; }
+      .section-title { font-size: 22px; margin-bottom: 16px; }
+
+      /* Cards */
+      .card { padding: 24px 22px; border-radius: 16px; }
+      .card h2 { font-size: 22px; }
+      .card h3 { font-size: 18px; margin-top: 24px; }
+      .card h4 { font-size: 16px; margin-top: 20px; }
+      .card p, .card ul, .card ol { font-size: 16px; }
+
+      /* Step */
+      .step { padding: 20px; }
+      .step h4 { font-size: 16px; }
+
+      /* Terminals */
+      .terminals { grid-template-columns: 1fr; gap: 10px; }
+
+      /* Tables */
+      .compare-table { font-size: 14px; }
+      .compare-table th, .compare-table td { padding: 10px 12px; }
+      .compare-table th:first-child { width: auto; }
+
+      /* Code */
+      .code-block, .flow-chart { padding: 18px 20px; font-size: 13px; }
+
+      /* Summary grid */
+      .summary-grid { grid-template-columns: 1fr; }
+
+      /* Footer */
+      footer { padding: 24px 20px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </div>
+        <span class="brand-name">Comms Docs</span>
+        <span class="brand-sub">Dev Environment</span>
+      </div>
+      <a class="back-link" href="index.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+        返回
+      </a>
+    </div>
+  </header>
+  <div class="accent-line"></div>
+
+  <section class="hero">
+    <h1>多個 <span class="gradient">Supabase 帳號</span>共存的<br />開發環境設定</h1>
+    <p class="subtitle">
+      Supabase 免費方案每帳號限 2 個 project，手上專案多一點就會碰到多帳號管理。這篇記錄用 <code style="font-family:'SF Mono',monospace;background:#E2E8F0;padding:2px 7px;border-radius:5px;font-size:15px">~/.zshrc</code> 加上 chpwd hook 做到「進 repo 自動切帳號」的完整設定方案。
+    </p>
+    <div class="meta">
+      <span>建立日期：2026-04-23</span>
+      <span>適用：macOS + Zsh</span>
+      <span>完成時間：約 15 分鐘</span>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" style="padding-top: 56px;">
+    <h2 class="section-title">背景：為什麼會有多帳號</h2>
+    <div class="card">
+      <p>Supabase 免費方案每個帳號<strong>最多 2 個 project</strong>。當手上同時有 3 個以上 project 時，只能申請多個帳號來分配。例如：</p>
+      <div class="flow-chart">
+<span class="highlight">Account A</span>：DS Generator + Mailchimp Dashboard
+<span class="highlight">Account B</span>：營收儀表板 + WiFi Regulation Checker
+<span class="highlight">Account C</span>：MKT ShortLink</div>
+      <p>每個帳號都需要能用 CLI 操作（<code>gen types</code>、<code>migration</code>、<code>db push</code> 等），但 <strong>Supabase CLI 一次只認一個身份</strong> — 這就是多帳號管理要解的問題。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">預備知識：~/.zshrc 是什麼</h2>
+    <div class="card">
+      <p>macOS Catalina 之後預設 shell 是 <strong>Zsh</strong>，每次開 terminal 時會自動讀取 <code>~/.zshrc</code> 跑一次。這個檔案放：</p>
+      <table class="compare-table">
+        <thead>
+          <tr><th>類別</th><th>範例</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>環境變數</td><td><code>export NODE_ENV=development</code></td></tr>
+          <tr><td>PATH 擴充</td><td><code>export PATH="$HOME/.local/bin:$PATH"</code></td></tr>
+          <tr><td>指令別名</td><td><code>alias gs='git status'</code></td></tr>
+          <tr><td>自訂函式</td><td><code>myfunc() { ... }</code></td></tr>
+          <tr><td>工具載入</td><td><code>source /opt/homebrew/opt/nvm/nvm.sh</code></td></tr>
+        </tbody>
+      </table>
+      <p><strong>生效時機</strong>：改完 <code>~/.zshrc</code> 要<strong>開新 terminal</strong> 或 <code>source ~/.zshrc</code> 才會套用到當前 session。<code>.</code> 開頭是隱藏檔，<code>ls</code> 看不到，要 <code>ls -a</code>。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">核心機制：CLI 如何認身份</h2>
+    <div class="card">
+      <p>每次 <code>supabase</code> 指令執行時，它檢查身份的順序：</p>
+      <div class="flow-chart">
+<span class="dim">1.</span> 環境變數  <span class="highlight">SUPABASE_ACCESS_TOKEN</span>        <span class="dim">← 最優先</span>
+<span class="dim">2.</span> 檔案      <span class="highlight">~/.supabase/access-token</span>     <span class="dim">← 其次</span>
+<span class="dim">3.</span> 都沒有 → 提示「請先 supabase login」</div>
+      <ul>
+        <li><code>supabase login</code> 會透過 OAuth 把 token 寫入 <code>~/.supabase/access-token</code>（一次一個帳號）</li>
+        <li><code>supabase logout</code> 會刪除那個檔案</li>
+      </ul>
+      <div class="note">
+        <strong>關鍵洞察：</strong>使用 <code>SUPABASE_ACCESS_TOKEN</code> <strong>環境變數</strong>時，<strong>不同 terminal 可以有不同身份</strong>，因為環境變數是 per-shell 的。這就是多帳號共存的核心機制。
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">方案比較</h2>
+    <div class="card">
+      <p>四種可行做法，各有取捨：</p>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>方案</th>
+            <th>切換方式</th>
+            <th>優點</th>
+            <th>缺點</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="highlight">1. Shell function</td>
+            <td>打 <code>sb-a</code></td>
+            <td>一行切換，零依賴</td>
+            <td>Token 明文寫 dotfile</td>
+          </tr>
+          <tr>
+            <td>2. <code>.env.local</code></td>
+            <td>進 repo 後 source</td>
+            <td>身份綁專案</td>
+            <td>要手動載入</td>
+          </tr>
+          <tr>
+            <td>3. direnv</td>
+            <td><code>cd</code> 自動切換</td>
+            <td>完全自動</td>
+            <td>多裝一個工具</td>
+          </tr>
+          <tr>
+            <td>4. Keychain</td>
+            <td>搭配 function</td>
+            <td>Token 存系統鑰匙圈</td>
+            <td>略多步驟</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note">
+        <strong>本文採用：方案 1 + <code>chpwd</code> hook 擴充</strong>（結合方案 1 的簡單和方案 3 的自動切換），完全用原生 Zsh 功能，不裝額外工具。
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">完整設定步驟</h2>
+
+    <div class="card">
+      <div class="step">
+        <span class="step-num">STEP 1</span>
+        <h4>取得 Personal Access Tokens</h4>
+        <p>對每個 Supabase 帳號<strong>各做一次</strong>：</p>
+        <ol>
+          <li>開瀏覽器（建議用無痕視窗避免 session 衝突）登入該帳號</li>
+          <li>到 <a href="https://supabase.com/dashboard/account/tokens" target="_blank" style="color:var(--teal); font-weight:600;">supabase.com/dashboard/account/tokens</a></li>
+          <li>按 <strong>Generate new token</strong></li>
+          <li>命名建議：<code>cli-&lt;帳號描述&gt;</code>（例如 <code>cli-work</code>、<code>cli-personal</code>、<code>cli-marketing</code>）</li>
+          <li>複製 <code>sbp_xxxxxxxxxxxxxxxx...</code>（50+ 字元）— <strong>只顯示一次</strong>，關掉就看不到</li>
+        </ol>
+      </div>
+
+      <div class="step">
+        <span class="step-num">STEP 2</span>
+        <h4>設定 ~/.zshrc</h4>
+        <p>打開 <code>~/.zshrc</code>（用 VS Code、TextEdit、nano 都可以）：</p>
+        <div class="code-block"><span class="comment"># VS Code 打開</span>
+code ~/.zshrc
+
+<span class="comment"># 或 macOS 內建 TextEdit</span>
+open -e ~/.zshrc</div>
+        <p>在<strong>檔案最下方</strong>貼上這整段（記得把 <code>sbp_REPLACE_WITH_...</code> 替換成你真的 token，帳號名稱也改成你自己取的）：</p>
+        <div class="code-block"><span class="comment"># ============================================================</span>
+<span class="comment"># Supabase — 多帳號切換（Personal Access Tokens）</span>
+<span class="comment"># ============================================================</span>
+
+<span class="comment"># Helper：設 terminal 分頁標題</span>
+_sb_set_title() { print -Pn <span class="string">"\e]0;[$1] %n — %~\a"</span>; }
+
+<span class="fn">sb-a</span>() {
+  <span class="keyword">export</span> SUPABASE_ACCESS_TOKEN=<span class="string">"sbp_REPLACE_WITH_cli-work_TOKEN"</span>
+  _sb_set_title <span class="string">"cli-work"</span>
+  <span class="keyword">echo</span> <span class="string">"→ Supabase switched to: cli-work"</span>
+}
+
+<span class="fn">sb-b</span>() {
+  <span class="keyword">export</span> SUPABASE_ACCESS_TOKEN=<span class="string">"sbp_REPLACE_WITH_cli-personal_TOKEN"</span>
+  _sb_set_title <span class="string">"cli-personal"</span>
+  <span class="keyword">echo</span> <span class="string">"→ Supabase switched to: cli-personal"</span>
+}
+
+<span class="fn">sb-c</span>() {
+  <span class="keyword">export</span> SUPABASE_ACCESS_TOKEN=<span class="string">"sbp_REPLACE_WITH_cli-marketing_TOKEN"</span>
+  _sb_set_title <span class="string">"cli-marketing"</span>
+  <span class="keyword">echo</span> <span class="string">"→ Supabase switched to: cli-marketing"</span>
+}
+
+<span class="comment"># 查當前身份 + projects</span>
+<span class="fn">sb-who</span>() {
+  <span class="keyword">if</span> [ -z <span class="string">"$SUPABASE_ACCESS_TOKEN"</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> <span class="string">"→ No token set. Falling back to ~/.supabase/access-token"</span>
+  <span class="keyword">else</span>
+    <span class="keyword">echo</span> <span class="string">"→ Active token: ${SUPABASE_ACCESS_TOKEN:0:12}…${SUPABASE_ACCESS_TOKEN: -4}"</span>
+  <span class="keyword">fi</span>
+  supabase projects list 2>&1 | head -20
+}
+
+<span class="comment"># 清掉當前 shell 的 token</span>
+<span class="fn">sb-clear</span>() {
+  <span class="keyword">unset</span> SUPABASE_ACCESS_TOKEN
+  print -Pn <span class="string">"\e]0;%n — %~\a"</span>
+  <span class="keyword">echo</span> <span class="string">"→ Cleared."</span>
+}
+
+<span class="comment"># ------------------------------------------------------------</span>
+<span class="comment"># 自動根據當前資料夾切換 Supabase 身份（chpwd hook）</span>
+<span class="comment"># ------------------------------------------------------------</span>
+_sb_auto_switch() {
+  <span class="keyword">case</span> <span class="string">"$PWD"</span> <span class="keyword">in</span>
+    <span class="comment"># cli-work — 列出這個帳號下的 repo 路徑</span>
+    */work-project-A|*/work-project-A/*|*/work-project-B|*/work-project-B/*)
+      <span class="keyword">export</span> SUPABASE_ACCESS_TOKEN=<span class="string">"sbp_REPLACE_WITH_cli-work_TOKEN"</span>
+      _sb_set_title <span class="string">"cli-work"</span>
+      ;;
+    <span class="comment"># cli-personal</span>
+    */personal-project-A|*/personal-project-A/*)
+      <span class="keyword">export</span> SUPABASE_ACCESS_TOKEN=<span class="string">"sbp_REPLACE_WITH_cli-personal_TOKEN"</span>
+      _sb_set_title <span class="string">"cli-personal"</span>
+      ;;
+    <span class="comment"># cli-marketing</span>
+    */marketing-project|*/marketing-project/*)
+      <span class="keyword">export</span> SUPABASE_ACCESS_TOKEN=<span class="string">"sbp_REPLACE_WITH_cli-marketing_TOKEN"</span>
+      _sb_set_title <span class="string">"cli-marketing"</span>
+      ;;
+  <span class="keyword">esac</span>
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook chpwd _sb_auto_switch
+_sb_auto_switch  <span class="comment"># 開 terminal 時立刻對當前資料夾跑一次</span></div>
+        <p>存檔後：</p>
+        <div class="code-block">source ~/.zshrc    <span class="comment"># 或直接開新 terminal 分頁</span></div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">STEP 3</span>
+        <h4>驗證切換</h4>
+        <div class="code-block">sb-a      <span class="comment"># 切到 Account A</span>
+sb-who    <span class="comment"># 會列出該帳號可見的所有 projects</span></div>
+        <p>如果看到正確的 projects 清單，就設定成功。切到其他帳號：<code>sb-b</code> / <code>sb-c</code>。</p>
+      </div>
+
+      <div class="step">
+        <span class="step-num">STEP 4</span>
+        <h4>綁定每個 repo 到對應的 project</h4>
+        <p>這步驟讓 repo 知道自己對應哪個 Supabase project，以後下指令可以用 <code>--linked</code> 簡寫，不用每次記 project ID。對每個 repo 做一次：</p>
+        <div class="code-block"><span class="keyword">cd</span> &lt;repo 路徑&gt;
+sb-a                                                  <span class="comment"># 切到 repo 所屬的帳號</span>
+supabase link --project-ref &lt;project-reference-id&gt;</div>
+        <p><code>project-reference-id</code> 是 20 字元字串，從 <code>supabase projects list</code> 的 <strong>REFERENCE ID</strong> 欄位複製。</p>
+        <div class="warning">
+          <strong>記得把 <code>supabase/.temp/</code> 加進 <code>.gitignore</code></strong>。link 會在 repo 建立這個資料夾暫存 link 狀態，屬於本機設定，不應 commit。
+        </div>
+        <div class="code-block"><span class="keyword">echo</span> <span class="string">""</span> &gt;&gt; .gitignore
+<span class="keyword">echo</span> <span class="string">"# Supabase CLI (local link cache — not for commit)"</span> &gt;&gt; .gitignore
+<span class="keyword">echo</span> <span class="string">"supabase/.temp/"</span> &gt;&gt; .gitignore</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">使用方式</h2>
+    <div class="card">
+      <h3>一次切換一個 terminal</h3>
+      <div class="code-block">sb-a                                         <span class="comment"># 切帳號</span>
+supabase projects list                       <span class="comment"># 看該帳號能看到的 projects</span>
+supabase gen types typescript --linked       <span class="comment"># 對當前 repo 綁定的 project 產生 types</span></div>
+
+      <h3>三個 terminal 同時用三個帳號</h3>
+      <p>每個 terminal 視窗/分頁<strong>獨立</strong>，環境變數互不影響：</p>
+
+      <div class="terminals">
+        <div class="terminal-mock">
+          <div class="title">Terminal 1</div>
+          <div><span class="prompt">$</span> <span class="cmd">sb-a</span></div>
+          <div><span class="out">→ cli-work</span></div>
+          <div class="token">TOKEN=sbp_aaaa...</div>
+        </div>
+        <div class="terminal-mock">
+          <div class="title">Terminal 2</div>
+          <div><span class="prompt">$</span> <span class="cmd">sb-b</span></div>
+          <div><span class="out">→ cli-personal</span></div>
+          <div class="token">TOKEN=sbp_bbbb...</div>
+        </div>
+        <div class="terminal-mock">
+          <div class="title">Terminal 3</div>
+          <div><span class="prompt">$</span> <span class="cmd">sb-c</span></div>
+          <div><span class="out">→ cli-marketing</span></div>
+          <div class="token">TOKEN=sbp_cccc...</div>
+        </div>
+      </div>
+
+      <h3>進 repo 自動切換</h3>
+      <p>如果你在 Step 2 有設定 <code>_sb_auto_switch</code>（chpwd hook），以後 <strong><code>cd</code> 進任何一個 linked repo，自動切到對的帳號</strong>：</p>
+      <div class="code-block"><span class="keyword">cd</span> ~/Projects/work-project-A     <span class="comment"># → 自動切到 cli-work，標題變 [cli-work]</span>
+<span class="keyword">cd</span> ~/Projects/marketing-project  <span class="comment"># → 自動切到 cli-marketing，標題變 [cli-marketing]</span>
+<span class="keyword">cd</span> ~                             <span class="comment"># → 身份不變（不在 linked repo）</span></div>
+      <p>Terminal 分頁標題會即時顯示當前身份，不會搞錯。</p>
+
+      <h3>常用指令</h3>
+      <table class="compare-table">
+        <thead>
+          <tr><th>動作</th><th>指令</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>切帳號</td><td><code>sb-a</code> / <code>sb-b</code> / <code>sb-c</code></td></tr>
+          <tr><td>查當前身份</td><td><code>sb-who</code></td></tr>
+          <tr><td>清當前 session 身份</td><td><code>sb-clear</code></td></tr>
+          <tr><td>列出可見 projects</td><td><code>supabase projects list</code></td></tr>
+          <tr><td>產生 DB types</td><td><code>supabase gen types typescript --linked &gt; types.ts</code></td></tr>
+          <tr><td>查 migrations</td><td><code>supabase migration list</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">附錄：7 天閒置會被 pause</h2>
+    <div class="card">
+      <p>Supabase 免費方案如果 <strong>7 天內沒有任何 API 請求</strong>，project 會進入 paused 狀態。被 pause 的 project 無法操作，要到 Dashboard 按 Restore 才能恢復（通常幾分鐘）。</p>
+      <p><strong>什麼算「活動」</strong>：任何 API call（REST、GraphQL、Realtime）、auth 事件、DB query 都算。</p>
+
+      <h3>防止 pause 的三種方案</h3>
+
+      <h4>方案 A：Vercel Cron 每日打一次 API</h4>
+      <p>如果 project 已有 Vercel 部署，<code>vercel.json</code> 加 cron：</p>
+      <div class="code-block">{
+  <span class="string">"crons"</span>: [{ <span class="string">"path"</span>: <span class="string">"/api/ping"</span>, <span class="string">"schedule"</span>: <span class="string">"0 0 */3 * *"</span> }]
+}</div>
+      <p><code>/api/ping</code> 寫一個最小的 DB query（例如 <code>SELECT 1</code>），每 3 天自動打一次就保活。</p>
+
+      <h4>方案 B：GitHub Actions 集中管理多 project</h4>
+      <p>用一個 repo 跑 cron workflow，對多個 project 依序打 API：</p>
+      <div class="code-block"><span class="comment"># .github/workflows/keepalive.yml</span>
+<span class="keyword">on</span>:
+  schedule:
+    - cron: <span class="string">'0 0 */3 * *'</span>
+<span class="keyword">jobs</span>:
+  ping:
+    steps:
+      - run: |
+          curl <span class="string">"https://$P1.supabase.co/rest/v1/..."</span> -H <span class="string">"apikey: $KEY1"</span>
+          curl <span class="string">"https://$P2.supabase.co/rest/v1/..."</span> -H <span class="string">"apikey: $KEY2"</span></div>
+
+      <h4>方案 C：Supabase 內建 pg_cron（最乾淨）</h4>
+      <p>免費方案也支援 <code>pg_cron</code> 擴充，直接在 DB 排程：</p>
+      <div class="code-block"><span class="comment">-- 在 Supabase SQL Editor 執行</span>
+<span class="keyword">create extension if not exists</span> pg_cron;
+
+<span class="keyword">select</span> cron.schedule(
+  <span class="string">'keepalive'</span>,
+  <span class="string">'0 0 */3 * *'</span>,         <span class="comment">-- 每 3 天跑一次</span>
+  $$ <span class="keyword">select</span> <span class="num">1</span>; $$        <span class="comment">-- 最小 query</span>
+);</div>
+      <p>完全不用外部服務，每個 project 各自跑一次這個 SQL 就好。</p>
+
+      <h3>推薦</h3>
+      <table class="compare-table">
+        <thead>
+          <tr><th>Project 性質</th><th>推薦方案</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>有 Vercel 部署 + 日常有活動</td><td class="highlight">不用做（已有活動）</td></tr>
+          <tr><td>靜態/低流量專案</td><td class="highlight">方案 C（pg_cron）最省事</td></tr>
+          <tr><td>想集中管理多個</td><td class="highlight">方案 B（GitHub Actions）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">進階：提升安全性</h2>
+    <div class="card">
+      <p>如果你的 dotfile（<code>~/.zshrc</code>）會備份到 git / 雲端，把 token 明文寫在裡面不夠安全。這時改用 <strong>macOS Keychain</strong>：</p>
+      <div class="code-block"><span class="comment"># 存 token 到系統鑰匙圈</span>
+security add-generic-password -a <span class="string">"$USER"</span> -s <span class="string">"sb-work"</span> -w <span class="string">"sbp_aaaa..."</span>
+security add-generic-password -a <span class="string">"$USER"</span> -s <span class="string">"sb-personal"</span> -w <span class="string">"sbp_bbbb..."</span>
+security add-generic-password -a <span class="string">"$USER"</span> -s <span class="string">"sb-marketing"</span> -w <span class="string">"sbp_cccc..."</span>
+
+<span class="comment"># 改寫 ~/.zshrc 的 function</span>
+<span class="fn">sb-a</span>() {
+  <span class="keyword">export</span> SUPABASE_ACCESS_TOKEN=$(security find-generic-password -a <span class="string">"$USER"</span> -s <span class="string">"sb-work"</span> -w)
+  _sb_set_title <span class="string">"cli-work"</span>
+}</div>
+      <p>這樣 <code>~/.zshrc</code> 不含任何 token 字串，安全很多。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">總結</h2>
+    <div class="card">
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="key">核心機制</div>
+          <div class="val">多帳號靠 <code>SUPABASE_ACCESS_TOKEN</code> 環境變數，每個 terminal 獨立</div>
+        </div>
+        <div class="summary-item">
+          <div class="key">取 Token</div>
+          <div class="val">Personal Access Token 到 dashboard 拿，一次只顯示務必存好</div>
+        </div>
+        <div class="summary-item">
+          <div class="key">綁定 Repo</div>
+          <div class="val"><code>supabase link</code> 綁定 repo，以後用 <code>--linked</code> 簡寫</div>
+        </div>
+        <div class="summary-item">
+          <div class="key">避免誤 Commit</div>
+          <div class="val"><code>supabase/.temp/</code> 要加進 <code>.gitignore</code></div>
+        </div>
+        <div class="summary-item">
+          <div class="key">自動切換</div>
+          <div class="val"><code>chpwd</code> hook 讓 <code>cd</code> 進 repo 自動切對帳號</div>
+        </div>
+        <div class="summary-item">
+          <div class="key">多分頁識別</div>
+          <div class="val">Terminal title 顯示身份前綴，多分頁不會搞錯</div>
+        </div>
+        <div class="summary-item">
+          <div class="key">7 天 Pause</div>
+          <div class="val">用 <code>pg_cron</code> 或 Vercel cron 保活</div>
+        </div>
+        <div class="summary-item">
+          <div class="key">完成時間</div>
+          <div class="val">初次設定約 15 分鐘，之後多帳號切換完全無感</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <a href="index.html">← 返回 Comms Docs 首頁</a>
+  </footer>
+
+</body>
+</html>
