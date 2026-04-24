@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VCCI 工具網頁化部署方案評估</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand-1: #2563EB;
+      --brand-2: #1D4ED8;
+      --brand-3: #1E40AF;
+      --bg: #F5F3F0;
+      --card: #FFFFFF;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-tertiary: #64748B;
+      --ring: rgba(15, 23, 42, 0.06);
+      --blue: #2563EB;
+      --blue-light: #EFF6FF;
+      --blue-ring: rgba(37, 99, 235, 0.12);
+      --amber-light: #FFFBEB;
+      --amber-border: #FCD34D;
+      --amber-text: #92400E;
+      --green: #16A34A;
+      --green-light: #F0FDF4;
+      --green-ring: rgba(22, 163, 74, 0.15);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Header ---- */
+    header { background: #0F172A; position: sticky; top: 0; z-index: 40; }
+    header .inner {
+      max-width: 1120px; margin: 0 auto;
+      padding: 0 32px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header .logo { display: flex; align-items: center; gap: 14px; }
+    header .logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      color: white; font-size: 18px; font-weight: 800;
+    }
+    header .brand-name { font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em; }
+    header .brand-sub {
+      font-size: 13px; font-weight: 600; color: var(--blue);
+      margin-left: 10px;
+      background: rgba(37, 99, 235, 0.12);
+      padding: 2px 10px; border-radius: 99px;
+    }
+    header .back-link {
+      font-size: 14px; font-weight: 500; color: #E2E8F0; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      transition: all 0.15s;
+    }
+    header .back-link:hover { background: rgba(255,255,255,0.12); color: #FFFFFF; }
+    .accent-line { height: 3px; background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3)); }
+
+    /* ---- Hero ---- */
+    .hero { max-width: 1120px; margin: 0 auto; padding: 64px 32px 48px; }
+    .hero h1 {
+      font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      font-size: 19px; color: var(--text-secondary); max-width: 780px; line-height: 1.8;
+    }
+    .hero .meta {
+      margin-top: 20px; font-size: 14px; color: var(--text-tertiary);
+      display: flex; gap: 18px; flex-wrap: wrap;
+    }
+    .hero .meta span::before { content: "·"; margin-right: 18px; color: var(--text-tertiary); opacity: 0.4; }
+    .hero .meta span:first-child::before { content: ""; margin: 0; }
+
+    /* ---- Sections ---- */
+    .section { max-width: 1120px; margin: 0 auto; padding: 0 32px 56px; }
+    .section-title {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 24px;
+    }
+
+    /* ---- Cards ---- */
+    .card {
+      background: var(--card); border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      outline: 1px solid var(--ring);
+      padding: 40px; margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .card h3 {
+      font-size: 20px; font-weight: 700; letter-spacing: -0.01em;
+      margin-bottom: 10px; margin-top: 32px;
+    }
+    .card h3:first-child { margin-top: 0; }
+    .card h4 {
+      font-size: 17px; font-weight: 700; letter-spacing: -0.005em;
+      margin-bottom: 8px; margin-top: 24px;
+    }
+    .card p { color: var(--text-secondary); margin-bottom: 14px; font-size: 17px; }
+    .card p:last-child { margin-bottom: 0; }
+    .card ul, .card ol { padding-left: 24px; margin-bottom: 14px; color: var(--text-secondary); }
+    .card ul li, .card ol li { margin-bottom: 6px; }
+    .card strong { color: var(--text-primary); font-weight: 700; }
+    .card code {
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      background: #F1F5F9; color: #0F172A;
+      padding: 2px 8px; border-radius: 6px;
+      font-size: 14px; font-weight: 500;
+    }
+
+    /* ---- TL;DR list ---- */
+    .tldr {
+      background: var(--blue-light); border-radius: 16px; padding: 28px 32px;
+      outline: 1px solid var(--blue-ring);
+      margin-bottom: 24px;
+    }
+    .tldr ul { list-style: none; padding: 0; margin: 0; }
+    .tldr li {
+      position: relative; padding-left: 30px; margin-bottom: 10px;
+      color: #1E3A8A; font-size: 17px; line-height: 1.75;
+    }
+    .tldr li:last-child { margin-bottom: 0; }
+    .tldr li::before {
+      content: "▸"; position: absolute; left: 8px; top: 0;
+      color: var(--blue); font-weight: 700;
+    }
+    .tldr li strong { color: #1E3A8A; font-weight: 700; }
+
+    /* ---- Compare table ---- */
+    .compare-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 20px 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden;
+      outline: 1px solid var(--ring);
+    }
+    .compare-table th {
+      background: #F8FAFC; text-align: left; padding: 14px 18px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .compare-table td {
+      padding: 14px 18px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table td:first-child {
+      font-weight: 600; color: var(--text-primary);
+    }
+    .compare-table .highlight { color: var(--blue); font-weight: 600; }
+    .compare-table th.option-col { min-width: 140px; }
+
+    /* ---- Arch diagram ---- */
+    .arch-diagram {
+      background: #0F172A; color: #E2E8F0;
+      border-radius: 14px; padding: 28px 32px;
+      margin: 20px 0;
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      font-size: 13px; line-height: 1.9;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .arch-diagram .layer-public { color: #2DD4BF; font-weight: 700; }
+    .arch-diagram .layer-private { color: #FCD34D; font-weight: 700; }
+    .arch-diagram .highlight { color: #60A5FA; }
+    .arch-diagram .dim { color: #64748B; }
+
+    /* ---- Scenario ---- */
+    .scenario {
+      background: #F8FAFC; border-radius: 14px; padding: 24px 28px;
+      margin: 20px 0;
+      outline: 1px solid var(--ring);
+    }
+    .scenario .scenario-tag {
+      display: inline-block;
+      background: var(--blue); color: white;
+      font-weight: 700; font-size: 13px;
+      padding: 3px 12px; border-radius: 99px;
+      margin-bottom: 12px;
+    }
+    .scenario h4 {
+      font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+      margin-bottom: 10px; margin-top: 0;
+    }
+    .scenario ol { padding-left: 22px; margin-bottom: 10px; }
+    .scenario ol li { margin-bottom: 4px; color: var(--text-secondary); font-size: 16px; }
+    .scenario .callout-line {
+      background: var(--blue-light); color: #1E3A8A;
+      padding: 10px 16px; border-radius: 10px;
+      font-size: 15px; font-weight: 600;
+      margin-top: 12px;
+    }
+
+    /* ---- Callout ---- */
+    .callout {
+      border-radius: 12px; padding: 20px 24px;
+      font-size: 16px; line-height: 1.7;
+      margin: 20px 0;
+    }
+    .callout.info {
+      background: var(--blue-light);
+      outline: 1px solid var(--blue-ring);
+      color: #1E3A8A;
+    }
+    .callout.warn {
+      background: var(--amber-light);
+      outline: 1px solid rgba(245,158,11,0.15);
+      color: var(--amber-text);
+    }
+    .callout.info strong, .callout.warn strong { font-weight: 700; }
+
+    /* ---- FAQ ---- */
+    .faq-item {
+      padding: 22px 0; border-bottom: 1px solid rgba(15,23,42,0.07);
+    }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-item h4 {
+      font-size: 18px; font-weight: 700; color: var(--text-primary);
+      margin-bottom: 8px; margin-top: 0;
+    }
+    .faq-item p {
+      color: var(--text-secondary); margin-bottom: 0;
+    }
+
+    /* ---- Timeline ---- */
+    .timeline {
+      margin: 20px 0;
+    }
+    .timeline-item {
+      display: grid; grid-template-columns: 160px 1fr; gap: 20px;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(15,23,42,0.06);
+    }
+    .timeline-item:last-child { border-bottom: none; }
+    .timeline-date {
+      font-weight: 700; color: var(--blue); font-size: 15px;
+    }
+    .timeline-desc { color: var(--text-secondary); font-size: 16px; }
+    .timeline-desc strong { color: var(--text-primary); }
+
+    /* ---- Footer ---- */
+    footer {
+      max-width: 1120px; margin: 40px auto 0;
+      padding: 40px 32px 60px;
+      border-top: 1px solid rgba(15,23,42,0.08);
+    }
+    footer .foot-inner {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 14px; color: var(--text-tertiary); flex-wrap: wrap; gap: 12px;
+    }
+    footer a {
+      color: var(--text-tertiary); text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    footer a:hover { color: var(--blue); }
+
+    /* ---- Mobile ---- */
+    @media (max-width: 640px) {
+      header .inner { padding: 0 16px; height: 56px; }
+      header .brand-sub { display: none; }
+      .hero { padding: 40px 16px 32px; }
+      .hero h1 { font-size: 30px; }
+      .hero .subtitle { font-size: 17px; }
+      .section { padding: 0 16px 40px; }
+      .section-title { font-size: 24px; }
+      .card { padding: 24px 20px; border-radius: 16px; }
+      .card h2 { font-size: 22px; }
+      .card h3 { font-size: 18px; }
+      .tldr { padding: 20px 22px; border-radius: 14px; }
+      .compare-table { font-size: 14px; }
+      .compare-table th, .compare-table td { padding: 10px 12px; }
+      .compare-table th { font-size: 11px; }
+      .arch-diagram { font-size: 11px; padding: 18px; line-height: 1.7; }
+      .scenario { padding: 18px 20px; }
+      .scenario h4 { font-size: 16px; }
+      .timeline-item { grid-template-columns: 1fr; gap: 4px; }
+      footer { padding: 30px 16px 40px; }
+      footer .foot-inner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <div class="logo">
+        <div class="logo-icon">V</div>
+        <div>
+          <span class="brand-name">Comms Docs</span>
+          <span class="brand-sub">VCCI Tool</span>
+        </div>
+      </div>
+      <a href="index.html" class="back-link">← 返回</a>
+    </div>
+  </header>
+  <div class="accent-line"></div>
+
+  <section class="hero">
+    <h1>VCCI 工具網頁化部署 — <span class="gradient">Mac mini 方案</span></h1>
+    <p class="subtitle">
+      讓每位同事都能自助完成 VCCI 日本登錄送件。三方案評估、7 個設計決策、同事使用流程。
+    </p>
+    <div class="meta">
+      <span>建立日期：2026-04-24</span>
+      <span>目標讀者：EnGenius 內部團隊</span>
+      <span>Mac mini 預計 2026-08 到貨</span>
+    </div>
+  </section>
+
+  <!-- TL;DR -->
+  <section class="section">
+    <div class="tldr">
+      <ul>
+        <li><strong>問題：</strong>VCCI 自動化工具目前只能在 Terrel 的 Mac 上跑，其他同事無法自助送件</li>
+        <li><strong>方案比較：</strong>Google Form 收件頁 / <strong>Mac mini 自架 Web</strong>（中選）/ 完整 SaaS（殺雞用牛刀）</li>
+        <li><strong>決定：</strong>8 月 Mac mini 到貨後部署 FastAPI Web 服務，同事走瀏覽器即可送件</li>
+        <li><strong>雙層存取：</strong>Viewer 繼續用 Vercel 線上 dashboard（外網可看）；Submitter 走公司內網 / Tailscale 連 Mac mini</li>
+        <li><strong>Admin 介入頻率：</strong>從「每件要等 Terrel」→「每週 1–3 次 VCCI session 過期時遠端登一次」</li>
+        <li><strong>時程：</strong>設計已鎖定；Mac mini 到貨後約 1 週可上線</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 問題 -->
+  <section class="section">
+    <h2 class="section-title">我們要解決什麼問題</h2>
+    <div class="card">
+      <p>
+        VCCI（日本電波障害自主規制協議會）申請是每一款賣到日本的網通產品必經流程。目前流程：
+      </p>
+      <ul>
+        <li>Terrel 本機跑 <code>vcci-extract</code> + <code>vcci-submit</code> CLI 工具</li>
+        <li>其他同事只能看 dashboard 狀態，無法自己送件</li>
+        <li>業務問「XX 可以出日本了嗎？」時，要翻 dashboard 或問 Terrel</li>
+        <li>新產品要送件時，要把 Test Report PDF 傳給 Terrel，等他空檔處理</li>
+      </ul>
+      <div class="callout warn">
+        <strong>痛點：</strong>Terrel 是單點瓶頸，turnaround 不固定；同事無法直接控制送件節奏。
+      </div>
+      <p style="margin-top:16px">
+        <strong>目標：讓每位有需要的同事都能自助完成送件，Terrel 只在系統需要維護時介入。</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- 三方案比較 -->
+  <section class="section">
+    <h2 class="section-title">三個方案的比較</h2>
+    <div class="card">
+      <div style="overflow-x:auto">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="option-col">🟢 A：PDF 收件頁</th>
+            <th class="option-col">🟡 B：Mac mini 自架 <span style="color: var(--blue)">（中選）</span></th>
+            <th class="option-col">🔴 C：完整 SaaS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>內容</td>
+            <td>同事上傳 PDF → Terrel 本機跑工具 → 回報結果</td>
+            <td>Mac mini 常駐 server，同事透過瀏覽器走完全流程</td>
+            <td>完整產品：PostgreSQL + 多租戶 + RBAC</td>
+          </tr>
+          <tr>
+            <td>開發時間</td>
+            <td>1 天</td>
+            <td class="highlight">1 週（7 工時）</td>
+            <td>1–2 人月</td>
+          </tr>
+          <tr>
+            <td>同事自助度</td>
+            <td>30%（還是要等 Terrel）</td>
+            <td class="highlight">95%（只有 session 過期要 admin）</td>
+            <td>100%</td>
+          </tr>
+          <tr>
+            <td>Terrel 介入</td>
+            <td>每件 30 分鐘</td>
+            <td class="highlight">每週 5 分鐘 × 1–3 次</td>
+            <td>幾乎不用</td>
+          </tr>
+          <tr>
+            <td>月成本</td>
+            <td>$0</td>
+            <td class="highlight">$0（現有 Mac mini）</td>
+            <td>$50+</td>
+          </tr>
+          <tr>
+            <td>適合規模</td>
+            <td>5 人以下</td>
+            <td class="highlight">5–20 人</td>
+            <td>20+ 人 / 外部客戶</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 為什麼選 Mac mini -->
+  <section class="section">
+    <h2 class="section-title">為什麼選 Mac mini（方案 B）</h2>
+    <div class="card">
+      <h3>選它的三個理由</h3>
+      <ol>
+        <li><strong>macOS 對 Playwright 最友善</strong> — 自動化工具需要 Chromium，macOS 原生支援，不用像 Linux 一樣裝 xvfb/display server</li>
+        <li><strong>和開發環境一致</strong> — Terrel 的 MacBook 和 Mac mini 同為 macOS，除錯成本最低</li>
+        <li><strong>VCCI portal 擋自動登入，需要人介入</strong> — Mac mini 接螢幕可讓 admin 隨時遠端接手登入，雲端 VPS 做不到這件事</li>
+      </ol>
+
+      <h3>要承認的限制</h3>
+      <ol>
+        <li><strong>單點失敗</strong>：Mac mini 掛掉 → 工具全斷。但 Terrel 本機原本就能跑，是完整 fallback</li>
+        <li><strong>辦公室事件</strong>：停電、斷網就離線。辦公室有 UPS / 備援網路最佳</li>
+        <li><strong>VCCI session 仍需人介入</strong>：Mac mini 沒消除這件事，只是讓 admin 統一登一次服務多人，而不是每個同事各自登</li>
+      </ol>
+
+      <div class="callout info">
+        <strong>實際評估：</strong>Mac mini 缺點可控，益處大於成本 — 是這個問題規模下的最佳解。
+      </div>
+    </div>
+  </section>
+
+  <!-- 架構 -->
+  <section class="section">
+    <h2 class="section-title">雙層存取架構</h2>
+    <div class="card">
+      <p>系統切分成兩個不同服務，根據使用者角色分流：</p>
+      <div class="arch-diagram"><span class="layer-public">╔══════════ 公開 Internet ═══════════╗</span>
+<span class="layer-public">║                                    ║</span>
+<span class="layer-public">║</span>   Viewer（同事）                    <span class="layer-public">║</span>
+<span class="layer-public">║</span>   <span class="dim">· 手機 / 家裡 / 出差都能看</span>         <span class="layer-public">║</span>
+<span class="layer-public">║</span>   <span class="dim">· Google 登入</span>                     <span class="layer-public">║</span>
+<span class="layer-public">║</span>   <span class="dim">· 只能讀 dashboard</span>                <span class="layer-public">║</span>
+<span class="layer-public">║</span>                                    <span class="layer-public">║</span>
+<span class="layer-public">║</span>   ↓                                <span class="layer-public">║</span>
+<span class="layer-public">║</span>   <span class="highlight">https://vcci-engenius-jp.vercel.app/</span> <span class="layer-public">║</span>
+<span class="layer-public">║</span>   <span class="dim">（現有網站，不需改）</span>                <span class="layer-public">║</span>
+<span class="layer-public">╚════════════════════════════════════╝</span>
+                 │
+                 ▼
+         <span class="highlight">GitHub repo（資料來源）</span>
+                 ▲
+                 │
+<span class="layer-private">╔═════ 公司內網 / Tailscale 私網 ════╗</span>
+<span class="layer-private">║</span>                                    <span class="layer-private">║</span>
+<span class="layer-private">║</span>   Submitter（有送件權限的同事）      <span class="layer-private">║</span>
+<span class="layer-private">║</span>   <span class="dim">· 辦公室、或遠端 Tailscale</span>         <span class="layer-private">║</span>
+<span class="layer-private">║</span>   <span class="dim">· 可上傳 PDF、送件</span>                 <span class="layer-private">║</span>
+<span class="layer-private">║</span>                                    <span class="layer-private">║</span>
+<span class="layer-private">║</span>   ↓                                <span class="layer-private">║</span>
+<span class="layer-private">║</span>   <span class="highlight">http://mini.office:8000</span>          <span class="layer-private">║</span>
+<span class="layer-private">║</span>   <span class="dim">FastAPI Web（新，跑在 Mac mini）</span>   <span class="layer-private">║</span>
+<span class="layer-private">║</span>                                    <span class="layer-private">║</span>
+<span class="layer-private">║</span>   Playwright + VCCI portal cookie   <span class="layer-private">║</span>
+<span class="layer-private">║</span>   <span class="dim">（admin 登一次駐留）</span>               <span class="layer-private">║</span>
+<span class="layer-private">╚════════════════════════════════════╝</span></div>
+
+      <h3>為什麼切兩層</h3>
+      <ul>
+        <li><strong>Viewer 的需求</strong>：「隨時隨地看狀態」 → 外網、要方便</li>
+        <li><strong>Submitter 的需求</strong>：「能寫資料、能送件」 → 內網、要安全</li>
+        <li><strong>Mac mini 上有 VCCI 帳密 cookie</strong> → 不適合對公開 Internet 開放</li>
+        <li><strong>Vercel dashboard 只讀</strong> → 外網公開無風險</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 使用情境 -->
+  <section class="section">
+    <h2 class="section-title">同事會怎麼使用：5 個真實情境</h2>
+    <div class="card">
+
+      <div class="scenario">
+        <span class="scenario-tag">情境 1</span>
+        <h4>日本 PM 有新產品要送</h4>
+        <p>上午 9:30 收到 Test Report PDF：</p>
+        <ol>
+          <li>打開 <code>http://mini.office:8000</code>，Google 帳號登入</li>
+          <li>點「新しい届出を追加」，上傳 PDF</li>
+          <li>系統 10 秒自動抽出 YAML 資料</li>
+          <li>畫面顯示可編輯欄位（class、code、distance）；PDF 抽出的測試機關資料唯讀</li>
+          <li>確認後按「送出 VCCI」→ 系統跑 Playwright 填表</li>
+          <li>畫面顯示 VCCI Review 頁截圖 → PM 肉眼檢查 → 按「確認送出」</li>
+          <li>9:36 收到送件完成 email（Report No. 已記錄到系統）</li>
+        </ol>
+        <div class="callout-line">⏱ 總時間：4 分鐘，Terrel 完全沒介入</div>
+      </div>
+
+      <div class="scenario">
+        <span class="scenario-tag">情境 2</span>
+        <h4>業務秒查「XX 可以出日本嗎？」</h4>
+        <ol>
+          <li>客戶詢問 → 業務打開 Vercel dashboard → 搜尋型號</li>
+          <li>看 Status badge（🟢 綠色 = 可出貨 / 🟡 黃色 = 審核中 / 🔴 紅色 = 被退）</li>
+        </ol>
+        <div class="callout-line">⏱ 20 秒搞定，不用找 Terrel、不用翻 Excel</div>
+      </div>
+
+      <div class="scenario">
+        <span class="scenario-tag">情境 3</span>
+        <h4>週五早上批次檢查審核狀態</h4>
+        <ol>
+          <li>Admin 打開 dashboard 首頁，點「🔄 Sync VCCI Status」</li>
+          <li>系統 30 秒內抓回所有新核發的 Acceptance No.</li>
+          <li>通過的型號自動變綠燈；有核發的會自動寄 email 通知</li>
+        </ol>
+      </div>
+
+      <div class="scenario">
+        <span class="scenario-tag">情境 4</span>
+        <h4>VCCI session 過期 → Admin 遠端登入</h4>
+        <ol>
+          <li>同事按送出 → 系統偵測到要重登，顯示「session 已過期，admin 已被通知」</li>
+          <li>Terrel 手機收到 email：「有同事在等送件，請遠端登入 Mac mini」</li>
+          <li>Terrel 從任何地方（捷運、家裡）用 MacBook + Tailscale 遠端 Screen Sharing 到 Mac mini</li>
+          <li>5 分鐘內登入完成、服務恢復、同事的送件繼續跑</li>
+        </ol>
+      </div>
+
+      <div class="scenario">
+        <span class="scenario-tag">情境 5</span>
+        <h4>一天要送 5 件</h4>
+        <ol>
+          <li>同事一次上傳 5 份 PDF</li>
+          <li>系統排成 queue，逐件顯示「排隊中 / 送件中 / 等 review」</li>
+          <li>每件到 review 頁時發通知，同事依序確認 5 次</li>
+        </ol>
+        <div class="callout-line">⏱ 總耗時約 10–15 分鐘（之前本機流程也是如此）</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 7 設計決策 -->
+  <section class="section">
+    <h2 class="section-title">7 個設計決策（2026-04-24 鎖定）</h2>
+    <div class="card">
+      <div style="overflow-x:auto">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="width:40px">#</th>
+            <th style="width:160px">主題</th>
+            <th style="width:260px">決定</th>
+            <th>一句話原因</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>D1</td>
+            <td>Google 登入機制</td>
+            <td>用 <strong>Authlib</strong> 做 OAuth</td>
+            <td>輕量，不需要完整 user 管理</td>
+          </tr>
+          <tr>
+            <td>D2</td>
+            <td>同事能改 YAML 嗎</td>
+            <td>限定幾個安全欄位可改，其他唯讀</td>
+            <td>擋 90% 誤用事故</td>
+          </tr>
+          <tr>
+            <td>D3</td>
+            <td>多人同時送件</td>
+            <td>Server queue + 即時顯示「排第幾位」</td>
+            <td>VCCI 一次只能跑一件，排隊比卡住體驗好</td>
+          </tr>
+          <tr>
+            <td>D4</td>
+            <td>Session 過期通知</td>
+            <td>寄 email 給 admin（以後可加 Slack）</td>
+            <td>SMTP 已有，零成本</td>
+          </tr>
+          <tr>
+            <td>D5</td>
+            <td>誰能用這個系統</td>
+            <td>Viewer 外網開放 / Submitter 內網限定</td>
+            <td>權限分級，降低攻擊面</td>
+          </tr>
+          <tr>
+            <td>D6</td>
+            <td>Git 衝突</td>
+            <td>送件前 pull --rebase，失敗 retry 3 次</td>
+            <td>日常狀況 99% 不會撞</td>
+          </tr>
+          <tr>
+            <td>D7</td>
+            <td>審計紀錄</td>
+            <td>每個送件 git commit 自動標示「誰送的」</td>
+            <td>未來查稽核 <code>git log</code> 即可</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <p style="margin-top:20px">
+        <strong>所有細節、實作指引、代碼片段</strong> 在工程文件 <code>docs/web-deployment-options.md</code>（VCCI automation repo）。
+      </p>
+    </div>
+  </section>
+
+  <!-- 時程 -->
+  <section class="section">
+    <h2 class="section-title">時程與下一步</h2>
+    <div class="card">
+      <h3>現況</h3>
+      <ul>
+        <li>✅ 三方案評估完成</li>
+        <li>✅ 7 個設計決策鎖定</li>
+        <li>✅ 使用者流程走過（5 個情境）</li>
+        <li>✅ Phase 分階段拆解（0.5 / 1 / 2）</li>
+        <li>⏳ <strong>Mac mini 8 月到貨</strong></li>
+      </ul>
+
+      <h3>未來行程</h3>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">2026-05 ~ 07</div>
+          <div class="timeline-desc">
+            <strong>軟體空窗期</strong>：本機開發 Phase 0.5 原型（FastAPI + 基本上傳流程），跑在 Terrel MacBook 驗證
+            <div style="font-size:13px;color:var(--text-tertiary);margin-top:3px">預計 2–3 天</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026-08</div>
+          <div class="timeline-desc">
+            <strong>Mac mini 到貨</strong>：搬現成程式到 Mac mini、設 Tailscale、Phase 1 上線
+            <div style="font-size:13px;color:var(--text-tertiary);margin-top:3px">預計 1 週</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026-09 起</div>
+          <div class="timeline-desc">
+            <strong>Phase 2 功能擴充</strong>：queue 管理後台、即時狀態頁、更多自動化
+            <div style="font-size:13px;color:var(--text-tertiary);margin-top:3px">視需要</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout info" style="margin-top:24px">
+        <strong>不急著做 deployment guide 的原因：</strong>Mac mini 硬體還沒到，指令類文件（<code>brew install</code>、specific IP 設定、launchctl plist）3 個月後版本會 rot。等 Mac mini 實際到手、驗證過的版本才寫最可靠。
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section">
+    <h2 class="section-title">FAQ</h2>
+    <div class="card">
+      <div class="faq-item">
+        <h4>Q：我什麼時候開始可以用？</h4>
+        <p>Mac mini 8 月到貨後約 1 週。在此之前維持現狀（跟 Terrel 講 → 等）。</p>
+      </div>
+      <div class="faq-item">
+        <h4>Q：會需要我自己裝什麼軟體嗎？</h4>
+        <p><strong>Viewer（只想看狀態）：</strong>不用裝任何東西，繼續用 Vercel dashboard。</p>
+        <p><strong>Submitter（要送件）：</strong>辦公室用 → 什麼都不用裝，打開瀏覽器即可；外出 / 在家用 → 裝 Tailscale（工程部統一協助）。</p>
+      </div>
+      <div class="faq-item">
+        <h4>Q：如果我是同事，我能直接看 VCCI 帳密嗎？</h4>
+        <p><strong>不能也不應該。</strong>VCCI 帳密只存在 Mac mini 的 cookie 裡，不會給任何個人帳號。Admin（Terrel）統一登入、服務多人。這是設計上的安全隔離。</p>
+      </div>
+      <div class="faq-item">
+        <h4>Q：送錯件怎麼辦？</h4>
+        <p><strong>送出前：</strong>review 頁有 VCCI 官網截圖，同事要自己肉眼確認（這是安全把關）。</p>
+        <p><strong>送出後：</strong>VCCI 送件一旦 Acceptance No. 核發就無法撤回。若送錯資料要改，要在 VCCI portal 做「変更届」，是獨立流程。</p>
+      </div>
+      <div class="faq-item">
+        <h4>Q：會不會發生很多人同時想送件打架？</h4>
+        <p>不會。系統有 queue，第 2 位會看到「你排第 #2，預計 5 分鐘」的排隊顯示。實際上一天同時送件的機率很低（每天送件數不多）。</p>
+      </div>
+      <div class="faq-item">
+        <h4>Q：session 過期率高嗎？</h4>
+        <p>根據過去 2 週的觀察，VCCI 伺服器 session 很短 — 幾乎每次跑工具都要重登。但搬到 Mac mini 後，<strong>admin 登一次可服務多人</strong>，實際介入頻率估計每週 1–3 次。</p>
+      </div>
+      <div class="faq-item">
+        <h4>Q：Mac mini 掛了怎麼辦？</h4>
+        <p>Terrel 本機原本就能跑工具 — 是 complete fallback。Mac mini 修復期間回到「請 Terrel 代送」模式。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot-inner">
+      <div>EnGenius Technologies — Internal Document</div>
+      <a href="index.html">← 返回所有文件</a>
+    </div>
+  </footer>
+</body>
+</html>
