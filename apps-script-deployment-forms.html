@@ -216,11 +216,13 @@
     /* ---- Decision Tree ---- */
     .decision-tree {
       background: #0F172A; color: #E2E8F0;
-      border-radius: 16px; padding: 32px 36px;
+      border-radius: 16px; padding: 28px 32px;
       margin: 20px 0;
       font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
-      font-size: 15px; line-height: 2;
+      font-size: 15px; line-height: 1.85;
       overflow-x: auto;
+      white-space: pre;     /* 保留換行跟空格（ASCII 樹狀結構需要）*/
+      tab-size: 4;
     }
     .decision-tree .q { color: #FDE68A; font-weight: 700; }
     .decision-tree .a { color: #2DD4BF; }
