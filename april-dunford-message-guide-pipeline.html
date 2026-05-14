@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>April Dunford 定位方法論 × Message Guide Skill Pipeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand-1: #F59E0B;
+      --brand-2: #F97316;
+      --brand-3: #EF4444;
+      --bg: #F5F3F0;
+      --card: #FFFFFF;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-tertiary: #64748B;
+      --ring: rgba(15, 23, 42, 0.06);
+      --teal: #0D9488;
+      --teal-light: #F0FDFA;
+      --teal-ring: rgba(13, 148, 136, 0.12);
+      --indigo: #6366F1;
+      --indigo-light: #EEF2FF;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Header ---- */
+    header { background: #0F172A; position: sticky; top: 0; z-index: 40; }
+    header .inner {
+      max-width: 1120px; margin: 0 auto;
+      padding: 0 32px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header .logo { display: flex; align-items: center; gap: 14px; }
+    header .logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+    }
+    header .logo-icon svg { width: 20px; height: 20px; color: white; }
+    header .brand-name { font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em; }
+    header .brand-sub {
+      font-size: 13px; font-weight: 600; color: var(--teal);
+      margin-left: 10px;
+      background: rgba(13, 148, 136, 0.1);
+      padding: 2px 10px; border-radius: 99px;
+    }
+    header .back-link {
+      font-size: 14px; font-weight: 500; color: #E2E8F0; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      transition: all 0.15s;
+    }
+    header .back-link:hover { background: rgba(255,255,255,0.12); color: #FFFFFF; }
+    .accent-line { height: 3px; background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3)); }
+
+    /* ---- Hero ---- */
+    .hero { max-width: 1120px; margin: 0 auto; padding: 64px 32px 48px; }
+    .hero .eyebrow {
+      display: inline-block; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--teal); background: var(--teal-light);
+      padding: 4px 12px; border-radius: 99px;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #0D9488, #0891B2);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      font-size: 19px; color: var(--text-secondary); max-width: 760px; line-height: 1.8;
+    }
+
+    /* ---- Sections ---- */
+    .section { max-width: 1120px; margin: 0 auto; padding: 0 32px 56px; }
+    .section-title {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 8px;
+    }
+    .section-sub {
+      color: var(--text-tertiary); font-size: 16px; margin-bottom: 24px;
+    }
+
+    /* ---- Cards ---- */
+    .card {
+      background: var(--card); border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      outline: 1px solid var(--ring);
+      padding: 40px; margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .card h3 {
+      font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+      margin-bottom: 8px; margin-top: 28px;
+    }
+    .card h3:first-child { margin-top: 0; }
+    .card p { color: var(--text-secondary); margin-bottom: 14px; font-size: 17px; }
+    .card p:last-child { margin-bottom: 0; }
+    .card ul { color: var(--text-secondary); padding-left: 22px; margin: 12px 0; }
+    .card li { margin: 6px 0; font-size: 16px; }
+
+    /* ---- Specs Table ---- */
+    .specs-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 20px 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden;
+      outline: 1px solid var(--ring);
+    }
+    .specs-table th {
+      background: #F8FAFC; text-align: left; padding: 14px 20px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .specs-table td {
+      padding: 14px 20px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .specs-table tr:last-child td { border-bottom: none; }
+    .specs-table td:first-child {
+      font-weight: 600; color: var(--text-primary); white-space: nowrap;
+    }
+    .specs-table.with-width td:first-child { min-width: 220px; }
+
+    /* ---- Compare Table ---- */
+    .compare-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 20px 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden;
+      outline: 1px solid var(--ring);
+    }
+    .compare-table th {
+      background: #F8FAFC; text-align: left; padding: 14px 18px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .compare-table td {
+      padding: 14px 18px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table td:first-child {
+      font-weight: 600; color: var(--text-primary);
+    }
+
+    /* ---- Strategy grid ---- */
+    .strategy-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin: 20px 0 8px;
+    }
+    @media (max-width: 800px) { .strategy-grid { grid-template-columns: 1fr; } }
+    .strategy-item {
+      border-radius: 16px; padding: 24px;
+      outline: 1px solid var(--ring); background: #F8FAFC;
+    }
+    .strategy-item .strat-tag {
+      display: inline-block; font-size: 12px; font-weight: 700;
+      padding: 3px 10px; border-radius: 99px; margin-bottom: 10px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .strategy-item.head .strat-tag { background: #DBEAFE; color: #1D4ED8; }
+    .strategy-item.bigfish .strat-tag { background: #D1FAE5; color: #047857; }
+    .strategy-item.new .strat-tag { background: #EDE9FE; color: #6D28D9; }
+    .strategy-item h4 {
+      font-size: 17px; font-weight: 700; margin-bottom: 8px;
+      letter-spacing: -0.01em; color: var(--text-primary);
+    }
+    .strategy-item p {
+      font-size: 15px; color: var(--text-secondary); line-height: 1.7; margin: 0;
+    }
+
+    /* ---- Pipeline ---- */
+    .pipeline {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      margin: 24px 0;
+    }
+    @media (max-width: 900px) {
+      .pipeline { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .pipeline { grid-template-columns: 1fr; }
+    }
+    .pipe-step {
+      border-radius: 16px; padding: 24px 22px;
+      outline: 1px solid var(--ring);
+      background: var(--card);
+      position: relative;
+    }
+    .pipe-step .stage-num {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-tertiary);
+      margin-bottom: 6px;
+    }
+    .pipe-step h4 {
+      font-size: 16px; font-weight: 700; margin-bottom: 8px;
+      letter-spacing: -0.01em; color: var(--text-primary);
+    }
+    .pipe-step p {
+      font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0;
+    }
+    .pipe-step.s0 { border-top: 4px solid #6366F1; }
+    .pipe-step.s1 { border-top: 4px solid #0D9488; }
+    .pipe-step.s2 { border-top: 4px solid #F59E0B; }
+    .pipe-step.s3 { border-top: 4px solid #EF4444; }
+
+    /* ---- Flow ---- */
+    .flow {
+      background: #F8FAFC; border-radius: 14px; padding: 22px 28px;
+      margin: 20px 0; font-size: 15px; line-height: 2;
+      color: var(--text-secondary);
+      border-left: 4px solid var(--teal);
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+    }
+
+    /* ---- Tab structure visual ---- */
+    .tab-visual {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      margin: 20px 0;
+    }
+    @media (max-width: 800px) { .tab-visual { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .tab-visual { grid-template-columns: 1fr; } }
+    .tab-card {
+      border-radius: 14px; padding: 20px 18px;
+      outline: 1px solid var(--ring);
+      background: #F8FAFC;
+      position: relative;
+    }
+    .tab-card.primary {
+      background: linear-gradient(135deg, rgba(13,148,136,0.06), rgba(8,145,178,0.06));
+      outline-color: var(--teal-ring);
+    }
+    .tab-card .tab-icon { font-size: 24px; margin-bottom: 8px; }
+    .tab-card h4 {
+      font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--text-primary);
+    }
+    .tab-card .audience {
+      font-size: 12px; color: var(--text-tertiary); margin-bottom: 8px;
+      text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;
+    }
+    .tab-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+    .tab-card.primary::after {
+      content: '★ Default'; position: absolute; top: 10px; right: 12px;
+      font-size: 10px; font-weight: 700;
+      background: var(--teal); color: white;
+      padding: 2px 8px; border-radius: 99px;
+    }
+
+    /* ---- VAP boxes ---- */
+    .vap-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+      margin: 20px 0;
+    }
+    @media (max-width: 800px) { .vap-grid { grid-template-columns: 1fr; } }
+    .vap-box {
+      border-radius: 14px; padding: 22px 20px;
+    }
+    .vap-box.v { background: #F0FDFA; outline: 1px solid var(--teal-ring); }
+    .vap-box.a { background: #FFFBEB; outline: 1px solid rgba(245,158,11,0.15); }
+    .vap-box.p { background: #FEF2F2; outline: 1px solid rgba(239,68,68,0.15); }
+    .vap-box .vap-tag {
+      display: inline-block; font-size: 14px; font-weight: 800;
+      padding: 4px 12px; border-radius: 8px; margin-bottom: 12px;
+    }
+    .vap-box.v .vap-tag { background: #0D9488; color: white; }
+    .vap-box.a .vap-tag { background: #D97706; color: white; }
+    .vap-box.p .vap-tag { background: #EF4444; color: white; }
+    .vap-box h4 {
+      font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary);
+    }
+    .vap-box p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin: 0; }
+
+    /* ---- Suitability ---- */
+    .suitability-cols {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin: 20px 0;
+    }
+    @media (max-width: 700px) { .suitability-cols { grid-template-columns: 1fr; } }
+    .suit-fit, .suit-nofit {
+      border-radius: 14px; padding: 24px 28px;
+    }
+    .suit-fit {
+      background: #F0FDFA;
+      outline: 1px solid var(--teal-ring);
+    }
+    .suit-nofit {
+      background: #FFF7ED;
+      outline: 1px solid rgba(234, 88, 12, 0.12);
+    }
+    .suit-fit .suit-title, .suit-nofit .suit-title {
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 12px;
+    }
+    .suit-fit .suit-title { color: #0F766E; }
+    .suit-nofit .suit-title { color: #C2410C; }
+    .suit-fit ul, .suit-nofit ul { list-style: none; padding: 0; }
+    .suit-fit li, .suit-nofit li {
+      font-size: 16px; color: var(--text-secondary); line-height: 1.7;
+      padding: 4px 0 4px 24px; position: relative;
+    }
+    .suit-fit li::before {
+      content: "✓"; position: absolute; left: 0;
+      color: #0D9488; font-weight: 700;
+    }
+    .suit-nofit li::before {
+      content: "✗"; position: absolute; left: 0;
+      color: #EA580C; font-weight: 700;
+    }
+
+    /* ---- Note callout ---- */
+    .note {
+      background: var(--teal-light); border-radius: 12px; padding: 20px 24px;
+      outline: 1px solid var(--teal-ring);
+      font-size: 16px; color: #115E59; line-height: 1.7;
+      margin-top: 24px;
+    }
+    .note strong { font-weight: 700; }
+
+    .highlight-box {
+      background: var(--indigo-light); border-radius: 12px; padding: 20px 24px;
+      outline: 1px solid rgba(99, 102, 241, 0.12);
+      font-size: 16px; color: #3730A3; line-height: 1.7;
+      margin: 20px 0;
+    }
+    .highlight-box strong { font-weight: 700; color: #312E81; }
+
+    /* ---- FAQ ---- */
+    .faq-item { margin-bottom: 24px; }
+    .faq-item .q {
+      font-size: 17px; font-weight: 700; color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .faq-item .q::before { content: 'Q · '; color: var(--teal); }
+    .faq-item .a {
+      font-size: 16px; color: var(--text-secondary); line-height: 1.75;
+    }
+
+    /* ---- Divider ---- */
+    .divider {
+      height: 1px; background: rgba(15, 23, 42, 0.06);
+      max-width: 1120px; margin: 0 auto;
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      max-width: 1120px; margin: 0 auto; padding: 32px 32px 48px;
+      text-align: center; font-size: 14px; color: var(--text-tertiary);
+    }
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ---- Mobile RWD ---- */
+    @media (max-width: 640px) {
+      body { font-size: 16px; }
+
+      header .inner { padding: 0 16px; height: 52px; }
+      header .brand-name { font-size: 14px; }
+      header .brand-sub { font-size: 11px; margin-left: 6px; padding: 2px 8px; }
+      header .back-link { font-size: 13px; padding: 5px 12px; }
+
+      .hero { padding: 40px 20px 32px; }
+      .hero h1 { font-size: 28px; }
+      .hero .subtitle { font-size: 16px; }
+
+      .section { padding: 0 20px 40px; }
+      .section-title { font-size: 22px; }
+      .section-sub { font-size: 14px; }
+
+      .card { padding: 24px 20px; border-radius: 16px; }
+      .card h2 { font-size: 22px; }
+      .card h3 { font-size: 17px; margin-top: 24px; }
+      .card p { font-size: 16px; }
+      .card li { font-size: 15px; }
+
+      .specs-table { font-size: 15px; }
+      .specs-table td { padding: 12px 16px; }
+
+      .card:has(.compare-table) { padding: 24px 12px; overflow-x: auto; }
+      .compare-table { font-size: 14px; min-width: 520px; }
+      .compare-table th, .compare-table td { padding: 10px 12px; }
+
+      .strategy-grid { grid-template-columns: 1fr; }
+      .strategy-item { padding: 20px; }
+
+      .pipeline { grid-template-columns: 1fr; gap: 10px; }
+      .pipe-step { padding: 20px 18px; }
+      .pipe-step h4 { font-size: 15px; }
+      .pipe-step p { font-size: 13px; }
+
+      .flow { padding: 18px 16px; font-size: 13px; line-height: 1.9; overflow-x: auto; }
+
+      .tab-visual { grid-template-columns: 1fr; }
+      .tab-card { padding: 18px 16px; }
+
+      .vap-grid { grid-template-columns: 1fr; }
+      .vap-box { padding: 20px 18px; }
+
+      .suitability-cols { grid-template-columns: 1fr; gap: 12px; }
+      .suit-fit, .suit-nofit { padding: 20px; }
+      .suit-fit li, .suit-nofit li { font-size: 15px; }
+
+      .note, .highlight-box { padding: 16px 18px; font-size: 15px; }
+      .faq-item .q { font-size: 16px; }
+      .faq-item .a { font-size: 15px; }
+
+      .divider { margin: 0 20px; }
+      footer { padding: 24px 20px 40px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg>
+      </div>
+      <span class="brand-name">內部知識</span>
+      <span class="brand-sub">Dunford × Skill Pipeline</span>
+    </div>
+    <a href="index.html" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回文件列表
+    </a>
+  </div>
+</header>
+<div class="accent-line"></div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="eyebrow">PMM · Pipeline 方法論</div>
+  <h1>從 April Dunford 定位方法論<br>到 <span class="gradient">Message Guide Skill Pipeline</span></h1>
+  <p class="subtitle">
+    把 B2B 科技定位大師 April Dunford 的方法論，變成 EnGenius PMM 可以照著跑的四階段 AI 工作流。每個產品都跑同一條 pipeline，從 PM Brief 一路到對外可發佈的 Message Guide HTML。本文整理方法論本身、它特別在哪裡、以及我們怎麼把它變成 skill。
+  </p>
+</div>
+
+<!-- ============================== -->
+<!-- 一、Dunford 是誰 -->
+<!-- ============================== -->
+<div class="section">
+  <div class="section-title">April Dunford 是誰？</div>
+  <div class="section-sub">為什麼 B2B SaaS 圈把她的方法論奉為事實標準</div>
+  <div class="card">
+    <p>April Dunford 是 B2B 科技產品定位專家，著有兩本業界標準書：</p>
+    <ul>
+      <li><strong>《Obviously Awesome》</strong>（2019）— 定位方法論本體</li>
+      <li><strong>《Sales Pitch》</strong>（2023）— 把定位翻譯成業務可講的故事</li>
+    </ul>
+    <p>她的方法重點不是「品牌包裝」，而是回答一個更基本的問題：</p>
+    <div class="highlight-box">
+      <strong>「在客戶心中，你的產品應該被放在哪個貨架上？」</strong>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- 二、方法論核心 -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">方法論核心：5(+1) 構件</div>
+  <div class="section-sub">定位不是 tagline，是這 5 件事的明確回答</div>
+  <div class="card">
+    <table class="specs-table with-width">
+      <thead>
+        <tr><th style="width:240px;">構件</th><th>要回答的問題</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1. Competitive Alternatives</td><td>如果你不存在，客戶會用什麼？不只是競品——可能是 Excel、人工、什麼都不做</td></tr>
+        <tr><td>2. Unique Attributes</td><td>你有什麼是替代方案沒有的功能 / 能力？</td></tr>
+        <tr><td>3. Value &amp; Proof</td><td>這些 attributes 對客戶帶來什麼價值？有證據嗎？</td></tr>
+        <tr><td>4. Best-fit Customers</td><td>哪種客戶會因為這些價值而瘋狂喜歡你？</td></tr>
+        <tr><td>5. Market Category</td><td>你選擇在哪個市場「框架」下競爭？</td></tr>
+        <tr><td>(+1) Trends</td><td>選用：你能搭上什麼趨勢，讓客戶覺得現在非買不可？</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Dunford 三大商業角色（3 Strategies）</h3>
+    <p>定位之外，每個產品還要選一條商業角色 — <strong>選錯角色 = 跟錯誤的對手打 = 客戶用錯誤的標準評你</strong>：</p>
+    <div class="strategy-grid">
+      <div class="strategy-item head">
+        <span class="strat-tag">Head-to-Head</span>
+        <h4>正面對打領導者</h4>
+        <p>在既有品類內爭取「最好的 X」位置。需要規格 / 通路 / 品牌任一面向有領先優勢。</p>
+      </div>
+      <div class="strategy-item bigfish">
+        <span class="strat-tag">Big Fish, Small Pond</span>
+        <h4>定義能贏的子市場</h4>
+        <p>「在大池塘是小魚、在小池塘是大魚。」找出生態系、特定客群、特殊場景，當該子市場的明確贏家。</p>
+      </div>
+      <div class="strategy-item new">
+        <span class="strat-tag">Create New Market</span>
+        <h4>重新定義品類</h4>
+        <p>幫新品類命名、建立新規則。需要明確的 market shift 證據才走得通。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- 三、方法論特別之處 -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">方法論的特別之處</div>
+  <div class="section-sub">跟其他定位方法相比，Dunford 有 4 個關鍵差異</div>
+
+  <div class="card">
+    <h3>1. 從「替代方案」反推，不是從「我們很棒」開始</h3>
+    <p>傳統做法是列產品功能；Dunford 強迫站在客戶角度——客戶不是在 A vs B vs C 之間選，他們是在<strong>「你 vs 現狀」</strong>之間選。</p>
+
+    <h3>2. Market Category 是策略選擇，不是既定事實</h3>
+    <p>同一個產品可以放在不同類別上競爭。她著名案例是把一個「資料庫工具」重新定位成「給某類分析師的工作平台」，價格直接翻倍。</p>
+
+    <h3>3. 定位 → 銷售敘事是線性流程</h3>
+    <p>《Sales Pitch》補上了缺角：定位完之後，怎麼變成業務在會議室講的故事。結構是 <strong>Insight → Alternatives &amp; their flaws → Perfect World → Introducing us → Proof</strong>。</p>
+
+    <h3>4. 適合「產品已存在但賣不動」的情境</h3>
+    <p>不是給 0→1 新創想商業模式用的，是給「東西做出來了、有些客戶、但市場反應混亂」的團隊重新對焦。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- 四、為什麼變成 Skill Pipeline -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">為什麼把它變成 Skill Pipeline</div>
+  <div class="section-sub">EnGenius 過去的痛點，跟為什麼要強制走完整流程</div>
+  <div class="card">
+    <p>EnGenius 是網通品牌，產品線多、規格密集、競品環伺。同一支 PM Brief 從產出到對外溝通要經過多個角色（PM / PMM / 業務 / 通路 / PR），每個角色都需要從同一個定位拿東西用。</p>
+
+    <h3>過去的痛點</h3>
+    <ul>
+      <li>PM Brief 規格太多，但客戶價值講不清楚</li>
+      <li>PMM 寫對外文件時憑感覺發揮，每份產品定位不一致</li>
+      <li>業務 / 通路拿到的訊息跟官網不對齊</li>
+      <li>重要的「不擁有清單」（誠實揭露的弱項）沒人寫，下游素材打嘴</li>
+    </ul>
+
+    <div class="note">
+      <strong>解法：</strong>把 Dunford 方法論變成<strong>強制走完的 AI 流程</strong>。每個產品都跑同一條 pipeline，每個階段都有確認點、有結構化產出。
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- 五、Skill Pipeline -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">Skill Pipeline · 四階段</div>
+  <div class="section-sub">對應 Dunford 方法論的四個 Claude Code skill，從 PM Brief 一路到對外可發佈 HTML</div>
+
+  <div class="card">
+    <div class="pipeline">
+      <div class="pipe-step s0">
+        <div class="stage-num">Stage 0</div>
+        <h4>/message-guide-review</h4>
+        <p>用 5 面向 rubric 評 PM Brief 品質，找盲點。攔截 GIGO，確保 Brief 夠撐 Dunford 5 構件。</p>
+      </div>
+      <div class="pipe-step s1">
+        <div class="stage-num">Stage 1</div>
+        <h4>/message-guide-narrative</h4>
+        <p>商業角色判定 + 五要素敘事 + 競品 first-source 取證 + 魔鬼代言人壓測。對應 Dunford 5 構件 + 3 strategies。</p>
+      </div>
+      <div class="pipe-step s2">
+        <div class="stage-num">Stage 2</div>
+        <h4>/message-guide-build</h4>
+        <p>把定位卡寫成對外 Part A-E 結構化內容。Sales Pitch 落地——把推理變對外語言。</p>
+      </div>
+      <div class="pipe-step s3">
+        <div class="stage-num">Stage 3</div>
+        <h4>/message-guide-render</h4>
+        <p>整合所有上游產出 → multi-tab HTML 上線。視覺化呈現 + 永久 trace。</p>
+      </div>
+    </div>
+
+    <h3>實際 Pipeline 走法</h3>
+    <div class="flow">
+PM Brief<br>
+&nbsp;&nbsp;↓&nbsp; /message-guide-review&nbsp;&nbsp;&nbsp;&nbsp; ← 體檢 Brief、落地 review-report.json + inputs/brief.md<br>
+&nbsp;&nbsp;↓&nbsp; /message-guide-narrative&nbsp; ← 跑 Dunford → narrative.html + positioning-card.yaml<br>
+&nbsp;&nbsp;↓&nbsp; /message-guide-build&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ← 寫對外 → message-guide-content.md<br>
+&nbsp;&nbsp;↓&nbsp; /message-guide-render&nbsp;&nbsp;&nbsp; ← 4-tab HTML + metadata + Vercel 上線<br>
+4-tab Message Guide 上線
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- 六、跟 Dunford 原方法的擴展 -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">我們加了什麼（原書沒有的紀律）</div>
+  <div class="section-sub">把方法論的精神變成下游素材的紀律</div>
+
+  <!-- V/A/P -->
+  <div class="card">
+    <h2>1. V/A/P 三級證據紀律</h2>
+    <p>解決「PMM 把推論當事實流出 → 下游素材踩雷」的核心問題。</p>
+    <div class="vap-grid">
+      <div class="vap-box v">
+        <span class="vap-tag">[V] Verified</span>
+        <h4>已驗證</h4>
+        <p>有獨立來源（官網 / datasheet / 分析師報告 / press release）。<strong>必附 inline 可點擊連結</strong>。沒連結 = 不算 V，降級為 A。</p>
+      </div>
+      <div class="vap-box a">
+        <span class="vap-tag">[A] Assumption</span>
+        <h4>推論</h4>
+        <p>無來源。寫進文件時要明標。<strong>[A] 不可進 Pillar bullet</strong>（會被下游當事實流出）。具體數字只進 Appendix。</p>
+      </div>
+      <div class="vap-box p">
+        <span class="vap-tag">[P] Pending</span>
+        <h4>PM 未給</h4>
+        <p><strong>不可進對外 Guide</strong>。一律收進 Appendix Action Items 給 PM 補。</p>
+      </div>
+    </div>
+    <div class="note">
+      <strong>實戰意義：</strong>narrative skill 在每個推論寫進文件時強制標 V/A/P；build skill 拒收 [A] 數字進 Pillar；render skill 拒收 [P] 進 Tab 4。三層守門。
+    </div>
+  </div>
+
+  <!-- 不擁有清單 -->
+  <div class="card">
+    <h2>2.「不擁有清單」強制 artifact</h2>
+    <p>Dunford 強調 <em>saying no to what you're not</em>，但沒規定怎麼存。我們強制 narrative skill 在 Phase 4a C 之後產出「本產品不擁有的」清單，避免下游素材打嘴。</p>
+  </div>
+
+  <!-- 魔鬼代言人 -->
+  <div class="card">
+    <h2>3. 魔鬼代言人 Q1-Q5 壓測</h2>
+    <p>主敘事 A-E 寫完強制跑五題，通不過的回頭改 A-E：</p>
+    <ul>
+      <li><strong>Q1</strong>：世界真的變了嗎？</li>
+      <li><strong>Q2</strong>：舊方案真的失效嗎？</li>
+      <li><strong>Q3</strong>：Frame of reference 站得住嗎？</li>
+      <li><strong>Q4</strong>：不擁有清單夠誠實嗎？</li>
+      <li><strong>Q5</strong>：Secondary Audience 真的有嗎？</li>
+    </ul>
+  </div>
+
+  <!-- 三軸 Pillar -->
+  <div class="card">
+    <h2>4. 三軸 Pillar（What / Who / Why us）</h2>
+    <p>每個產品強制三條 Pillar，防止 Pillar 全寫成平台論述、產品間沒辨識度：</p>
+    <table class="compare-table">
+      <thead>
+        <tr><th style="width:120px;">軸</th><th>角色</th><th>內容</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>What</td><td>產品本體</td><td>規格組合 right-sizing 邏輯、核心配置</td></tr>
+        <tr><td>Who</td><td>Target fit</td><td>為哪類 target / site profile / 應用情境設計</td></tr>
+        <tr><td>Why us</td><td>差異化</td><td>平台 / 生態系 / 通路 / 商業模式 USP</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pillars + Capabilities -->
+  <div class="card">
+    <h2>5. Pillars + Capabilities 雙軌</h2>
+    <p>Dunford 強調差異化，但實務上買家<strong>先要確認「這台是稱職的 [品類] 產品」</strong>才會聽差異化。所以：</p>
+    <ul>
+      <li><strong>B3 Pillars</strong> = 為什麼選我們（差異化）</li>
+      <li><strong>B4 Capabilities</strong> = 這台是不是稱職的 [品類]（品類基本盤）</li>
+    </ul>
+    <p>避免「基本盤誤當差異化」或「以為不寫基本盤就算了」的陷阱。</p>
+  </div>
+
+  <!-- 對外紅線 -->
+  <div class="card">
+    <h2>6. 對外用語紅線</h2>
+    <p>對外文件<strong>絕對不可出現</strong>內部 reasoning 詞彙：</p>
+    <ul>
+      <li><code>Head-to-Head</code> / <code>Big Fish, Small Pond</code> / <code>Create New Market</code></li>
+      <li><code>池塘</code> / <code>Ecosystem Captive</code> / <code>四層借力 L1-L4</code></li>
+      <li><code>魔鬼代言人</code> / <code>V/A/P</code> 字母</li>
+      <li><code>Dunford</code></li>
+    </ul>
+    <p>對外講商業角色用：<strong>Category challenger</strong> / <strong>Subcategory leader</strong> / <strong>Category creator</strong>。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- 七、Multi-tab 結構 -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">Multi-tab Message Guide 結構</div>
+  <div class="section-sub">每個產品自成一頁，含完整 pipeline trace</div>
+
+  <div class="card">
+    <p>Render skill 產出的每個產品頁面是 4 個 tab：</p>
+    <div class="tab-visual">
+      <div class="tab-card">
+        <div class="tab-icon">📄</div>
+        <h4>Input</h4>
+        <div class="audience">PMM / PM</div>
+        <p>PM Brief 原文（含 Google Doc URL）+ optional HQ Guide。追溯起點。</p>
+      </div>
+      <div class="tab-card">
+        <div class="tab-icon">📊</div>
+        <h4>Diagnostic</h4>
+        <div class="audience">內部 audit</div>
+        <p>Phase 3.5 異常診斷（條件出現）。Brief 有結構性問題時才有。</p>
+      </div>
+      <div class="tab-card">
+        <div class="tab-icon">🔧</div>
+        <h4>Internal</h4>
+        <div class="audience">PMM 學習</div>
+        <p>narrative.html 完整推理（折疊預設關閉，含內部術語警告）。</p>
+      </div>
+      <div class="tab-card primary">
+        <div class="tab-icon">🌐</div>
+        <h4>Outbound</h4>
+        <div class="audience">通路 / 業務 / PR</div>
+        <p>對外文件（default active）。套品牌 template + lint。</p>
+      </div>
+    </div>
+    <h3>設計理念</h3>
+    <ul>
+      <li>通路 / 業務 / PR → default 看 Tab 4 對外清版</li>
+      <li>PMM 想追根究底 → 切到 Tab 1 看原始 Brief、Tab 3 看內部推理</li>
+      <li>新 PMM onboarding → 4 個 tab 全看一遍學完整 pipeline</li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- 八、適用情境 -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">什麼情境適合用</div>
+  <div class="card">
+    <div class="suitability-cols">
+      <div class="suit-fit">
+        <div class="suit-title">適合 · Good Fit</div>
+        <ul>
+          <li>B2B 科技產品（SaaS、網通、企業軟硬體）</li>
+          <li>產品功能多、不知道怎麼講重點</li>
+          <li>業務 demo 都在講功能、客戶聽不懂價值</li>
+          <li>需要重新定義戰場、不想跟對手規格戰</li>
+          <li>定價上不去、覺得被當 commodity</li>
+          <li>跨團隊（PM / PMM / 業務 / PR）訊息不一致</li>
+        </ul>
+      </div>
+      <div class="suit-nofit">
+        <div class="suit-title">不太適合 · Not Fit</div>
+        <ul>
+          <li>純 B2C 大眾消費品（情感品牌驅動）</li>
+          <li>還沒有產品、還沒有客戶的早期構想</li>
+          <li>純品牌行銷活動（這是商業定位，不是品牌定位）</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>直接讀書 vs 用 Skill Pipeline</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>面向</th><th>直接讀 Dunford 的書</th><th>用 Skill Pipeline</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>使用方式</td><td>自己讀、自己消化、自己應用</td><td>AI 引導跑完所有步驟</td></tr>
+        <tr><td>嚴謹度</td><td>容易跳過難題（例：不擁有清單）</td><td>強制每個步驟有產出</td></tr>
+        <tr><td>跨角色</td><td>一個人腦中跑</td><td>多角色都能讀同一份結構化文件</td></tr>
+        <tr><td>版本管理</td><td>沒有</td><td>每次跑都有檔案落地、可追溯</td></tr>
+        <tr><td>對外文件</td><td>靠手寫</td><td>自動套品牌 template + 部署上線</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- 九、典型流程時間 -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">跑完一個產品要多久</div>
+  <div class="section-sub">從拿到 PM Brief 到對外 Message Guide 上線</div>
+  <div class="card">
+    <p><strong>約 2-4 小時純執行時間</strong>（不含等 PM 補資料的等候時間）。每個 stage 之間都有 🔴 確認點，要 PMM / Lulu 拍板才往下走。</p>
+    <table class="specs-table with-width">
+      <thead>
+        <tr><th>階段</th><th>預估時間</th><th>產出</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Stage 0 Review</td><td>5-10 分鐘</td><td>Markdown 報告 + JSON + inputs/brief.md 落地</td></tr>
+        <tr><td>Stage 1 Narrative</td><td>60-90 分鐘</td><td>narrative.html + positioning-card.yaml</td></tr>
+        <tr><td>Stage 2 Build</td><td>30-45 分鐘</td><td>message-guide-content.md（Part A-E）</td></tr>
+        <tr><td>Stage 3 Render</td><td>5-10 分鐘</td><td>Multi-tab HTML + metadata + Vercel 上線</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- 十、FAQ -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">常見問題</div>
+  <div class="card">
+    <div class="faq-item">
+      <div class="q">為什麼 Stage 0 Review 不會修 Brief 內容？</div>
+      <div class="a">Review 是 <strong>gate（守門員），不是 transformer</strong>。職責是評估、不是改寫。發現問題就回頭找 PM 修 Brief，修完再 review 一次。如果 review 也改寫，會喪失中立性。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="q">為什麼定位卡（positioning-card.yaml）是 freeze 點？</div>
+      <div class="a">定位敘事跟對外寫作要分開做。否則寫文案時為了句子好看，會偷偷改定位。Freeze 點確保<strong>改定位 = 回 Stage 1 重跑</strong>，不能在 Stage 2 偷偷動。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="q">通路看不懂 Tab 3 內部術語怎麼辦？</div>
+      <div class="a">Tab 4 (Outbound) 是 default active，<strong>通路打開就看到對外清版</strong>。Tab 3 預設折疊 + 有警告 badge，要主動展開才看到推理過程。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="q">PM 還沒給定價怎麼辦？</div>
+      <div class="a">走 narrative skill 的 <code>[A]-driven mode</code>：用假設定價跑完流程，但 positioning-card.yaml 會標記 <code>ready_for_build: false</code>，build / render skill 看到旗標就 stop，<strong>對外文件不能從這份產出</strong>，只能當內部討論用。等 PM 補了 final MSRP 再重跑。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="q">跨 PMM 一致性怎麼保證？</div>
+      <div class="a">所有 PMM 用同一份 skill 邏輯（共用 repo + 共用 context/）。skill 強制檢核項目，例如：Pillar 數量 3-4、Use Case 必含 Not ideal for、V/A/P 標註齊全。</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================== -->
+<!-- 結語 -->
+<!-- ============================== -->
+<div class="section" style="padding-top: 56px;">
+  <div class="section-title">結語</div>
+  <div class="card">
+    <p>Dunford 方法論的核心是「<strong>定位是選擇，不是發現</strong>」。把它變成 AI 流程後，最大價值是<strong>強制每個產品都做完同樣的選擇步驟</strong>——不會因為時程壓力、PMM 風格不同、或文件規格不全而跳過關鍵環節。</p>
+
+    <p>V/A/P 紀律、不擁有清單、What/Who/Why us 三軸——這些都是把「方法論的精神」變成「下游素材的紀律」。對外清版乾淨、內部 trace 完整——這就是這套 pipeline 想達成的事。</p>
+
+    <div class="note">
+      <strong>推薦閱讀：</strong>April Dunford 《Obviously Awesome》、《Sales Pitch》。理解原書 + 用本 pipeline，才能拿到最大價值。
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="index.html">← 返回文件列表</a>
+</footer>
+
+</body>
+</html>
