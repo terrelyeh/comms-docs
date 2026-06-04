@@ -119,7 +119,7 @@
     .plan-rose .plan-icon { background: #FFF1F2; color: #E11D48; } .plan-rose .plan-label { color: #BE123C; }
     .plan-slate .plan-icon { background: #F1F5F9; color: #475569; } .plan-slate .plan-label { color: #475569; }
 
-    /* ---- Steps (三旋鈕 / numbered) ---- */
+    /* ---- Steps (numbered) ---- */
     .steps { list-style: none; padding: 0; margin: 8px 0 0; counter-reset: s; }
     .steps li {
       position: relative; padding: 16px 20px 16px 60px; margin-bottom: 12px;
@@ -185,6 +185,7 @@
       font-size: 15.5px; color: #115E59; line-height: 1.7; margin-top: 18px;
     }
     .note strong { font-weight: 700; }
+    .note code { background: rgba(13,148,136,0.1); color: #0F766E; padding: 2px 6px; border-radius: 5px; font-family: 'SF Mono','Fira Code',ui-monospace,monospace; font-size: 13px; font-weight: 600; }
     .warn {
       background: #FFF1F2; border-radius: 12px; padding: 18px 22px;
       outline: 1px solid rgba(225,29,72,0.16);
@@ -237,17 +238,17 @@
       .section-sub { font-size: 15.5px; }
       .card { padding: 24px 20px; border-radius: 16px; }
       .plan-header { gap: 12px; }
-      .plan-header h2 { font-size: 20px; }
+      .plan-header h2 { font-size: 19px; }
       .plan-icon { width: 44px; height: 44px; border-radius: 12px; font-size: 20px; }
       .plan-header .plan-label { font-size: 12px; }
       .steps li { padding: 14px 16px 14px 54px; font-size: 15px; }
-      .flow { padding: 18px 16px; font-size: 12.5px; }
+      .flow { padding: 18px 16px; font-size: 12px; }
       .card:has(.compare-table) { padding: 24px 12px; overflow-x: auto; }
       .compare-table { font-size: 14px; min-width: 520px; }
       .compare-table th, .compare-table td { padding: 10px 12px; }
       .specs-table { font-size: 15px; }
       .specs-table td { padding: 11px 14px; }
-      .specs-table td:first-child { width: 92px; white-space: normal; }
+      .specs-table td:first-child { width: 88px; white-space: normal; }
       .roadmap { grid-template-columns: 1fr; gap: 12px; }
       .note, .warn { padding: 16px 18px; font-size: 15px; }
       .divider { margin: 0 20px; }
@@ -285,25 +286,26 @@
 <div class="hero">
   <h1>虛擬行銷部門 <span class="gradient">AI Agent 參考架構藍圖</span></h1>
   <p class="subtitle">
-    一套可重複部署、再依客戶客製的「AI 行銷部門」。底盤統一(<code>Paperclip</code> 治理 + <code>Hermes</code> 員工 + <code>MCP/Skills</code> 能力),客製只動三個旋鈕。給 AI FDE 進客戶現場用 —— 標準化架構,把客戶 know-how 變成 skills。
+    一套可重複部署、再依客戶客製的「AI 行銷部門」。底盤統一(<code>Paperclip</code> 治理 + <code>Hermes</code> 員工 + <code>MCP/Skills</code> 能力),客製只動三個旋鈕。<strong>修正版</strong>:6 個同層職能、消掉 Digital 重疊傘、補上 Lifecycle 與 Analytics/Ops,並依客戶規模縮放。
   </p>
   <div class="meta-row">
-    <span class="meta-chip">📅 2026-06-03</span>
+    <span class="meta-chip">📅 2026-06-03 · 修正版</span>
     <span class="meta-chip">🧑‍💻 AI FDE / 部署者</span>
     <span class="meta-chip">🏗️ Paperclip · Hermes · MCP</span>
   </div>
 </div>
 
-<!-- 核心心法 -->
+<!-- 設計原則 -->
 <div class="section">
-  <div class="section-title">核心心法</div>
-  <p class="section-sub">每進一家客戶<strong>不重寫系統</strong>,只調三樣。標準化架構是底盤,skills 是你的核心交付物與 IP。</p>
+  <div class="section-title">設計原則:照 workflow 拆,不照人類職稱拆</div>
+  <p class="section-sub">AI agent 的編制不該複製人類組織圖。用三個準則切分,編制自然乾淨。</p>
   <div class="card">
     <ol class="steps">
-      <li><strong>Skills</strong> — 把客戶流程、品牌語氣、SOP、定位封裝成 skills;每客戶一個私有 repo / Hermes tap,可版本控管、遠端更新。</li>
-      <li><strong>MCP 接線</strong> — 接客戶既有工具棧(CRM、分析、廣告後台)。</li>
-      <li><strong>組織設定</strong> — Paperclip 的 org chart、各職位 persona、預算上限、審批關卡。</li>
+      <li><strong>一段連貫的 workflow</strong> — 輸入 → 產出是一條完整流程。</li>
+      <li><strong>一組共用的工具面</strong> — MCP / skills 集中在同一個 agent。</li>
+      <li><strong>一種一致的審批風險</strong> — 例如「會花錢」要獨立成自己的審批邊界。</li>
     </ol>
+    <div class="note"><strong>依此原則,舊版的「Digital Marketing」被拆解</strong> —— 它本來就是涵蓋 SEO/付費/email 的傘,跟旗下項目重疊。它真正獨有的價值(量測與追蹤治理)獨立成 <strong>Analytics & MarTech Ops</strong>,其餘回歸各 owner。</div>
   </div>
 </div>
 
@@ -312,125 +314,146 @@
 <!-- 三層架構 -->
 <div class="section" style="padding-top:56px;">
   <div class="section-title">三層架構總覽</div>
-  <p class="section-sub">治理層管「有哪些員工、各自預算、做得對不對」;員工層是會做事的 agent;能力層是各職位的專業。</p>
+  <p class="section-sub">治理層管「有哪些員工、各自預算、做得對不對」;員工層是會做事的 agent;能力層是各職能的專業。</p>
   <div class="card">
     <table class="compare-table">
       <thead><tr><th>層</th><th>角色</th><th>工具</th></tr></thead>
       <tbody>
         <tr><td>治理層</td><td>主管 / HR / 財務</td><td class="highlight">Paperclip(org chart · 預算 · 審批 · 稽核)</td></tr>
-        <tr><td>員工層</td><td>各職位 agent</td><td class="highlight">Hermes(常駐 · 模型不限 · Skills 系統)</td></tr>
-        <tr><td>能力層</td><td>各職位專業</td><td class="highlight">客製 skills + 客戶 MCP + Claude World Studio MCP</td></tr>
+        <tr><td>員工層</td><td>各職能 agent</td><td class="highlight">Hermes(常駐 · 模型不限 · Skills 系統)</td></tr>
+        <tr><td>能力層</td><td>各職能專業</td><td class="highlight">客製 skills + 客戶 MCP + Claude World Studio MCP</td></tr>
       </tbody>
     </table>
     <h3>編組關係</h3>
     <div class="flow"><span class="hl">Paperclip</span>(治理層:org chart / 預算上限 / 審批 / 稽核)
-   ├── 產品行銷   Hermes + 定位 skills
-   ├── SEO        Hermes + SEO skills + Ahrefs/Search Console MCP
-   ├── Digital    Hermes + campaign skills + HubSpot/GA MCP
-   ├── Content    Hermes + 品牌 skills + 內容 MCP
-   ├── 廣告專員    Hermes + 廣告 skills <span class="dim">(預算上限由 Paperclip 鎖)</span>
-   └── 影片製作    Hermes + Remotion/NotebookLM MCP
+   ├── 策略 & 產品行銷    Hermes + 定位 skills <span class="dim">(大腦)</span>
+   ├── Organic Growth   Hermes + SEO/內容 skills + Ahrefs/Search Console MCP
+   ├── Paid / Demand Gen Hermes + 廣告 skills <span class="dim">(預算上限由 Paperclip 鎖)</span>
+   ├── Lifecycle / CRM   Hermes + email/自動化 skills + HubSpot/Klaviyo MCP
+   ├── Creative Studio   Hermes + 文案/視覺/影片 skills + Canva/Remotion MCP
+   └── Analytics & Ops   Hermes + 報表 skills + GA/Amplitude/Supermetrics MCP
             ▲
-   <span class="hl">行銷總監</span>(human + orchestrator):派工、審核、人類把關</div>
+   <span class="hl">行銷總監</span>(human):最終審核、人類把關</div>
   </div>
 </div>
 
 <div class="divider"></div>
 
-<!-- 6 職位編制 -->
+<!-- 6 職能編制 -->
 <div class="section" style="padding-top:56px;">
-  <div class="section-title">6 職位編制</div>
-  <p class="section-sub">每個職位 = 一個常駐 Hermes agent,掛上對應 skills 與客戶 MCP。注意每個職位的<strong>審批點</strong>。</p>
+  <div class="section-title">6 職能編制(同層 · 最小重疊)</div>
+  <p class="section-sub">每個職能 = 一個常駐 Hermes agent,掛上對應 skills 與客戶 MCP。注意每個職能的<strong>審批點</strong>。</p>
 
-  <!-- 1 產品行銷 -->
+  <!-- 1 策略 & 產品行銷 -->
   <div class="card role-card plan-teal">
     <div class="plan-header">
       <div class="plan-icon">🎯</div>
-      <div><h2>1 · 產品行銷</h2><div class="plan-label">PRODUCT MARKETING · 品牌單一事實來源</div></div>
+      <div><h2>1 · 策略 & 產品行銷</h2><div class="plan-label">大腦 · 品牌單一事實來源</div></div>
     </div>
     <table class="specs-table">
-      <tr><td>職責</td><td>定位、訊息架構、競品分析、價值主張、launch messaging</td></tr>
+      <tr><td>職責</td><td>定位、訊息架構、競品/市場情報、GTM 策略、<strong>目標拆解與派 brief</strong></td></tr>
       <tr><td>Skills</td><td><code>message-guide-*</code> pipeline、<code>competitive-brief</code>、<code>message-guide-review</code></td></tr>
       <tr><td>MCP</td><td>Web 研究、Similarweb、文件(Drive / Notion)</td></tr>
-      <tr><td>輸入→輸出</td><td>產品 brief / HQ guide / 競品 → 定位卡、Message Guide、Sales enablement</td></tr>
-      <tr><td>審批點</td><td>對外訊息定稿需人類核可</td></tr>
+      <tr><td>輸入→輸出</td><td>產品 brief / HQ guide / 競品 → 定位卡、Message Guide、季度策略、各職能 brief</td></tr>
+      <tr><td>審批點</td><td>對外訊息與策略定稿需人類核可</td></tr>
     </table>
-    <div class="note"><strong>下游所有職位都吃這份定位</strong> —— 它是整個部門品牌一致性的源頭。</div>
+    <div class="note"><strong>下游所有職能都吃這份定位</strong>,同時是拆解目標、派工的大腦。</div>
   </div>
 
-  <!-- 2 SEO -->
+  <!-- 2 Organic Growth -->
   <div class="card role-card plan-blue">
     <div class="plan-header">
-      <div class="plan-icon">🔍</div>
-      <div><h2>2 · SEO</h2><div class="plan-label">SEARCH ENGINE OPTIMIZATION</div></div>
+      <div class="plan-icon">🌱</div>
+      <div><h2>2 · Organic Growth</h2><div class="plan-label">OWNED / EARNED 一條龍</div></div>
     </div>
     <table class="specs-table">
-      <tr><td>職責</td><td>關鍵字研究、技術 SEO 巡檢、內容 gap、排名追蹤、on-page 建議</td></tr>
-      <tr><td>Skills</td><td><code>seo-audit</code> + 自建 keyword-research / serp-monitor</td></tr>
-      <tr><td>MCP</td><td>Ahrefs、Similarweb、Google Search Console(客戶接)</td></tr>
-      <tr><td>輸入→輸出</td><td>網站 URL / 關鍵字 / 競品域名 → 稽核報告、關鍵字地圖、給 Content 的 brief</td></tr>
-      <tr><td>審批點</td><td>網站結構大改、上 production 需核可</td></tr>
-      <tr><td>排程</td><td>每週自動巡檢(Hermes cron)</td></tr>
+      <tr><td>職責</td><td>SEO(關鍵字、技術巡檢、on-page)+ 內容(部落格/案例/電子報內容)+ 自然社群</td></tr>
+      <tr><td>Skills</td><td><code>seo-audit</code>、<code>draft-content</code>、<code>eg-content-repurpose</code>、<code>internal-comms</code>、自建 keyword-research</td></tr>
+      <tr><td>MCP</td><td>Ahrefs、Similarweb、Search Console、Claude World Studio(trend-pulse / cf-browser)、發布工具</td></tr>
+      <tr><td>輸入→輸出</td><td>定位 + 關鍵字機會 → 內容行事曆、SEO 優化內容、自然流量成長</td></tr>
+      <tr><td>審批點</td><td>對外發布、網站結構改動需核可</td></tr>
+      <tr><td>排程</td><td>每週 SEO 巡檢 + 選題(Hermes cron)</td></tr>
     </table>
+    <div class="note"><strong>SEO 與 Content 合併</strong>,避免「內容行事曆誰擁有」的切割打架。</div>
   </div>
 
-  <!-- 3 Digital -->
-  <div class="card role-card plan-amber">
-    <div class="plan-header">
-      <div class="plan-icon">📊</div>
-      <div><h2>3 · Digital Marketing</h2><div class="plan-label">渠道協調者</div></div>
-    </div>
-    <table class="specs-table">
-      <tr><td>職責</td><td>campaign 規劃、跨渠道協調、UTM / 追蹤治理、漏斗分析、成效報表</td></tr>
-      <tr><td>Skills</td><td><code>campaign-plan</code>、<code>performance-report</code>、UTM 指南、ShortLink</td></tr>
-      <tr><td>MCP</td><td>HubSpot、Amplitude、Supermetrics、Klaviyo、GA</td></tr>
-      <tr><td>輸入→輸出</td><td>campaign 目標 / 預算 / 渠道數據 → campaign brief、週/月報表、優化建議</td></tr>
-      <tr><td>審批點</td><td>campaign 上線、預算分配需核可</td></tr>
-    </table>
-  </div>
-
-  <!-- 4 Content -->
-  <div class="card role-card plan-orange">
-    <div class="plan-header">
-      <div class="plan-icon">✍️</div>
-      <div><h2>4 · Content Marketing</h2><div class="plan-label">CONTENT</div></div>
-    </div>
-    <table class="specs-table">
-      <tr><td>職責</td><td>部落格、社群、電子報、案例、內容再利用</td></tr>
-      <tr><td>Skills</td><td><code>draft-content</code>、<code>email-sequence</code>、<code>eg-content-repurpose</code>、<code>internal-comms</code></td></tr>
-      <tr><td>MCP</td><td>Claude World Studio 內容 MCP(trend-pulse、cf-browser)、發布工具</td></tr>
-      <tr><td>輸入→輸出</td><td>定位 + SEO brief → 各渠道內容草稿、編輯行事曆</td></tr>
-      <tr><td>審批點</td><td>對外發布前需核可</td></tr>
-    </table>
-  </div>
-
-  <!-- 5 廣告專員 -->
+  <!-- 3 Paid / Demand Gen -->
   <div class="card role-card plan-rose">
     <div class="plan-header">
       <div class="plan-icon">📣</div>
-      <div><h2>5 · 廣告專員</h2><div class="plan-label">AD SPECIALIST · 最高風險職位</div></div>
+      <div><h2>3 · Paid / Demand Gen</h2><div class="plan-label">付費需求開發 · 最高風險職能</div></div>
     </div>
     <table class="specs-table">
-      <tr><td>職責</td><td>受眾分析、文案 / 素材 brief、出價策略<strong>建議</strong>、成效分析、A/B 規劃</td></tr>
-      <tr><td>Skills</td><td>自建 ad-copy / audience-research、<code>campaign-plan</code></td></tr>
+      <tr><td>職責</td><td>付費搜尋 / 社群、受眾、出價策略<strong>建議</strong>、A/B、需求開發 campaign</td></tr>
+      <tr><td>Skills</td><td><code>campaign-plan</code>、自建 ad-copy / audience-research</td></tr>
       <tr><td>MCP</td><td>Supermetrics、Meta / Google Ads(<strong>唯讀報表</strong>)</td></tr>
-      <tr><td>輸入→輸出</td><td>campaign 目標 / 預算上限 / 受眾 → 文案、受眾建議、出價建議、成效分析</td></tr>
+      <tr><td>輸入→輸出</td><td>目標 / 預算上限 / 受眾 → 廣告文案、受眾建議、出價建議、成效分析</td></tr>
       <tr><td>審批點</td><td class="danger">🚨 實際投放 / 動用預算一律人類執行;agent 只給建議。Paperclip 鎖月預算上限</td></tr>
     </table>
   </div>
 
-  <!-- 6 影片製作 -->
-  <div class="card role-card plan-slate">
+  <!-- 4 Lifecycle / CRM -->
+  <div class="card role-card plan-amber">
     <div class="plan-header">
-      <div class="plan-icon">🎬</div>
-      <div><h2>6 · 影片製作</h2><div class="plan-label">VIDEO PRODUCTION</div></div>
+      <div class="plan-icon">🔁</div>
+      <div><h2>4 · Lifecycle / CRM</h2><div class="plan-label">OWNED AUDIENCE 經營</div></div>
     </div>
     <table class="specs-table">
-      <tr><td>職責</td><td>腳本、分鏡、影片生成、字幕 / 多語、社群短影音</td></tr>
-      <tr><td>Skills</td><td><code>youtube-script</code>、<code>storyboard-generator</code>、<code>remotion</code>、<code>network-release-notes</code></td></tr>
-      <tr><td>MCP</td><td>Remotion(render)、nanobanana(生圖)、Canva、NotebookLM(podcast / slides / video)</td></tr>
-      <tr><td>輸入→輸出</td><td>content brief + 品牌素材 → 腳本、分鏡、成片、字幕</td></tr>
+      <tr><td>職責</td><td>email、nurture 流程、行銷自動化、名單分群、留存 / 再行銷</td></tr>
+      <tr><td>Skills</td><td><code>email-sequence</code>、<code>campaign-plan</code>(lifecycle 版)、自建 segmentation</td></tr>
+      <tr><td>MCP</td><td>HubSpot、Klaviyo、客戶 CRM</td></tr>
+      <tr><td>輸入→輸出</td><td>名單 + 旅程目標 → nurture 序列、自動化流程、留存 campaign、名單健康報告</td></tr>
+      <tr><td>審批點</td><td>對外寄送(EDM)前需核可</td></tr>
+    </table>
+  </div>
+
+  <!-- 5 Creative Studio -->
+  <div class="card role-card plan-orange">
+    <div class="plan-header">
+      <div class="plan-icon">🎨</div>
+      <div><h2>5 · Creative Studio</h2><div class="plan-label">服務全部門的產能</div></div>
+    </div>
+    <table class="specs-table">
+      <tr><td>職責</td><td>文案、視覺 / 設計、影片、品牌素材(供應所有職能)</td></tr>
+      <tr><td>Skills</td><td><code>youtube-script</code>、<code>storyboard-generator</code>、<code>remotion</code>、<code>draft-content</code>(copy)</td></tr>
+      <tr><td>MCP</td><td>nanobanana(生圖)、Canva、Remotion(render)、NotebookLM、Figma</td></tr>
+      <tr><td>輸入→輸出</td><td>各職能 creative brief + 品牌素材 → 文案、圖、影片、成片</td></tr>
       <tr><td>審批點</td><td>對外發布前需核可</td></tr>
+    </table>
+    <div class="note"><strong>共用產能</strong>,吃同一份品牌 skill,避免多 agent 風格分裂。</div>
+  </div>
+
+  <!-- 6 Analytics & MarTech Ops -->
+  <div class="card role-card plan-slate">
+    <div class="plan-header">
+      <div class="plan-icon">📈</div>
+      <div><h2>6 · Analytics &amp; MarTech Ops</h2><div class="plan-label">量測層 · AI 最擅長</div></div>
+    </div>
+    <table class="specs-table">
+      <tr><td>職責</td><td>數據彙整、儀表板、歸因分析、UTM / 追蹤治理、MarTech 串接健康</td></tr>
+      <tr><td>Skills</td><td><code>performance-report</code>、<code>dashboard-builder</code>、UTM 指南、ShortLink</td></tr>
+      <tr><td>MCP</td><td>Amplitude、Supermetrics、GA、HubSpot(讀)</td></tr>
+      <tr><td>輸入→輸出</td><td>各渠道數據 → 統一儀表板、歸因報告、UTM 規範、洞察回饋給策略</td></tr>
+      <tr><td>審批點</td><td>多為唯讀分析;追蹤規範變更需協調</td></tr>
+    </table>
+    <div class="note">把成效回饋給<strong>策略</strong>,形成閉環。這塊最適合 AI 自動化。</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 依規模縮放 -->
+<div class="section" style="padding-top:56px;">
+  <div class="section-title">依客戶規模縮放(6 不是魔法數字)</div>
+  <p class="section-sub">FDE 賣法:baseline 給 6,Discovery 後依客戶縮放 —— 小客戶合併、大客戶展開。</p>
+  <div class="card">
+    <table class="compare-table">
+      <thead><tr><th>客戶規模</th><th>agent 數</th><th>編制</th></tr></thead>
+      <tbody>
+        <tr><td>小型 / SMB</td><td class="highlight">3</td><td>策略 / Growth(organic+paid 合)/ Creative+Ops 合</td></tr>
+        <tr><td>中型</td><td class="highlight">6</td><td>上面六職能</td></tr>
+        <tr><td>大型 / Enterprise</td><td class="highlight">8–10</td><td>再拆出 Social/Community、Localization、CRO、PR</td></tr>
+      </tbody>
     </table>
   </div>
 </div>
@@ -439,22 +462,25 @@
 
 <!-- 協作流程 -->
 <div class="section" style="padding-top:56px;">
-  <div class="section-title">跨職位協作流程</div>
-  <p class="section-sub">定位先行,內容與廣告都吃同一份定位,Digital 統整成效回饋形成閉環。</p>
+  <div class="section-title">跨職能協作流程</div>
+  <p class="section-sub">定位先行;三個渠道引擎共用 Creative 產能;Analytics 統一量測後回饋策略,形成閉環。</p>
   <div class="card">
-    <div class="flow"><span class="hl">產品行銷</span>(定位)
-    │  定位卡 / Message Guide <span class="dim">(品牌單一事實來源)</span>
-    ▼
-<span class="hl">SEO</span> ── 關鍵字地圖 + 內容 brief ──▶ <span class="hl">Content / 影片</span>(產出內容)
-                                          │
-                                          ▼
-                              <span class="hl">廣告專員</span>(受眾 + 文案 + 出價建議)
-                                          │  <span class="dim">人類核可後投放</span>
-                                          ▼
-                              <span class="hl">Digital</span>(統整 campaign + UTM 追蹤)
-                                          │  成效回饋
-                                          ▼
-                              <span class="hl">產品行銷</span>(迭代定位) ◀── 閉環</div>
+    <div class="flow"><span class="hl">策略 &amp; 產品行銷</span>(大腦:定位 + 目標拆解 + 派 brief)
+        │  定位卡 / Message Guide <span class="dim">(品牌單一事實來源)</span>
+   ┌────┼─────────────────┬───────────────┐
+   ▼    ▼                 ▼               ▼
+<span class="hl">Organic Growth</span>     <span class="hl">Paid/Demand Gen</span>   <span class="hl">Lifecycle/CRM</span>
+(SEO+內容+社群)     (付費 · 預算)       (email · 自動化)
+   └────────┬──────────────┴───────────────┘
+            │  共用 creative brief
+            ▼
+     <span class="hl">Creative Studio</span>(文案 / 視覺 / 影片 → 供應全部門)
+            │
+            ▼
+   <span class="hl">Analytics &amp; MarTech Ops</span>(統一量測 · 歸因 · UTM 治理)
+            │  成效回饋
+            ▼
+     <span class="hl">策略 &amp; 產品行銷</span>(迭代定位) ◀── 閉環</div>
   </div>
 </div>
 
@@ -466,17 +492,17 @@
   <div class="card plan-rose">
     <h3 style="margin-top:0;">Paperclip 負責什麼</h3>
     <table class="specs-table">
-      <tr><td>org chart</td><td>6 職位 + 回報給「行銷總監(human)」</td></tr>
-      <tr><td>預算上限</td><td>每個 agent 設月預算上限,超支自動暫停(廣告專員尤其重要)</td></tr>
-      <tr><td>審批關卡</td><td>對外發布、廣告花費、網站結構改動</td></tr>
+      <tr><td>org chart</td><td>6 職能 + 回報給「行銷總監(human)」</td></tr>
+      <tr><td>預算上限</td><td>每個 agent 設月預算上限,超支自動暫停(Paid / Demand Gen 尤其重要)</td></tr>
+      <tr><td>審批關卡</td><td>對外發布、廣告花費、EDM 寄送、網站結構改動</td></tr>
       <tr><td>稽核</td><td>immutable audit log,所有決策與 tool call 可追溯</td></tr>
-      <tr><td>品牌來源</td><td>全部 content / 影片 agent 吃同一份 message guide + <code>.impeccable</code></td></tr>
+      <tr><td>品牌來源</td><td>全部產出吃同一份 message guide + <code>.impeccable</code></td></tr>
     </table>
     <div class="warn"><strong>幫別人建,特別要顧的四條紅線:</strong></div>
     <ul class="redline-list">
       <li><strong>花錢 / 投放絕不自動化</strong> — 一律走人類審批,合約寫清責任歸屬。</li>
       <li><strong>資料與密鑰隔離</strong> — 每客戶獨立部署,各自 API key 走 secrets 管理。</li>
-      <li><strong>成熟度風險</strong> — 工具都還新,先 pilot 一個職位再擴成整個部門。</li>
+      <li><strong>成熟度風險</strong> — 工具都還新,先 pilot 一個職能再擴成整個部門。</li>
       <li><strong>品牌一致性</strong> — 同一份品牌 skill,避免多 agent 風格分裂。</li>
     </ul>
   </div>
@@ -487,18 +513,18 @@
 <!-- 導入路線 -->
 <div class="section" style="padding-top:56px;">
   <div class="section-title">導入路線</div>
-  <p class="section-sub">分階段,不要一步到位。先把一個職位跑出成效,再擴編,最後才疊治理層。</p>
+  <p class="section-sub">分階段,不要一步到位。先把一個職能跑出成效,再擴編,最後才疊治理層。</p>
   <div class="card">
     <div class="roadmap">
       <div class="roadmap-step r1">
         <div class="step-label">Phase 1 · Pilot</div>
-        <h4>單一職位驗證</h4>
-        <p>挑 1 個高價值職位(SEO 巡檢 或 Content 選題),用 Hermes + 客製 skill 跑出成效。</p>
+        <h4>單一職能驗證</h4>
+        <p>挑 1 個高價值職能(Organic Growth 或 Analytics/Ops),用 Hermes + 客製 skill 跑出成效。</p>
       </div>
       <div class="roadmap-step r2">
         <div class="step-label">Phase 2 · 擴編</div>
         <h4>串起協作流程</h4>
-        <p>加到 3–4 個常駐職位,讓定位 → 內容 → 成效的流程跑起來。</p>
+        <p>加到 3–4 個常駐職能,讓定位 → 內容 → 成效的流程跑起來。</p>
       </div>
       <div class="roadmap-step r3">
         <div class="step-label">Phase 3 · 治理</div>
@@ -520,8 +546,8 @@
       <div><h2>把第一次做的沉澱成模板</h2><div class="plan-label">之後每客戶 fork 再客製</div></div>
     </div>
     <table class="specs-table">
-      <tr><td>org 模板</td><td>6 職位 + 預算 / 審批預設</td></tr>
-      <tr><td>skill pack</td><td>6 職位通用 baseline skill,客戶版覆寫</td></tr>
+      <tr><td>org 模板</td><td>6 職能 + 預算 / 審批預設</td></tr>
+      <tr><td>skill pack</td><td>6 職能通用 baseline skill,客戶版覆寫</td></tr>
       <tr><td>MCP playbook</td><td>常見平台(HubSpot / GA / Ahrefs / 廣告後台)怎麼接</td></tr>
       <tr><td>交接資產</td><td>Discovery 問卷 + 交接文件模板</td></tr>
     </table>
@@ -531,7 +557,7 @@
 
 <!-- Footer -->
 <footer>
-  <p>虛擬行銷部門 — AI Agent 參考架構藍圖 · 內部技術筆記 · 2026-06-03</p>
+  <p>虛擬行銷部門 — AI Agent 參考架構藍圖(修正版)· 內部技術筆記 · 2026-06-03</p>
   <p style="margin-top: 6px;"><a href="index.html">返回文件列表</a></p>
 </footer>
 
