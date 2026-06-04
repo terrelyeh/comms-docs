@@ -175,6 +175,19 @@
     }
     .specs-table .danger { color: #BE123C; font-weight: 700; }
 
+    /* ---- RACI table ---- */
+    .raci-table { width:100%; border-collapse:separate; border-spacing:0; margin:8px 0 0; font-size:15px; border-radius:14px; overflow:hidden; outline:1px solid var(--ring); }
+    .raci-table th { background:#F8FAFC; padding:12px 8px; font-size:12px; font-weight:700; color:var(--text-tertiary); text-align:center; border-bottom:1px solid rgba(15,23,42,0.08); white-space:nowrap; }
+    .raci-table th:first-child { text-align:left; }
+    .raci-table td { padding:11px 8px; text-align:center; border-bottom:1px solid rgba(15,23,42,0.04); font-weight:700; }
+    .raci-table td:first-child { text-align:left; font-weight:600; color:var(--text-primary); white-space:nowrap; }
+    .raci-table tr:last-child td { border-bottom:none; }
+    .raci-table .a { color:#0D9488; }
+    .raci-table .r { color:#1E293B; }
+    .raci-table .ci { color:#94A3B8; font-weight:600; }
+    .raci-table .x { color:#CBD5E1; font-weight:400; }
+    .raci-legend { font-size:14px; color:var(--text-tertiary); margin-top:14px; line-height:1.7; }
+
     /* ---- Role card spacing ---- */
     .role-card { margin-bottom: 20px; }
 
@@ -249,6 +262,9 @@
       .specs-table { font-size: 15px; }
       .specs-table td { padding: 11px 14px; }
       .specs-table td:first-child { width: 88px; white-space: normal; }
+      .card:has(.raci-table) { padding: 24px 12px; overflow-x: auto; }
+      .raci-table { font-size: 13px; min-width: 600px; }
+      .raci-table th, .raci-table td { padding: 9px 7px; }
       .roadmap { grid-template-columns: 1fr; gap: 12px; }
       .note, .warn { padding: 16px 18px; font-size: 15px; }
       .divider { margin: 0 20px; }
@@ -437,6 +453,45 @@
       <tr><td>審批點</td><td>多為唯讀分析;追蹤規範變更需協調</td></tr>
     </table>
     <div class="note">把成效回饋給<strong>策略</strong>,形成閉環。這塊最適合 AI 自動化。</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 職責邊界 / RACI -->
+<div class="section" style="padding-top:56px;">
+  <div class="section-title">職責邊界 / RACI</div>
+  <p class="section-sub">多 agent 最容易搶事或互相等。一條心法 + 一張 RACI 矩陣 + handoff 規則,把邊界講死。</p>
+  <div class="card">
+    <div class="note" style="margin-top:0;"><strong>核心心法:</strong>#5 Creative Studio 是「內部設計外包(產能)」;#2/#3/#4 是「渠道老闆」。<strong>老闆決定 what / when / why、負責成效與發布;Studio 只把素材做漂亮。</strong></div>
+
+    <h3>RACI 矩陣</h3>
+    <table class="raci-table">
+      <thead>
+        <tr><th>活動</th><th>策略</th><th>Organic</th><th>Paid</th><th>Life</th><th>Creative</th><th>Ops</th><th>人類</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>定位 / 訊息架構</td><td class="r">R</td><td class="ci">I</td><td class="ci">I</td><td class="ci">I</td><td class="ci">I</td><td class="ci">C</td><td class="a">A</td></tr>
+        <tr><td>內容行事曆 / 選題</td><td class="ci">C</td><td class="a">A</td><td class="x">–</td><td class="x">–</td><td class="ci">I</td><td class="ci">I</td><td class="x">–</td></tr>
+        <tr><td>社群貼文(文字)</td><td class="x">–</td><td class="a">A</td><td class="x">–</td><td class="x">–</td><td class="x">–</td><td class="x">–</td><td class="x">–</td></tr>
+        <tr><td>社群素材(圖 / 影片)</td><td class="x">–</td><td class="a">A</td><td class="x">–</td><td class="x">–</td><td class="r">R</td><td class="x">–</td><td class="x">–</td></tr>
+        <tr><td>SEO 技術 / on-page</td><td class="x">–</td><td class="a">A</td><td class="x">–</td><td class="x">–</td><td class="x">–</td><td class="ci">C</td><td class="x">–</td></tr>
+        <tr><td>付費廣告(受眾/文案/出價建議)</td><td class="ci">C</td><td class="x">–</td><td class="a">A</td><td class="x">–</td><td class="ci">C</td><td class="ci">I</td><td class="x">–</td></tr>
+        <tr><td>廣告投放 / 動用預算 🚨</td><td class="x">–</td><td class="x">–</td><td class="r">R</td><td class="x">–</td><td class="x">–</td><td class="ci">I</td><td class="a">A</td></tr>
+        <tr><td>Email / nurture(分群·發送)</td><td class="x">–</td><td class="x">–</td><td class="x">–</td><td class="a">A</td><td class="ci">C</td><td class="ci">I</td><td class="x">–</td></tr>
+        <tr><td>素材設計(文案 / 視覺 / 影片)</td><td class="x">–</td><td class="ci">C</td><td class="ci">C</td><td class="ci">C</td><td class="a">A</td><td class="x">–</td><td class="x">–</td></tr>
+        <tr><td>UTM / 追蹤規範</td><td class="ci">I</td><td class="ci">C</td><td class="ci">C</td><td class="ci">C</td><td class="x">–</td><td class="a">A</td><td class="x">–</td></tr>
+        <tr><td>成效報表 / 歸因</td><td class="ci">I</td><td class="ci">I</td><td class="ci">I</td><td class="ci">I</td><td class="x">–</td><td class="a">A</td><td class="x">–</td></tr>
+        <tr><td>對外發布審批</td><td class="x">–</td><td class="r">R</td><td class="r">R</td><td class="r">R</td><td class="x">–</td><td class="x">–</td><td class="a">A</td></tr>
+      </tbody>
+    </table>
+    <p class="raci-legend"><strong>R</strong> 執行(動手做) · <strong style="color:#0D9488;">A</strong> 當責(拍板 / 最終負責,每列僅一個) · <strong>C</strong> 諮詢(雙向) · <strong>I</strong> 告知(單向) · – 不涉入。<br><strong>人類拿到 A 的列 = 審批關卡</strong>(定位定稿、花錢、對外發布)。</p>
+
+    <h3>把 handoff 寫進 skill(避免搶事 / 互等)</h3>
+    <div class="note" style="margin-top:8px;">
+      <strong>渠道 owner(#2/#3/#4):</strong>「需要素材時產生 creative brief 交給 Creative Studio,收回後<strong>由我發布</strong>。」<br>
+      <strong>Creative Studio(#5):</strong>「我<strong>只交付素材,不對外發布</strong>;發布權在渠道 owner。」
+    </div>
   </div>
 </div>
 
