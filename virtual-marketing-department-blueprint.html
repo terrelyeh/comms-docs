@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>虛擬行銷部門 — AI Agent 參考架構藍圖</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand-1: #F59E0B;
+      --brand-2: #F97316;
+      --brand-3: #EF4444;
+      --bg: #F5F3F0;
+      --card: #FFFFFF;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-tertiary: #64748B;
+      --ring: rgba(15, 23, 42, 0.06);
+      --teal: #0D9488;
+      --teal-light: #F0FDFA;
+      --teal-ring: rgba(13, 148, 136, 0.12);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'PingFang TC', ui-sans-serif, system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Header ---- */
+    header { background: #0F172A; position: sticky; top: 0; z-index: 40; }
+    header .inner {
+      max-width: 1120px; margin: 0 auto;
+      padding: 0 32px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header .logo { display: flex; align-items: center; gap: 14px; }
+    header .logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+    }
+    header .logo-icon svg { width: 20px; height: 20px; color: white; }
+    header .brand-name { font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em; }
+    header .brand-sub {
+      font-size: 13px; font-weight: 600; color: var(--teal);
+      margin-left: 10px;
+      background: rgba(13, 148, 136, 0.1);
+      padding: 2px 10px; border-radius: 99px;
+    }
+    header .back-link {
+      font-size: 14px; font-weight: 500; color: #E2E8F0; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      transition: all 0.15s;
+    }
+    header .back-link:hover { background: rgba(255,255,255,0.12); color: #FFFFFF; }
+    .accent-line { height: 3px; background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3)); }
+
+    /* ---- Hero ---- */
+    .hero { max-width: 1120px; margin: 0 auto; padding: 64px 32px 48px; }
+    .hero h1 {
+      font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #0D9488, #0891B2);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle { font-size: 19px; color: var(--text-secondary); max-width: 780px; line-height: 1.8; }
+    .hero .subtitle code { color: #0F766E; font-weight: 600; font-family: 'SF Mono','Fira Code',ui-monospace,monospace; font-size: 0.92em; }
+    .hero .meta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+    .hero .meta-chip {
+      font-size: 13px; font-weight: 600; color: var(--text-secondary);
+      background: #FFFFFF; outline: 1px solid var(--ring);
+      padding: 6px 14px; border-radius: 99px;
+    }
+
+    /* ---- Sections ---- */
+    .section { max-width: 1120px; margin: 0 auto; padding: 0 32px 56px; }
+    .section-title { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); margin-bottom: 8px; }
+    .section-sub { font-size: 17px; color: var(--text-secondary); margin-bottom: 24px; max-width: 820px; }
+
+    /* ---- Cards ---- */
+    .card {
+      background: var(--card); border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      outline: 1px solid var(--ring);
+      padding: 40px; margin-bottom: 24px;
+    }
+    .card h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 8px; margin-top: 32px; }
+    .card h3:first-child { margin-top: 0; }
+    .card p { color: var(--text-secondary); margin-bottom: 14px; font-size: 17px; }
+    .card p:last-child { margin-bottom: 0; }
+    .card code {
+      background: var(--teal-light); color: #0F766E; padding: 2px 7px; border-radius: 6px;
+      font-family: 'SF Mono','Fira Code',ui-monospace,monospace; font-size: 13.5px; font-weight: 600;
+    }
+
+    /* ---- Plan Header ---- */
+    .plan-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .plan-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .plan-header h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0; }
+    .plan-header .plan-label { font-size: 13px; font-weight: 600; margin-top: 2px; letter-spacing: 0.03em; }
+    .plan-teal .plan-icon { background: #F0FDFA; color: #0D9488; } .plan-teal .plan-label { color: #0D9488; }
+    .plan-blue .plan-icon { background: #EFF6FF; color: #2563EB; } .plan-blue .plan-label { color: #1D4ED8; }
+    .plan-amber .plan-icon { background: #FFFBEB; color: #D97706; } .plan-amber .plan-label { color: #B45309; }
+    .plan-orange .plan-icon { background: #FFF7ED; color: #EA580C; } .plan-orange .plan-label { color: #C2410C; }
+    .plan-rose .plan-icon { background: #FFF1F2; color: #E11D48; } .plan-rose .plan-label { color: #BE123C; }
+    .plan-slate .plan-icon { background: #F1F5F9; color: #475569; } .plan-slate .plan-label { color: #475569; }
+
+    /* ---- Steps (三旋鈕 / numbered) ---- */
+    .steps { list-style: none; padding: 0; margin: 8px 0 0; counter-reset: s; }
+    .steps li {
+      position: relative; padding: 16px 20px 16px 60px; margin-bottom: 12px;
+      background: #F8FAFC; border-radius: 14px; outline: 1px solid var(--ring);
+      font-size: 16px; color: var(--text-secondary); line-height: 1.7;
+    }
+    .steps li:last-child { margin-bottom: 0; }
+    .steps li::before {
+      counter-increment: s; content: counter(s);
+      position: absolute; left: 18px; top: 16px;
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+      color: #fff; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .steps strong { color: var(--text-primary); font-weight: 700; }
+
+    /* ---- Flow (dark diagram) ---- */
+    .flow {
+      background: #0F172A; color: #CBD5E1;
+      border-radius: 14px; padding: 24px 28px; margin: 8px 0 0;
+      font-size: 13.5px; line-height: 1.95;
+      font-family: 'SF Mono','Fira Code',ui-monospace,monospace;
+      border-left: 4px solid var(--teal);
+      overflow-x: auto; white-space: pre;
+    }
+    .flow .hl { color: #2DD4BF; }
+    .flow .dim { color: #64748B; }
+
+    /* ---- Tables ---- */
+    .compare-table, .specs-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin: 8px 0 0; font-size: 16px;
+      border-radius: 14px; overflow: hidden; outline: 1px solid var(--ring);
+    }
+    .compare-table th, .specs-table th {
+      background: #F8FAFC; text-align: left; padding: 13px 18px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .compare-table td, .specs-table td {
+      padding: 13px 18px; border-bottom: 1px solid rgba(15,23,42,0.04);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .compare-table tr:last-child td, .specs-table tr:last-child td { border-bottom: none; }
+    .compare-table td:first-child { font-weight: 600; color: var(--text-primary); }
+    .specs-table td:first-child { font-weight: 700; color: var(--text-primary); white-space: nowrap; width: 120px; }
+    .compare-table .highlight { color: var(--teal); font-weight: 600; }
+    .compare-table code, .specs-table code {
+      background: var(--teal-light); color: #0F766E; padding: 2px 6px; border-radius: 5px;
+      font-family: 'SF Mono','Fira Code',ui-monospace,monospace; font-size: 13px; font-weight: 600;
+    }
+    .specs-table .danger { color: #BE123C; font-weight: 700; }
+
+    /* ---- Role card spacing ---- */
+    .role-card { margin-bottom: 20px; }
+
+    /* ---- Note / Warn ---- */
+    .note {
+      background: var(--teal-light); border-radius: 12px; padding: 18px 22px;
+      outline: 1px solid var(--teal-ring);
+      font-size: 15.5px; color: #115E59; line-height: 1.7; margin-top: 18px;
+    }
+    .note strong { font-weight: 700; }
+    .warn {
+      background: #FFF1F2; border-radius: 12px; padding: 18px 22px;
+      outline: 1px solid rgba(225,29,72,0.16);
+      font-size: 15.5px; color: #9F1239; line-height: 1.7; margin-top: 18px;
+    }
+    .warn strong { font-weight: 700; }
+
+    /* ---- Redlines ---- */
+    .redline-list { list-style: none; padding: 0; margin-top: 8px; }
+    .redline-list li {
+      font-size: 16px; color: var(--text-secondary); line-height: 1.7;
+      padding: 12px 0 12px 34px; position: relative;
+      border-bottom: 1px solid rgba(15,23,42,0.04);
+    }
+    .redline-list li:last-child { border-bottom: none; }
+    .redline-list li::before { content: "🚩"; position: absolute; left: 0; top: 11px; }
+    .redline-list strong { color: var(--text-primary); }
+
+    /* ---- Roadmap ---- */
+    .roadmap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 8px; }
+    .roadmap-step { border-radius: 16px; padding: 26px 24px; outline: 1px solid var(--ring); }
+    .roadmap-step .step-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .roadmap-step h4 { font-size: 18px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
+    .roadmap-step p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; margin: 0; }
+    .roadmap-step.r1 { background: #F0FDFA; } .roadmap-step.r1 .step-label, .roadmap-step.r1 h4 { color: #0F766E; }
+    .roadmap-step.r2 { background: #FFFBEB; } .roadmap-step.r2 .step-label, .roadmap-step.r2 h4 { color: #B45309; }
+    .roadmap-step.r3 { background: #FFF7ED; } .roadmap-step.r3 .step-label, .roadmap-step.r3 h4 { color: #C2410C; }
+
+    /* ---- Divider ---- */
+    .divider { height: 1px; background: rgba(15, 23, 42, 0.06); max-width: 1120px; margin: 0 auto; }
+
+    /* ---- Footer ---- */
+    footer { max-width: 1120px; margin: 0 auto; padding: 32px 32px 48px; text-align: center; font-size: 14px; color: var(--text-tertiary); }
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ---- Mobile RWD ---- */
+    @media (max-width: 640px) {
+      body { font-size: 16px; }
+      header .inner { padding: 0 16px; height: 52px; }
+      header .brand-name { font-size: 14px; }
+      header .brand-sub { display: none; }
+      header .back-link { font-size: 13px; padding: 5px 12px; }
+      .hero { padding: 40px 20px 32px; }
+      .hero h1 { font-size: 27px; }
+      .hero .subtitle { font-size: 16px; }
+      .hero .meta-chip { font-size: 12px; padding: 5px 12px; }
+      .section { padding: 0 20px 40px; }
+      .section-title { font-size: 22px; }
+      .section-sub { font-size: 15.5px; }
+      .card { padding: 24px 20px; border-radius: 16px; }
+      .plan-header { gap: 12px; }
+      .plan-header h2 { font-size: 20px; }
+      .plan-icon { width: 44px; height: 44px; border-radius: 12px; font-size: 20px; }
+      .plan-header .plan-label { font-size: 12px; }
+      .steps li { padding: 14px 16px 14px 54px; font-size: 15px; }
+      .flow { padding: 18px 16px; font-size: 12.5px; }
+      .card:has(.compare-table) { padding: 24px 12px; overflow-x: auto; }
+      .compare-table { font-size: 14px; min-width: 520px; }
+      .compare-table th, .compare-table td { padding: 10px 12px; }
+      .specs-table { font-size: 15px; }
+      .specs-table td { padding: 11px 14px; }
+      .specs-table td:first-child { width: 92px; white-space: normal; }
+      .roadmap { grid-template-columns: 1fr; gap: 12px; }
+      .note, .warn { padding: 16px 18px; font-size: 15px; }
+      .divider { margin: 0 20px; }
+      footer { padding: 24px 20px 40px; font-size: 13px; }
+    }
+
+    /* ---- Accessibility ---- */
+    a:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 6px; }
+    header .back-link:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <span class="brand-name">內部技術筆記</span>
+      <span class="brand-sub">虛擬行銷部門藍圖</span>
+    </div>
+    <a href="index.html" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回文件列表
+    </a>
+  </div>
+</header>
+<div class="accent-line"></div>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>虛擬行銷部門 <span class="gradient">AI Agent 參考架構藍圖</span></h1>
+  <p class="subtitle">
+    一套可重複部署、再依客戶客製的「AI 行銷部門」。底盤統一(<code>Paperclip</code> 治理 + <code>Hermes</code> 員工 + <code>MCP/Skills</code> 能力),客製只動三個旋鈕。給 AI FDE 進客戶現場用 —— 標準化架構,把客戶 know-how 變成 skills。
+  </p>
+  <div class="meta-row">
+    <span class="meta-chip">📅 2026-06-03</span>
+    <span class="meta-chip">🧑‍💻 AI FDE / 部署者</span>
+    <span class="meta-chip">🏗️ Paperclip · Hermes · MCP</span>
+  </div>
+</div>
+
+<!-- 核心心法 -->
+<div class="section">
+  <div class="section-title">核心心法</div>
+  <p class="section-sub">每進一家客戶<strong>不重寫系統</strong>,只調三樣。標準化架構是底盤,skills 是你的核心交付物與 IP。</p>
+  <div class="card">
+    <ol class="steps">
+      <li><strong>Skills</strong> — 把客戶流程、品牌語氣、SOP、定位封裝成 skills;每客戶一個私有 repo / Hermes tap,可版本控管、遠端更新。</li>
+      <li><strong>MCP 接線</strong> — 接客戶既有工具棧(CRM、分析、廣告後台)。</li>
+      <li><strong>組織設定</strong> — Paperclip 的 org chart、各職位 persona、預算上限、審批關卡。</li>
+    </ol>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 三層架構 -->
+<div class="section" style="padding-top:56px;">
+  <div class="section-title">三層架構總覽</div>
+  <p class="section-sub">治理層管「有哪些員工、各自預算、做得對不對」;員工層是會做事的 agent;能力層是各職位的專業。</p>
+  <div class="card">
+    <table class="compare-table">
+      <thead><tr><th>層</th><th>角色</th><th>工具</th></tr></thead>
+      <tbody>
+        <tr><td>治理層</td><td>主管 / HR / 財務</td><td class="highlight">Paperclip(org chart · 預算 · 審批 · 稽核)</td></tr>
+        <tr><td>員工層</td><td>各職位 agent</td><td class="highlight">Hermes(常駐 · 模型不限 · Skills 系統)</td></tr>
+        <tr><td>能力層</td><td>各職位專業</td><td class="highlight">客製 skills + 客戶 MCP + Claude World Studio MCP</td></tr>
+      </tbody>
+    </table>
+    <h3>編組關係</h3>
+    <div class="flow"><span class="hl">Paperclip</span>(治理層:org chart / 預算上限 / 審批 / 稽核)
+   ├── 產品行銷   Hermes + 定位 skills
+   ├── SEO        Hermes + SEO skills + Ahrefs/Search Console MCP
+   ├── Digital    Hermes + campaign skills + HubSpot/GA MCP
+   ├── Content    Hermes + 品牌 skills + 內容 MCP
+   ├── 廣告專員    Hermes + 廣告 skills <span class="dim">(預算上限由 Paperclip 鎖)</span>
+   └── 影片製作    Hermes + Remotion/NotebookLM MCP
+            ▲
+   <span class="hl">行銷總監</span>(human + orchestrator):派工、審核、人類把關</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 6 職位編制 -->
+<div class="section" style="padding-top:56px;">
+  <div class="section-title">6 職位編制</div>
+  <p class="section-sub">每個職位 = 一個常駐 Hermes agent,掛上對應 skills 與客戶 MCP。注意每個職位的<strong>審批點</strong>。</p>
+
+  <!-- 1 產品行銷 -->
+  <div class="card role-card plan-teal">
+    <div class="plan-header">
+      <div class="plan-icon">🎯</div>
+      <div><h2>1 · 產品行銷</h2><div class="plan-label">PRODUCT MARKETING · 品牌單一事實來源</div></div>
+    </div>
+    <table class="specs-table">
+      <tr><td>職責</td><td>定位、訊息架構、競品分析、價值主張、launch messaging</td></tr>
+      <tr><td>Skills</td><td><code>message-guide-*</code> pipeline、<code>competitive-brief</code>、<code>message-guide-review</code></td></tr>
+      <tr><td>MCP</td><td>Web 研究、Similarweb、文件(Drive / Notion)</td></tr>
+      <tr><td>輸入→輸出</td><td>產品 brief / HQ guide / 競品 → 定位卡、Message Guide、Sales enablement</td></tr>
+      <tr><td>審批點</td><td>對外訊息定稿需人類核可</td></tr>
+    </table>
+    <div class="note"><strong>下游所有職位都吃這份定位</strong> —— 它是整個部門品牌一致性的源頭。</div>
+  </div>
+
+  <!-- 2 SEO -->
+  <div class="card role-card plan-blue">
+    <div class="plan-header">
+      <div class="plan-icon">🔍</div>
+      <div><h2>2 · SEO</h2><div class="plan-label">SEARCH ENGINE OPTIMIZATION</div></div>
+    </div>
+    <table class="specs-table">
+      <tr><td>職責</td><td>關鍵字研究、技術 SEO 巡檢、內容 gap、排名追蹤、on-page 建議</td></tr>
+      <tr><td>Skills</td><td><code>seo-audit</code> + 自建 keyword-research / serp-monitor</td></tr>
+      <tr><td>MCP</td><td>Ahrefs、Similarweb、Google Search Console(客戶接)</td></tr>
+      <tr><td>輸入→輸出</td><td>網站 URL / 關鍵字 / 競品域名 → 稽核報告、關鍵字地圖、給 Content 的 brief</td></tr>
+      <tr><td>審批點</td><td>網站結構大改、上 production 需核可</td></tr>
+      <tr><td>排程</td><td>每週自動巡檢(Hermes cron)</td></tr>
+    </table>
+  </div>
+
+  <!-- 3 Digital -->
+  <div class="card role-card plan-amber">
+    <div class="plan-header">
+      <div class="plan-icon">📊</div>
+      <div><h2>3 · Digital Marketing</h2><div class="plan-label">渠道協調者</div></div>
+    </div>
+    <table class="specs-table">
+      <tr><td>職責</td><td>campaign 規劃、跨渠道協調、UTM / 追蹤治理、漏斗分析、成效報表</td></tr>
+      <tr><td>Skills</td><td><code>campaign-plan</code>、<code>performance-report</code>、UTM 指南、ShortLink</td></tr>
+      <tr><td>MCP</td><td>HubSpot、Amplitude、Supermetrics、Klaviyo、GA</td></tr>
+      <tr><td>輸入→輸出</td><td>campaign 目標 / 預算 / 渠道數據 → campaign brief、週/月報表、優化建議</td></tr>
+      <tr><td>審批點</td><td>campaign 上線、預算分配需核可</td></tr>
+    </table>
+  </div>
+
+  <!-- 4 Content -->
+  <div class="card role-card plan-orange">
+    <div class="plan-header">
+      <div class="plan-icon">✍️</div>
+      <div><h2>4 · Content Marketing</h2><div class="plan-label">CONTENT</div></div>
+    </div>
+    <table class="specs-table">
+      <tr><td>職責</td><td>部落格、社群、電子報、案例、內容再利用</td></tr>
+      <tr><td>Skills</td><td><code>draft-content</code>、<code>email-sequence</code>、<code>eg-content-repurpose</code>、<code>internal-comms</code></td></tr>
+      <tr><td>MCP</td><td>Claude World Studio 內容 MCP(trend-pulse、cf-browser)、發布工具</td></tr>
+      <tr><td>輸入→輸出</td><td>定位 + SEO brief → 各渠道內容草稿、編輯行事曆</td></tr>
+      <tr><td>審批點</td><td>對外發布前需核可</td></tr>
+    </table>
+  </div>
+
+  <!-- 5 廣告專員 -->
+  <div class="card role-card plan-rose">
+    <div class="plan-header">
+      <div class="plan-icon">📣</div>
+      <div><h2>5 · 廣告專員</h2><div class="plan-label">AD SPECIALIST · 最高風險職位</div></div>
+    </div>
+    <table class="specs-table">
+      <tr><td>職責</td><td>受眾分析、文案 / 素材 brief、出價策略<strong>建議</strong>、成效分析、A/B 規劃</td></tr>
+      <tr><td>Skills</td><td>自建 ad-copy / audience-research、<code>campaign-plan</code></td></tr>
+      <tr><td>MCP</td><td>Supermetrics、Meta / Google Ads(<strong>唯讀報表</strong>)</td></tr>
+      <tr><td>輸入→輸出</td><td>campaign 目標 / 預算上限 / 受眾 → 文案、受眾建議、出價建議、成效分析</td></tr>
+      <tr><td>審批點</td><td class="danger">🚨 實際投放 / 動用預算一律人類執行;agent 只給建議。Paperclip 鎖月預算上限</td></tr>
+    </table>
+  </div>
+
+  <!-- 6 影片製作 -->
+  <div class="card role-card plan-slate">
+    <div class="plan-header">
+      <div class="plan-icon">🎬</div>
+      <div><h2>6 · 影片製作</h2><div class="plan-label">VIDEO PRODUCTION</div></div>
+    </div>
+    <table class="specs-table">
+      <tr><td>職責</td><td>腳本、分鏡、影片生成、字幕 / 多語、社群短影音</td></tr>
+      <tr><td>Skills</td><td><code>youtube-script</code>、<code>storyboard-generator</code>、<code>remotion</code>、<code>network-release-notes</code></td></tr>
+      <tr><td>MCP</td><td>Remotion(render)、nanobanana(生圖)、Canva、NotebookLM(podcast / slides / video)</td></tr>
+      <tr><td>輸入→輸出</td><td>content brief + 品牌素材 → 腳本、分鏡、成片、字幕</td></tr>
+      <tr><td>審批點</td><td>對外發布前需核可</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 協作流程 -->
+<div class="section" style="padding-top:56px;">
+  <div class="section-title">跨職位協作流程</div>
+  <p class="section-sub">定位先行,內容與廣告都吃同一份定位,Digital 統整成效回饋形成閉環。</p>
+  <div class="card">
+    <div class="flow"><span class="hl">產品行銷</span>(定位)
+    │  定位卡 / Message Guide <span class="dim">(品牌單一事實來源)</span>
+    ▼
+<span class="hl">SEO</span> ── 關鍵字地圖 + 內容 brief ──▶ <span class="hl">Content / 影片</span>(產出內容)
+                                          │
+                                          ▼
+                              <span class="hl">廣告專員</span>(受眾 + 文案 + 出價建議)
+                                          │  <span class="dim">人類核可後投放</span>
+                                          ▼
+                              <span class="hl">Digital</span>(統整 campaign + UTM 追蹤)
+                                          │  成效回饋
+                                          ▼
+                              <span class="hl">產品行銷</span>(迭代定位) ◀── 閉環</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 治理與紅線 -->
+<div class="section" style="padding-top:56px;">
+  <div class="section-title">治理層(Paperclip)與紅線</div>
+  <div class="card plan-rose">
+    <h3 style="margin-top:0;">Paperclip 負責什麼</h3>
+    <table class="specs-table">
+      <tr><td>org chart</td><td>6 職位 + 回報給「行銷總監(human)」</td></tr>
+      <tr><td>預算上限</td><td>每個 agent 設月預算上限,超支自動暫停(廣告專員尤其重要)</td></tr>
+      <tr><td>審批關卡</td><td>對外發布、廣告花費、網站結構改動</td></tr>
+      <tr><td>稽核</td><td>immutable audit log,所有決策與 tool call 可追溯</td></tr>
+      <tr><td>品牌來源</td><td>全部 content / 影片 agent 吃同一份 message guide + <code>.impeccable</code></td></tr>
+    </table>
+    <div class="warn"><strong>幫別人建,特別要顧的四條紅線:</strong></div>
+    <ul class="redline-list">
+      <li><strong>花錢 / 投放絕不自動化</strong> — 一律走人類審批,合約寫清責任歸屬。</li>
+      <li><strong>資料與密鑰隔離</strong> — 每客戶獨立部署,各自 API key 走 secrets 管理。</li>
+      <li><strong>成熟度風險</strong> — 工具都還新,先 pilot 一個職位再擴成整個部門。</li>
+      <li><strong>品牌一致性</strong> — 同一份品牌 skill,避免多 agent 風格分裂。</li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 導入路線 -->
+<div class="section" style="padding-top:56px;">
+  <div class="section-title">導入路線</div>
+  <p class="section-sub">分階段,不要一步到位。先把一個職位跑出成效,再擴編,最後才疊治理層。</p>
+  <div class="card">
+    <div class="roadmap">
+      <div class="roadmap-step r1">
+        <div class="step-label">Phase 1 · Pilot</div>
+        <h4>單一職位驗證</h4>
+        <p>挑 1 個高價值職位(SEO 巡檢 或 Content 選題),用 Hermes + 客製 skill 跑出成效。</p>
+      </div>
+      <div class="roadmap-step r2">
+        <div class="step-label">Phase 2 · 擴編</div>
+        <h4>串起協作流程</h4>
+        <p>加到 3–4 個常駐職位,讓定位 → 內容 → 成效的流程跑起來。</p>
+      </div>
+      <div class="roadmap-step r3">
+        <div class="step-label">Phase 3 · 治理</div>
+        <h4>疊上 Paperclip</h4>
+        <p>org chart、預算上限、審批、稽核,交付客戶可自行操作的 GUI。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Starter Kit -->
+<div class="section" style="padding-top:56px;">
+  <div class="section-title">FDE 可重複資產(Starter Kit)</div>
+  <div class="card plan-teal">
+    <div class="plan-header">
+      <div class="plan-icon">📦</div>
+      <div><h2>把第一次做的沉澱成模板</h2><div class="plan-label">之後每客戶 fork 再客製</div></div>
+    </div>
+    <table class="specs-table">
+      <tr><td>org 模板</td><td>6 職位 + 預算 / 審批預設</td></tr>
+      <tr><td>skill pack</td><td>6 職位通用 baseline skill,客戶版覆寫</td></tr>
+      <tr><td>MCP playbook</td><td>常見平台(HubSpot / GA / Ahrefs / 廣告後台)怎麼接</td></tr>
+      <tr><td>交接資產</td><td>Discovery 問卷 + 交接文件模板</td></tr>
+    </table>
+    <div class="note"><strong>你 FDE 真正在賣的不是工具</strong> —— 是「把客戶 know-how 變成 skills + 把流程變成 org / 預算 / 審批設定」的能力。</div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>虛擬行銷部門 — AI Agent 參考架構藍圖 · 內部技術筆記 · 2026-06-03</p>
+  <p style="margin-top: 6px;"><a href="index.html">返回文件列表</a></p>
+</footer>
+
+</body>
+</html>
