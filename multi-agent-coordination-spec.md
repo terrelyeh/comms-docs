@@ -75,7 +75,21 @@ requested → in-progress → delivered → closed
 - **真實產物**:用 nanobanana 產出主視覺(吃中品牌:暖中性 / teal / 無純黑)→ 流過 handoff → 嵌入文章 ✅
 - 審批關卡守住:文章卡在「待核可」,人類核可前不發布 ✅
 
-→ 證明 **Claude Code + 一個 Markdown 黑板 + RACI/handoff,就能跑有治理的多 agent 流程**,不需要 Paperclip/Hermes。
+### 閉環:量測 → 回饋 → 迭代(W23 → W24)
+再跑一個週期,證明部門能**依數據自我改進**:
+- Analytics 量測已發布內容 → 產成效報告
+- 透過黑板「成效快照」把洞察回饋策略(PoE ROI 高、內鏈有效)
+- 策略據此**迭代下週目標**(WiFi → 主打 PoE + 雙向內鏈),仍過人類核可
+
+```
+策略設目標 → Organic 寫稿 ─[handoff]→ Creative 做圖 → Organic 收回
+ → 審批 ─[人類核可]→ 發布 → Analytics 量測 ─[黑板回饋]→ 策略迭代下週目標 → …(自我改進閉環)
+```
+
+**兩種協調路徑都實證跑通**:交付物走 handoff(點對點);訊號走黑板(成效快照)。
+> ※ 成效數字為 dogfood 模擬值(非真實 GA),證明迴圈會動;實際部署由 GA / Search Console MCP 拉真值。
+
+→ 證明 **Claude Code + 一個 Markdown 黑板 + RACI/handoff,就能跑一個會自我改進、有治理的多 agent 部門**,不需要 Paperclip/Hermes。
 
 ## 規模化限制與升級時機
 

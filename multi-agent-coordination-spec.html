@@ -251,8 +251,8 @@
 <div class="divider"></div>
 
 <div class="section" style="padding-top:56px;">
-  <div class="section-title">實證(Dogfood · 2026-06-07)</div>
-  <p class="section-sub">不是紙上談兵 —— 在 Claude Code 上實際跑過一輪(EnGenius 情境,主題:中小企業 WiFi 佈建指南)。</p>
+  <div class="section-title">實證(Dogfood · 完整迴圈)</div>
+  <p class="section-sub">不是紙上談兵 —— 在 Claude Code 上實際跑過<strong>完整自我改進迴圈</strong>(EnGenius 情境,主題:WiFi 佈建指南 → 依數據迭代到 PoE)。</p>
   <div class="card plan-teal">
     <div class="plan-header">
       <div class="plan-icon">🧪</div>
@@ -270,7 +270,20 @@
       <img src="assets/coordination-dogfood-hero.png" alt="dogfood 跑出的部落格主視覺:暖中性底、teal 訊號波、無純黑" />
       <figcaption>↑ 這張主視覺是「Organic 開 handoff → Creative 用 nanobanana 接單 → Organic 收回嵌入」整條協調流程跑出來的真實產物。色彩吃中品牌(暖中性 / teal / 無純黑 / 無紫色)。</figcaption>
     </figure>
-    <div class="note"><strong>結論:</strong>Claude Code + 一個 Markdown 黑板 + RACI/handoff,就能跑有治理的多 agent 流程 —— <strong>不需要 Paperclip / Hermes</strong>。重 infra 是被規模逼出來的,不是一開始就架的。</div>
+
+    <h3>閉環:量測 → 回饋 → 迭代(W23 → W24)</h3>
+    <p>再跑一個週期,證明部門能<strong>依數據自我改進</strong>:Analytics 量測已發布內容 → 透過黑板把洞察回饋策略 → 策略據此調整下週目標(WiFi → 主打 PoE + 雙向內鏈),整段仍過人類核可。</p>
+    <div class="flow"><span class="hl">策略</span> 設目標
+   ▼
+<span class="hl">Organic</span> 寫稿 ──[handoff]──▶ <span class="hl">Creative</span> 做圖 ──▶ Organic 收回
+   ▼
+審批佇列 ──[<span class="hl">人類核可</span>]──▶ 發布(帶 UTM)
+   ▼
+<span class="hl">Analytics</span> 量測 ──[<span class="hl">黑板回饋</span>]──▶ <span class="hl">策略</span> 讀數據 → 迭代下週目標
+   ▲                                                    │
+   └──────────────── 自我改進閉環 ◀────────────────────┘</div>
+    <div class="note"><strong>兩種協調路徑都實證跑通:</strong>要<strong>交付物</strong>走 handoff(點對點,如 Organic↔Creative);要<strong>傳訊號</strong>走黑板(如 Analytics→策略 的成效快照)。<br><span style="color:#64748B;">※ 成效數字為 dogfood 模擬值(非真實 GA),用以證明迴圈會動;實際部署由 GA / Search Console MCP 拉真值。</span></div>
+    <div class="note"><strong>結論:</strong>Claude Code + 一個 Markdown 黑板 + RACI/handoff,就能跑一個<strong>會自我改進、有治理</strong>的多 agent 部門 —— <strong>不需要 Paperclip / Hermes</strong>。重 infra 是被規模逼出來的,不是一開始就架的。</div>
   </div>
 </div>
 
