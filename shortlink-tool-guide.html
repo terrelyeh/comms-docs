@@ -401,7 +401,7 @@
         <li><strong>登入</strong>：Google OAuth 用公司 email。第一次使用要先拿到管理員給的<strong>邀請連結</strong>，點開用公司 Google 帳號登入就會自動加入工作區。</li>
         <li><strong>左側 Sidebar → 連結管理</strong></li>
         <li><strong>右上角藍色「+ 建立新連結」</strong>（一次要建很多條，按它旁邊的 <code>▾</code>，見<a href="#bulk" style="color: var(--violet); font-weight: 600;">一次建很多條</a>）</li>
-        <li><strong>填三個核心欄位</strong>：目的地網址、標題（例：<code>Spring 2026 EDM top banner</code>）、UTM 活動（Campaign）。剩下的 source/medium/content 按模板或下拉選單填。</li>
+        <li><strong>填三個核心欄位</strong>：目的地網址、標題（例：<code>Spring 2026 EDM top banner</code>）、UTM 活動（Campaign）。剩下的 source / medium / content 從下拉選單選即可（有常用模板也可以一鍵帶入，非必要）。</li>
         <li><strong>建立 → 直接拿短網址和 QR</strong>：建立成功後頁面會直接顯示短網址（按「複製」）和 QR Code（可下載）。要再建同一組 UTM 的連結，按「再建一條（保留 UTM 與標籤）」；之後在列表上，短碼旁的 <code>⧉</code> 也能複製。</li>
         <li><strong>貼到你的通路</strong>（EDM / FB / IG / LinkedIn / QR 傳單皆可）</li>
         <li><strong>24 小時後看數據</strong>：在連結列表<strong>直接點那條連結的點擊數</strong>，就會打開它的數據分析（預設看全部期間）。</li>
@@ -475,8 +475,8 @@
       <h3>標籤 (Tags)</h3>
       <p>自由分類。建議先跟團隊對齊一組核心標籤（例：<code>常態 / 節慶 / KOL / 展場</code>），避免每個人自創。</p>
 
-      <h3>UTM 模板</h3>
-      <p>下拉選一個既有模板，source / medium / content 會自動帶入，你只需填 campaign。省重複打字。</p>
+      <h3>UTM 模板（選填）</h3>
+      <p>UTM 區塊最上方可以選一個既有模板，source / medium / content 會自動帶入，省重複打字。<strong>不選也完全可以</strong>，直接在下方選媒介和來源即可。</p>
 
       <h3>自訂短碼 (custom code)</h3>
       <p>想要 <code>/spring-2026</code> 而不是隨機 <code>/Ab3xK9p</code>：</p>
@@ -605,8 +605,13 @@
 
   <!-- Templates -->
   <div class="section" id="templates">
-    <h2 class="section-title">UTM 模板</h2>
+    <h2 class="section-title">UTM 模板（選用）</h2>
     <div class="card">
+      <div class="callout callout-green">
+        <div class="callout-title">不用模板也完全可以</div>
+        <p>模板只是捷徑：把常用通路的媒介 / 來源 / 內容存起來，建連結時一鍵帶入，省得重打、也讓大家的拼法一致。不用的話，建立連結時直接在 UTM 區塊選媒介和來源就好。適合<strong>同一個通路會反覆建連結</strong>的情況，例如每週 EDM、每場展會的攤位 QR。</p>
+      </div>
+
       <h3>設計理念：通路預設</h3>
       <p>一個模板 = 某個通路 / 素材類型的 UTM 預設組合：</p>
 
@@ -634,7 +639,7 @@
       </ol>
 
       <h3>模板管理</h3>
-      <p>Sidebar → <strong>UTM 模板</strong> → 新增 / 編輯 / 刪除。建議先盤點團隊常用的通路（EDM、FB 廣告、IG 自然貼文、展場 QR…），每個建一個模板。</p>
+      <p>左側選單<strong>下方</strong>（「設定」上面）→ <strong>UTM 模板</strong> → 新增 / 編輯 / 刪除。有某個通路你常常重複建連結時再建模板就好，不需要一開始就把每個通路都建一個。</p>
     </div>
   </div>
 
