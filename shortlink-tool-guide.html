@@ -353,7 +353,7 @@
         <li><a href="#templates">UTM 模板</a></li>
         <li><a href="#analytics">數據分析</a></li>
         <li><a href="#qr">QR Code</a></li>
-        <li><a href="#csv">CSV 批次匯入</a></li>
+        <li><a href="#bulk">一次建很多條</a></li>
         <li><a href="#share">公開分享報告</a></li>
         <li><a href="#team">團隊與權限</a></li>
         <li><a href="#governance">UTM 白名單治理</a></li>
@@ -400,11 +400,11 @@
       <ol class="step-list">
         <li><strong>登入</strong>：Google OAuth 用公司 email。第一次使用要先拿到管理員給的<strong>邀請連結</strong>，點開用公司 Google 帳號登入就會自動加入工作區。</li>
         <li><strong>左側 Sidebar → 連結管理</strong></li>
-        <li><strong>右上角「+ 建立新連結」</strong></li>
+        <li><strong>右上角藍色「+ 建立新連結」</strong>（一次要建很多條，按它旁邊的 <code>▾</code>，見<a href="#bulk" style="color: var(--violet); font-weight: 600;">一次建很多條</a>）</li>
         <li><strong>填三個核心欄位</strong>：目的地網址、標題（例：<code>Spring 2026 EDM top banner</code>）、UTM 活動（Campaign）。剩下的 source/medium/content 按模板或下拉選單填。</li>
-        <li><strong>儲存 → 自動回到列表 → 複製短網址</strong>：列表第一欄短碼旁的 <code>⧉</code> 一鍵複製 <code>https://go.engenius.ai/&lt;code&gt;</code>。</li>
+        <li><strong>建立 → 直接拿短網址和 QR</strong>：建立成功後頁面會直接顯示短網址（按「複製」）和 QR Code（可下載）。要再建同一組 UTM 的連結，按「再建一條（保留 UTM 與標籤）」；之後在列表上，短碼旁的 <code>⧉</code> 也能複製。</li>
         <li><strong>貼到你的通路</strong>（EDM / FB / IG / LinkedIn / QR 傳單皆可）</li>
-        <li><strong>24 小時後看數據</strong>：Sidebar → 數據分析 → 篩選這條連結 → 看點擊來源、裝置、時段。</li>
+        <li><strong>24 小時後看數據</strong>：在連結列表<strong>直接點那條連結的點擊數</strong>，就會打開它的數據分析（預設看全部期間）。</li>
       </ol>
     </div>
   </div>
@@ -419,13 +419,13 @@
       <table class="specs-table">
         <thead><tr><th>欄位</th><th>說明</th></tr></thead>
         <tbody>
-          <tr><td class="wrap">短網址 → 目的網址</td><td>三行一組：<strong>標題</strong>／<strong><code>/短碼</code></strong>（點 <code>⧉</code> 複製；點短碼本身是開新分頁測試，不計入數據）／<strong>→ 目的網址</strong>（不顯示 UTM，滑鼠移上去看完整網址；有 A/B 分流會標 <code>A/B ×N</code>）</td></tr>
+          <tr><td class="wrap">短網址 → 目的網址</td><td>三行一組：<strong>標題</strong>／<strong><code>/短碼</code></strong>（點 <code>⧉</code> 複製、點 QR 圖示展開 QR Code；點短碼本身是開新分頁測試，不計入數據）／<strong>→ 目的網址</strong>（不顯示 UTM，滑鼠移上去看完整網址；有 A/B 分流會標 <code>A/B ×N</code>）</td></tr>
           <tr><td>Campaign</td><td>這條屬於哪一場活動</td></tr>
           <tr><td class="wrap">媒介 / 來源</td><td>UTM medium（上）與 source（下）</td></tr>
           <tr><td>標籤</td><td>自由分類</td></tr>
           <tr><td>建立者</td><td>誰建了這條連結</td></tr>
           <tr><td>狀態</td><td>啟用 / 暫停 / 已封存</td></tr>
-          <tr><td>點擊數</td><td>累積總數 + 7 天 ↑↓%</td></tr>
+          <tr><td>點擊數</td><td>累積總數 + 近 7 天 ↑↓%。<strong>點數字</strong>直接打開這條連結的數據分析</td></tr>
         </tbody>
       </table>
 
@@ -578,9 +578,16 @@
       <h3>單活動駕駛艙 <code>/campaigns/[name]</code></h3>
       <p>點活動名稱進入該活動的指揮中心，有 3 個 tab：</p>
       <ul>
-        <li><strong>Overview</strong> — KPI + 30 天趨勢折線</li>
-        <li><strong>Traffic</strong> — 這場活動的 top sources / mediums / 裝置 / 國家</li>
-        <li><strong>Links</strong> — 這場活動底下的所有連結 + 每條的獨立 / 共享比</li>
+        <li><strong>總覽</strong> — 目標進度 + 點擊趨勢</li>
+        <li><strong>流量</strong> — 這場活動的來源 / 媒介 / 裝置 / 國家</li>
+        <li><strong>連結</strong> — 這場活動底下的所有連結 + 每條的點擊與佔比</li>
+      </ul>
+      <p>總覽和流量右邊可以切 <strong>全部期間 / 90 天 / 30 天</strong>，預設是全部期間 —— 活動結束幾個月後回頭看，數字也還在。</p>
+      <p>頁首的按鈕：</p>
+      <ul>
+        <li><strong>新增連結</strong> — 打開建立表單時<strong>已經帶入這個活動</strong>，只要填網址和通路</li>
+        <li><strong>分享報告</strong> — 產生給主管 / 合作夥伴看的唯讀報告，見<a href="#share" style="color: var(--violet); font-weight: 600;">公開分享報告</a></li>
+        <li><strong>複製所有連結</strong> — 一次複製這個活動的全部短網址</li>
       </ul>
 
       <div class="callout callout-violet">
@@ -590,6 +597,9 @@
 
       <h3>目標 (Goal)</h3>
       <p>可以幫 Campaign 設「目標點擊數」，Leaderboard 的 <code>goal%</code> 欄會顯示達成率。</p>
+
+      <h3>活動列表的期間</h3>
+      <p>活動列表上方可以切 <strong>近 7 天 / 30 天 / 90 天 / 全部期間</strong>。淡季想看上一檔展會的成績，選「全部期間」。</p>
     </div>
   </div>
 
@@ -615,8 +625,9 @@
       </div>
 
       <h3>使用流程</h3>
+      <p>兩種用法擇一：在模板頁按該模板的「<strong>使用</strong>」，會直接打開已套用模板的建立表單；或在建立表單的 UTM 區塊選模板。</p>
       <ol>
-        <li>建連結時 → 選模板</li>
+        <li>選模板</li>
         <li>系統自動帶入 source / medium / content / term</li>
         <li>你只需填 campaign</li>
         <li>儲存</li>
@@ -645,9 +656,21 @@
 
       <h3>篩選器</h3>
       <ul>
-        <li>時段：24h / 7d / 30d / 90d / 自訂</li>
-        <li>指定單一連結（從連結管理頁 ⋮ → 數據分析可直接帶入）</li>
-        <li>指定單一 Campaign</li>
+        <li>時段：24h / 7d / 30d / 90d / <strong>全部期間</strong> / 自訂（自訂的起訖日都包含當天）</li>
+        <li>指定單一連結（在連結列表點點擊數，或 ⋮ → 數據分析，會直接帶入並預設全部期間）</li>
+        <li>指定單一 Campaign / 標籤</li>
+      </ul>
+      <p>系統保留最近約兩年的點擊資料可在這裡分析。</p>
+
+      <div class="callout callout-violet">
+        <div class="callout-title">為什麼這裡的數字跟列表不一樣？</div>
+        <p>連結列表的點擊數是<strong>從建立到現在的累計</strong>；這頁只算你選的期間。要對得上，時段選「全部期間」。</p>
+      </div>
+
+      <h3>匯出與分享</h3>
+      <ul>
+        <li><strong>匯出</strong> — 下載的 CSV 就是你畫面上篩選的範圍（期間、活動、標籤、連結都會套用），每筆點擊附上 UTM 活動 / 來源 / 媒介 / 內容，可以直接拿去樞紐分析</li>
+        <li><strong>Share report</strong> — 把目前畫面的範圍做成分享報告，見<a href="#share" style="color: var(--violet); font-weight: 600;">公開分享報告</a></li>
       </ul>
 
       <h3>點擊熱度圖</h3>
@@ -664,12 +687,18 @@
   <div class="section" id="qr">
     <h2 class="section-title">QR Code</h2>
     <div class="card">
-      <p>每條連結都能產 QR code。步驟：</p>
-      <ol>
-        <li>連結管理 → 該列 ⋮ → <strong>QR Code</strong></li>
-        <li>下載 PNG（列印用）或 SVG（向量，印刷用）</li>
-        <li>中央嵌入 EnGenius 品牌 logo</li>
-      </ol>
+      <p>每條連結都能產 QR code，三個地方都拿得到：</p>
+      <ul>
+        <li><strong>連結列表</strong>：短碼旁邊的 QR 圖示（⋮ 選單裡的「QR Code」也行），會在那一列下方展開</li>
+        <li><strong>剛建立完</strong>：建立成功的畫面直接顯示 QR</li>
+        <li><strong>手機版</strong>：短網址右邊的 QR 按鈕</li>
+      </ul>
+      <p>下載格式：</p>
+      <ul>
+        <li><strong>PNG</strong> — 1024 × 1024 px，海報、DM 都夠清楚</li>
+        <li><strong>SVG</strong> — 真正的向量圖，放大不失真，給設計師排版或大型輸出用</li>
+      </ul>
+      <p>兩種都有中央的 EnGenius logo，檔名會用連結標題（例：<code>qr-Computex-海報.png</code>）。</p>
 
       <p>QR 跟短網址綁定 — 之後改目的地，原本掃出來的人也會跟著去新目的地。</p>
 
@@ -683,20 +712,43 @@
     </div>
   </div>
 
-  <!-- CSV -->
-  <div class="section" id="csv">
-    <h2 class="section-title">CSV 批次匯入</h2>
+  <!-- Bulk -->
+  <div class="section" id="bulk">
+    <h2 class="section-title">一次建很多條</h2>
     <div class="card">
-      <p>一次建幾十上百條連結（例：展場活動發給各國代理商）。</p>
+      <p>連結管理右上角「+ 建立新連結」旁邊的 <code>▾</code> 有三種批次方式，選單上也有一句說明：</p>
+      <table class="specs-table">
+        <thead><tr><th>方式</th><th>什麼時候用</th></tr></thead>
+        <tbody>
+          <tr><td class="wrap">批次建立</td><td><strong>同一個目的網址</strong>、多個版本（例如每位 KOL、每則貼文各一條，用 utm_content 區分）</td></tr>
+          <tr><td class="wrap">CSV 匯入</td><td><strong>每一列各自的目的網址與 UTM</strong>，一次建幾十條（例：發給各國代理商）</td></tr>
+          <tr><td class="wrap">活動啟動器</td><td>展會、新品發表：<strong>選一個範本，一次建好整套通路連結</strong></td></tr>
+        </tbody>
+      </table>
 
-      <p>Sidebar → <strong>連結管理</strong> → 右上角 <strong>Import CSV</strong> → 上傳 CSV → 預覽 → 確認。</p>
+      <h3>活動啟動器（展會 / 新品發表）</h3>
+      <ol>
+        <li>選範本：<strong>Product Launch</strong> 或 <strong>Exhibition Event</strong></li>
+        <li>填活動名稱（utm_campaign）和預設目的網址</li>
+        <li>勾選要的通路，可以改每一列的名稱、source / medium / content，也能複製或刪掉某列</li>
+        <li>按建立，一次產生全部連結</li>
+      </ol>
+      <p>展會範本已經內建 <strong>「QR — 展攤海報」</strong>（<code>qr / poster</code>）和 <strong>「QR — 傳單 / DM」</strong>（<code>qr / flyer</code>，預設不勾）通路。</p>
+      <div class="callout callout-green">
+        <div class="callout-title">每一列可以有自己的目的網址</div>
+        <p>展會海報常常各自導到不同頁面（LinkedIn 公司頁、Calendly 預約、產品頁）。在那一列名稱下方填它自己的網址即可；留空的列才會用上方的預設網址。</p>
+      </div>
+      <p>如果這個活動已經有連結，啟動器會自動標出已存在的通路組合，只建缺的，不會重複。</p>
 
-      <h3>CSV 欄位格式</h3>
+      <h3>CSV 匯入</h3>
+      <p>建立新連結旁的 <code>▾</code> → <strong>CSV 匯入</strong> → 上傳 CSV → 預覽 → 確認。</p>
       <div class="code-block"><span class="k">originalUrl,title,utmSource,utmMedium,utmCampaign,utmContent,tags</span>
 https://...,Spring EDM Top,newsletter,email,spring-sale,top_banner,EDM
 https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費</div>
-
       <p>每列都是獨立 UTM（不共用 template），因為同一批通常是同通路不同素材。</p>
+
+      <h3>批次建立</h3>
+      <p>建立新連結旁的 <code>▾</code> → <strong>批次建立</strong>。填一個目的網址和共同的 UTM，再列出多個 content，一次產生多條。完成後可以一次複製全部短網址，或一次下載全部 QR（每張 1024 px）。</p>
     </div>
   </div>
 
@@ -704,14 +756,32 @@ https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費</div>
   <div class="section" id="share">
     <h2 class="section-title">公開分享報告</h2>
     <div class="card">
-      <p>想把活動成效報告分享給沒有登入權限的人（主管、合作夥伴、客戶）？</p>
+      <p>想把成效給沒有帳號的人看（主管、合作夥伴、客戶）？產生一個唯讀的分享連結。</p>
 
-      <ol>
-        <li>進入 Campaign 詳情頁</li>
-        <li>右上角 <strong>產生分享連結</strong></li>
-        <li>拿到 <code>https://&lt;app-url&gt;/share/&lt;token&gt;</code></li>
-        <li>這個連結可以給任何人看該活動的 Overview + Traffic + Links，但無法編輯、也看不到其他活動</li>
-      </ol>
+      <h3>從哪裡產生</h3>
+      <ul>
+        <li><strong>活動詳情頁</strong> → 頁首「<strong>分享報告</strong>」：分享這個活動，期間跟你頁面上選的一樣（全部期間 / 90 天 / 30 天）</li>
+        <li><strong>數據分析頁</strong> → 頁首「<strong>Share report</strong>」：分享目前畫面的範圍（選了單一連結就分享那條、選了活動就分享那個活動，什麼都沒選就是整個工作區）</li>
+      </ul>
+
+      <h3>報告會固定日期</h3>
+      <p>產生時，報告就固定成當下畫面上的日期（例：<code>2026-05-01 – 2026-06-30</code>）或「全部期間」。主管下週再打開，看到的還是同一段期間的數字，不會因為日子往前滾而改變。</p>
+
+      <h3>可以設定</h3>
+      <ul>
+        <li><strong>分享連結有效期</strong>：7 / 30 / 90 天或自訂天數，過期就打不開</li>
+        <li><strong>密碼</strong>（選填）</li>
+        <li><strong>最大瀏覽次數</strong>（選填）</li>
+      </ul>
+
+      <h3>對方看到什麼</h3>
+      <ul>
+        <li>總點擊數、每日點擊</li>
+        <li><strong>通路表現</strong>：各媒介、各來源各帶來多少點擊</li>
+        <li><strong>連結排行</strong>：哪幾條連結點擊最多</li>
+        <li>裝置、瀏覽器、國家</li>
+      </ul>
+      <p>報告只算真實流量（不含內部測試點擊），預設中文，右上角可以切英文。對方只能看、不能編輯，也看不到其他活動。</p>
     </div>
   </div>
 
@@ -783,6 +853,9 @@ https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費</div>
         <li><strong>Q. 我自己點來測試，會灌水數據嗎？</strong>用「測試短網址」或點列表上的短碼開啟就不會，這兩種會標成「測試」、不算進點擊數。但直接複製短網址貼到瀏覽器開，會被當成一般點擊。</li>
         <li><strong>Q. 分享到 FB / LINE 的預覽圖不對怎麼辦？</strong>到「編輯連結 → 社群分享預覽」自訂標題和圖片，再用 Facebook Sharing Debugger 重新抓取。見<a href="#social-preview" style="color: var(--violet); font-weight: 600;">社群分享預覽</a>。</li>
         <li><strong>Q. 不小心刪錯連結怎麼辦？</strong>連結管理 → 垃圾桶 → 還原，短網址和點擊紀錄都會回來。</li>
+        <li><strong>Q. 列表上有幾百次點擊，點進數據分析卻是 0？</strong>數據分析只算你選的期間，列表是累計。把時段切到「全部期間」就對得上（從列表點點擊數進去時，預設就是全部期間）。</li>
+        <li><strong>Q. 下載的 QR 夠印海報嗎？</strong>夠。PNG 是 1024 × 1024 px；要更大的輸出用 SVG（向量，怎麼放大都清楚）。</li>
+        <li><strong>Q. 傳給主管的報告，數字會一直變嗎？</strong>不會。分享報告在產生時就固定了日期範圍，之後再打開都是同一段期間。</li>
       </ul>
     </div>
   </div>
