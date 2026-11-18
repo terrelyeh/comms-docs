@@ -238,7 +238,7 @@ code: spring-26
 
 ### Campaign 自動建立
 
-**填 `utm_campaign = "spring-sale"` → 系統自動 upsert 一筆 Campaign row（status=ACTIVE）。**
+**填 `utm_campaign = "spring_sale_2026"` → 系統自動 upsert 一筆 Campaign row（status=ACTIVE）。**
 
 不用先跑去 Campaigns 頁手動建才能填 UTM。直接建連結，Campaign 會自己出現在列表。
 
@@ -372,15 +372,31 @@ QR 跟短網址綁定 — 之後改目的地，原本掃出來的人也會跟著
 
 ### CSV 匯入
 
-建立新連結旁的 `▾` → **CSV 匯入** → 上傳 CSV → 預覽 → 確認。
+建立新連結旁的 `▾` → **CSV 匯入** → 上傳 CSV → 看前 5 列預覽 → 匯入 → 逐列顯示成功或失敗原因。
+
+> **欄位名稱要用小寫加底線**：例如 `original_url`、`utm_source`，不能寫成 `originalUrl`、`utmSource`，否則會整批匯入失敗。最保險的做法：在匯入頁按 **Download template** 下載範本，直接在上面填。
 
 ```csv
-originalUrl,title,utmSource,utmMedium,utmCampaign,utmContent,tags
-https://...,Spring EDM Top,newsletter,email,spring-sale,top_banner,EDM
-https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費
+original_url,title,custom_code,utm_source,utm_medium,utm_campaign,utm_content,tags,starts_at
+https://www.engeniustech.com/en/promo,Spring EDM Top,spring-edm-top,newsletter,email,spring_sale_2026,top_banner,EDM,2026-03-03T09:00:00+08:00
+https://www.engeniustech.com/en/promo,Spring FB Ad,,facebook,cpc,spring_sale_2026,video_30s,"FB,付費",
 ```
 
-每列都是獨立 UTM（不共用 template），因為同一批通常是同通路不同素材。
+| 欄位 | 說明 |
+|---|---|
+| `original_url`（必填） | 目的網址，要 http(s):// 開頭 |
+| `title` | 連結標題 |
+| `custom_code` | 自訂短碼；留空自動產生 |
+| `utm_source / utm_medium / utm_campaign / utm_content / utm_term` | UTM 五個欄位；source / medium 會照 UTM 白名單檢查 |
+| `tags` | 標籤，多個用逗號分隔（整格要加雙引號，例 `"FB,付費"`）；不存在的標籤會自動建立 |
+| `starts_at / expires_at` | 排程啟用 / 到期時間，ISO 格式，例 `2026-03-03T09:00:00+08:00` |
+| `max_clicks` | 點擊上限（正整數） |
+| `allowed_countries` | 只允許的國家，兩碼代號用逗號分隔，例 `"US,DE"` |
+| `redirect_type` | `TEMPORARY`（預設，302）或 `PERMANENT`（301） |
+
+- 一次最多 500 列；欄位順序可以自己調，只要名稱對
+- 某一列有錯（網址格式、短碼重複、不符白名單）只會跳過那一列，其他列照常建立
+- 每列都是獨立 UTM（不共用 template），因為同一批通常是同通路不同素材
 
 ### 批次建立
 
@@ -468,7 +484,7 @@ OWNER / ADMIN 到「設定 → 成員」產生**邀請連結**（不會自動寄
 
 ### Q. 我可以換短網址的目的地嗎？
 
-可以。編輯連結 → 改 `originalUrl` → 儲存。原本分享出去的短網址下次點擊會去新目的地。
+可以。編輯連結 → 改「原始網址」→ 儲存。原本分享出去的短網址下次點擊會去新目的地。
 
 ### Q. 為什麼建完連結、回到列表看不到？
 

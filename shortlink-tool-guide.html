@@ -592,7 +592,7 @@
 
       <div class="callout callout-violet">
         <div class="callout-title">Campaign 自動建立</div>
-        <p>填 <code>utm_campaign = "spring-sale"</code> → 系統自動 upsert 一筆 Campaign row（<code>status=ACTIVE</code>）。不用先跑去 Campaigns 頁手動建才能填 UTM。直接建連結，Campaign 會自己出現在列表。</p>
+        <p>填 <code>utm_campaign = "spring_sale_2026"</code> → 系統自動 upsert 一筆 Campaign row（<code>status=ACTIVE</code>）。不用先跑去 Campaigns 頁手動建才能填 UTM。直接建連結，Campaign 會自己出現在列表。</p>
       </div>
 
       <h3>目標 (Goal)</h3>
@@ -746,11 +746,33 @@
       <p>如果這個活動已經有連結，啟動器會自動標出已存在的通路組合，只建缺的，不會重複。</p>
 
       <h3>CSV 匯入</h3>
-      <p>建立新連結旁的 <code>▾</code> → <strong>CSV 匯入</strong> → 上傳 CSV → 預覽 → 確認。</p>
-      <div class="code-block"><span class="k">originalUrl,title,utmSource,utmMedium,utmCampaign,utmContent,tags</span>
-https://...,Spring EDM Top,newsletter,email,spring-sale,top_banner,EDM
-https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費</div>
-      <p>每列都是獨立 UTM（不共用 template），因為同一批通常是同通路不同素材。</p>
+      <p>建立新連結旁的 <code>▾</code> → <strong>CSV 匯入</strong> → 上傳 CSV → 看前 5 列預覽 → 匯入 → 逐列顯示成功或失敗原因。</p>
+      <div class="callout callout-amber">
+        <div class="callout-title">欄位名稱要用小寫加底線</div>
+        <p>例如 <code>original_url</code>、<code>utm_source</code>，不能寫成 <code>originalUrl</code>、<code>utmSource</code>，否則會整批匯入失敗。最保險的做法：在匯入頁按 <strong>Download template</strong> 下載範本，直接在上面填。</p>
+      </div>
+      <div class="code-block"><span class="k">original_url,title,custom_code,utm_source,utm_medium,utm_campaign,utm_content,tags,starts_at</span>
+https://www.engeniustech.com/en/promo,Spring EDM Top,spring-edm-top,newsletter,email,spring_sale_2026,top_banner,EDM,2026-03-03T09:00:00+08:00
+https://www.engeniustech.com/en/promo,Spring FB Ad,,facebook,cpc,spring_sale_2026,video_30s,"FB,付費",</div>
+      <table class="specs-table">
+        <thead><tr><th>欄位</th><th>說明</th></tr></thead>
+        <tbody>
+          <tr><td class="wrap"><code>original_url</code>（必填）</td><td>目的網址，要 http(s):// 開頭</td></tr>
+          <tr><td class="wrap"><code>title</code></td><td>連結標題</td></tr>
+          <tr><td class="wrap"><code>custom_code</code></td><td>自訂短碼；留空自動產生</td></tr>
+          <tr><td class="wrap"><code>utm_source / utm_medium / utm_campaign / utm_content / utm_term</code></td><td>UTM 五個欄位；source / medium 會照 UTM 白名單檢查</td></tr>
+          <tr><td class="wrap"><code>tags</code></td><td>標籤，多個用逗號分隔（整格要加雙引號，例 <code>"FB,付費"</code>）；不存在的標籤會自動建立</td></tr>
+          <tr><td class="wrap"><code>starts_at / expires_at</code></td><td>排程啟用 / 到期時間，ISO 格式，例 <code>2026-03-03T09:00:00+08:00</code></td></tr>
+          <tr><td class="wrap"><code>max_clicks</code></td><td>點擊上限（正整數）</td></tr>
+          <tr><td class="wrap"><code>allowed_countries</code></td><td>只允許的國家，兩碼代號用逗號分隔，例 <code>"US,DE"</code></td></tr>
+          <tr><td class="wrap"><code>redirect_type</code></td><td><code>TEMPORARY</code>（預設，302）或 <code>PERMANENT</code>（301）</td></tr>
+        </tbody>
+      </table>
+      <ul>
+        <li>一次最多 500 列；欄位順序可以自己調，只要名稱對</li>
+        <li>某一列有錯（網址格式、短碼重複、不符白名單）只會跳過那一列，其他列照常建立</li>
+        <li>每列都是獨立 UTM（不共用 template），因為同一批通常是同通路不同素材</li>
+      </ul>
 
       <h3>批次建立</h3>
       <p>建立新連結旁的 <code>▾</code> → <strong>批次建立</strong>。填一個目的網址和共同的 UTM，再列出多個 content，一次產生多條。完成後可以一次複製全部短網址，或一次下載全部 QR（每張 1024 px）。</p>
@@ -847,7 +869,7 @@ https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費</div>
     <div class="card">
       <ul class="qa-list">
         <li><strong>Q. 短網址會失效嗎？</strong>不會 — 除非你主動暫停或刪除、設過期時間、或設點擊上限。</li>
-        <li><strong>Q. 我可以換短網址的目的地嗎？</strong>可以。編輯連結 → 改 <code>originalUrl</code> → 儲存。原本分享出去的短網址下次點擊會去新目的地。</li>
+        <li><strong>Q. 我可以換短網址的目的地嗎？</strong>可以。編輯連結 → 改「原始網址」→ 儲存。原本分享出去的短網址下次點擊會去新目的地。</li>
         <li><strong>Q. 為什麼建完連結、回到列表看不到？</strong>曾經有這個 bug，現在修好了 — 建立 / 複製 / 刪除等操作都會強制同步。如果偶爾還是遇到，按頁首淡藍色「同步」按鈕。</li>
         <li><strong>Q.「建立副本」跟「複製短網址」差別？</strong>建立副本 = 在 DB 新增一條同設定的連結（不同 short code），用於 A/B 測試或跨通路重用；複製短網址 = 把短網址複製到剪貼簿，用於貼到 EDM / 社群。</li>
         <li><strong>Q. 我建的連結同事看得到嗎？</strong>同工作區的成員都看得到（協作用）。需要私人連結目前不支援。</li>
