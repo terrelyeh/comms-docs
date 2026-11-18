@@ -335,7 +335,7 @@
   <div class="hero">
     <h1>EnGenius ShortLink<br/><span class="gradient">操作指南</span></h1>
     <p class="subtitle">短網址 + UTM + 點擊分析，三件事在一個工具裡。這份文件從零上手、教你建第一條連結、管理活動、看成效，並解答常見疑問。</p>
-    <p class="meta">適用對象：行銷、內容編輯、合作夥伴管理者 &mdash; 2026-04-20</p>
+    <p class="meta">適用對象：行銷、內容編輯、合作夥伴管理者 &mdash; 2026-04-20（2026-11-18 更新）</p>
   </div>
 
   <!-- TOC -->
@@ -347,6 +347,8 @@
         <li><a href="#quickstart">5 分鐘上手</a></li>
         <li><a href="#links">連結管理</a></li>
         <li><a href="#advanced">進階選項</a></li>
+        <li><a href="#social-preview">社群分享預覽</a></li>
+        <li><a href="#trash">垃圾桶與還原</a></li>
         <li><a href="#campaigns">Campaign 管理</a></li>
         <li><a href="#templates">UTM 模板</a></li>
         <li><a href="#analytics">數據分析</a></li>
@@ -396,11 +398,11 @@
     <h2 class="section-title">5 分鐘上手：建你的第一條連結</h2>
     <div class="card">
       <ol class="step-list">
-        <li><strong>登入</strong>：Google OAuth 用公司 email。如果被擋，代表不在白名單，跟管理員要求加入。</li>
+        <li><strong>登入</strong>：Google OAuth 用公司 email。第一次使用要先拿到管理員給的<strong>邀請連結</strong>，點開用公司 Google 帳號登入就會自動加入工作區。</li>
         <li><strong>左側 Sidebar → 連結管理</strong></li>
-        <li><strong>右上角「+ 建立連結」</strong></li>
+        <li><strong>右上角「+ 建立新連結」</strong></li>
         <li><strong>填三個核心欄位</strong>：目的地網址、標題（例：<code>Spring 2026 EDM top banner</code>）、UTM 活動（Campaign）。剩下的 source/medium/content 按模板或下拉選單填。</li>
-        <li><strong>儲存 → 自動回到列表 → 複製短網址</strong>：列表右邊 <code>⧉</code> 一鍵複製 <code>https://go.engenius.ai/&lt;code&gt;</code>。</li>
+        <li><strong>儲存 → 自動回到列表 → 複製短網址</strong>：列表第一欄短碼旁的 <code>⧉</code> 一鍵複製 <code>https://go.engenius.ai/&lt;code&gt;</code>。</li>
         <li><strong>貼到你的通路</strong>（EDM / FB / IG / LinkedIn / QR 傳單皆可）</li>
         <li><strong>24 小時後看數據</strong>：Sidebar → 數據分析 → 篩選這條連結 → 看點擊來源、裝置、時段。</li>
       </ol>
@@ -411,18 +413,17 @@
   <div class="section" id="links">
     <h2 class="section-title">連結管理（/links）</h2>
     <div class="card">
-      <p>列出所有你建的連結，這頁是最常來的地方。</p>
+      <p>列出工作區裡所有人建的連結，這頁是最常來的地方。</p>
 
       <h3>表格欄位</h3>
       <table class="specs-table">
         <thead><tr><th>欄位</th><th>說明</th></tr></thead>
         <tbody>
-          <tr><td class="wrap">標題 + OG 縮圖</td><td>hover 看完整目的地 URL</td></tr>
+          <tr><td class="wrap">短網址 → 目的網址</td><td>三行一組：<strong>標題</strong>／<strong><code>/短碼</code></strong>（點 <code>⧉</code> 複製；點短碼本身是開新分頁測試，不計入數據）／<strong>→ 目的網址</strong>（不顯示 UTM，滑鼠移上去看完整網址；有 A/B 分流會標 <code>A/B ×N</code>）</td></tr>
           <tr><td>Campaign</td><td>這條屬於哪一場活動</td></tr>
-          <tr><td class="wrap">媒介 (Medium)</td><td>UTM medium 值</td></tr>
-          <tr><td class="wrap">來源 (Source)</td><td>UTM source 值</td></tr>
-          <tr><td>短網址</td><td>點 <code>⧉</code> 複製</td></tr>
+          <tr><td class="wrap">媒介 / 來源</td><td>UTM medium（上）與 source（下）</td></tr>
           <tr><td>標籤</td><td>自由分類</td></tr>
+          <tr><td>建立者</td><td>誰建了這條連結</td></tr>
           <tr><td>狀態</td><td>啟用 / 暫停 / 已封存</td></tr>
           <tr><td>點擊數</td><td>累積總數 + 7 天 ↑↓%</td></tr>
         </tbody>
@@ -432,10 +433,11 @@
       <ul>
         <li><strong>編輯連結</strong> — 改目的地、UTM、限制條件</li>
         <li><strong>數據分析</strong> — 跳到該連結的分析頁</li>
+        <li><strong>測試短網址</strong> — 開新分頁實際走一次轉址，這次點擊會標成「測試」、不計入數據。發佈前確認連結正常就用這個</li>
         <li><strong>QR Code</strong> — 下載 PNG / SVG</li>
         <li><strong>建立副本</strong> — 複製一條同設定的新連結（用 A/B 或跨通路很方便）</li>
         <li><strong>暫停</strong> — 短網址暫時不能用（點了導到「連結已停用」頁）</li>
-        <li><strong>刪除</strong> — 永久失效</li>
+        <li><strong>刪除</strong> — 短網址立即停止運作，連結移到<a href="#trash" style="color: var(--violet); font-weight: 600;">垃圾桶</a>，之後可以還原</li>
       </ul>
 
       <h3>搜尋與篩選</h3>
@@ -443,7 +445,18 @@
         <li>搜尋框：打字即時過濾，右邊 X 可清空</li>
         <li>Campaign 下拉：只看某活動的連結</li>
         <li>狀態 Chip：啟用 / 暫停 / 已封存</li>
+        <li>排序：最新 / 最舊 / 最多點擊 / 最少點擊</li>
+        <li>標籤下拉：只看某個標籤</li>
+        <li>建立者下拉：只看某位同事建的連結，選項後面的數字是他建了幾條</li>
       </ul>
+
+      <h3>匯出 CSV</h3>
+      <p>頁首「匯出」會下載目前狀態篩選下的連結清單，包含短網址、目的網址、點擊數、UTM 五欄、標籤、<strong>建立者</strong>、建立與到期時間。要統計「誰建了幾條、哪些連結點擊最多」，直接用 Excel 或 Google 試算表的樞紐分析即可。</p>
+
+      <div class="callout callout-green">
+        <div class="callout-title">哪些點擊不算進數據？</div>
+        <p>用「測試短網址」或點列表上的短碼開啟的點擊，會標成「測試」，點擊數只算真實流量。<strong>直接複製短網址貼到瀏覽器開，會被算成一般點擊</strong>，自己測試請用前兩種方式。社群平台抓預覽的爬蟲、搜尋引擎等機器人也不會被記錄。</p>
+      </div>
 
       <div class="callout callout-violet">
         <div class="callout-title">為什麼要按「同步」按鈕？</div>
@@ -498,6 +511,53 @@
         <li><strong>302（預設，暫時轉址）</strong> — <strong>行銷連結就用這個</strong>，SEO 不會傳遞</li>
         <li><strong>301（永久轉址）</strong> — 只在做永久網站搬家時用</li>
       </ul>
+    </div>
+  </div>
+
+  <!-- Social preview -->
+  <div class="section" id="social-preview">
+    <h2 class="section-title">社群分享預覽</h2>
+    <div class="card">
+      <p>短網址貼到 Facebook、LINE、LinkedIn、Threads 時，平台會抓一張「預覽卡片」（標題、描述、圖片）。預設抓的是目的頁面自己的內容，但常常不理想：</p>
+      <ul>
+        <li>LinkedIn 公司頁抓到的是「LinkedIn Login, Sign in」</li>
+        <li>Google 文件、雲端硬碟抓到「JavaScript isn't enabled in your browser」</li>
+        <li>同一個網頁要針對不同活動放不同標語</li>
+      </ul>
+
+      <h3>怎麼設定</h3>
+      <ol>
+        <li>連結管理 → 該列 ⋮ → <strong>編輯連結</strong></li>
+        <li>展開「<strong>社群分享預覽</strong>」</li>
+        <li>填預覽標題、預覽描述、預覽圖片網址（任一欄留空就沿用目的頁原本的內容）</li>
+        <li>右邊會即時顯示卡片長相 → 儲存</li>
+      </ol>
+      <p>圖片要填<strong>公開可存取的圖片網址</strong>，建議 1200 × 630 px（1.91:1）。目前不支援直接上傳檔案。這個設定只在「編輯連結」裡，建立新連結時沒有 —— 先建好、看過系統自動抓的預覽，不滿意再改。</p>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">已經分享出去的貼文要手動刷新</div>
+        <p>各平台會快取預覽卡片。如果連結早就貼出去了，改完後要到 <a href="https://developers.facebook.com/tools/debug/" target="_blank" rel="noopener" style="color: var(--violet); font-weight: 600;">Facebook Sharing Debugger</a>（Threads、LINE 也適用）或 <a href="https://www.linkedin.com/post-inspector/" target="_blank" rel="noopener" style="color: var(--violet); font-weight: 600;">LinkedIn Post Inspector</a> 貼上短網址，按「重新抓取」才會換成新卡片。</p>
+      </div>
+
+      <p>只有社群平台的預覽爬蟲會看到自訂內容；真人點擊照樣直接轉址到目的網址，UTM 與點擊統計都不受影響。有設自訂預覽的連結，即使同時設了「允許國家」，海外機房的平台爬蟲也能正常抓到卡片。</p>
+    </div>
+  </div>
+
+  <!-- Trash -->
+  <div class="section" id="trash">
+    <h2 class="section-title">垃圾桶與還原</h2>
+    <div class="card">
+      <p>刪除的連結不會真的消失，會移到垃圾桶：</p>
+      <ul>
+        <li><strong>入口</strong>：連結管理頁首的「垃圾桶」按鈕</li>
+        <li><strong>在垃圾桶期間</strong>：短網址停止運作（點了會顯示找不到頁面），點擊也不再累積</li>
+        <li><strong>還原</strong>：按「還原」就回到連結列表，短網址、設定、過去的點擊紀錄都和刪除前一樣</li>
+        <li><strong>誰能還原</strong>：連結的建立者，或工作區的 OWNER / ADMIN（其他人在那一列看不到還原按鈕）</li>
+      </ul>
+      <div class="callout callout-violet">
+        <div class="callout-title">刪除還是暫停？</div>
+        <p>只是暫時不想讓人點 → 用<strong>暫停</strong>，點擊的人會看到「連結已停用」頁，連結還留在列表裡。確定不要了、想讓列表乾淨 → 用<strong>刪除</strong>，萬一刪錯再到垃圾桶救回來。</p>
+      </div>
     </div>
   </div>
 
@@ -585,7 +645,7 @@
 
       <h3>篩選器</h3>
       <ul>
-        <li>時段：7d / 14d / 30d / 90d</li>
+        <li>時段：24h / 7d / 30d / 90d / 自訂</li>
         <li>指定單一連結（從連結管理頁 ⋮ → 數據分析可直接帶入）</li>
         <li>指定單一 Campaign</li>
       </ul>
@@ -629,7 +689,7 @@
     <div class="card">
       <p>一次建幾十上百條連結（例：展場活動發給各國代理商）。</p>
 
-      <p>Sidebar → <strong>連結管理</strong> → 右上角下拉 → <strong>批次匯入</strong> → 上傳 CSV → 預覽 → 確認。</p>
+      <p>Sidebar → <strong>連結管理</strong> → 右上角 <strong>Import CSV</strong> → 上傳 CSV → 預覽 → 確認。</p>
 
       <h3>CSV 欄位格式</h3>
       <div class="code-block"><span class="k">originalUrl,title,utmSource,utmMedium,utmCampaign,utmContent,tags</span>
@@ -664,8 +724,8 @@ https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費</div>
         <thead><tr><th>角色</th><th>權限</th></tr></thead>
         <tbody>
           <tr><td><strong>OWNER</strong></td><td>全權限</td></tr>
-          <tr><td><strong>ADMIN</strong></td><td>可管成員、可刪連結</td></tr>
-          <tr><td><strong>MEMBER</strong></td><td>可建自己的連結、編輯自己的</td></tr>
+          <tr><td><strong>ADMIN</strong></td><td>可管成員、可編輯 / 刪除 / 還原任何人的連結、可改 UTM 白名單</td></tr>
+          <tr><td><strong>MEMBER</strong></td><td>可建連結；只能編輯、刪除、還原自己建的</td></tr>
           <tr><td><strong>VIEWER</strong></td><td>唯讀</td></tr>
         </tbody>
       </table>
@@ -674,6 +734,9 @@ https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費</div>
       <p>一個工作區 = 一組連結 + 活動 + 成員 + UTM 規範。</p>
       <p>大部分團隊只需要一個（例：<code>HQ MKT</code>）。如果之後要分區（台灣 / 日本）或跨團隊（行銷 / 客服），再開新工作區。</p>
       <p>切換工作區在左上角的選擇器。</p>
+
+      <h3>邀請同事</h3>
+      <p>OWNER / ADMIN 到「設定 → 成員」產生<strong>邀請連結</strong>（不會自動寄信），自己貼到 Slack 或 Email 給對方。對方點開、用 Google 帳號登入就會自動加入工作區。邀請連結 7 天後失效，過期可以重發。</p>
     </div>
   </div>
 
@@ -681,7 +744,7 @@ https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費</div>
   <div class="section" id="governance">
     <h2 class="section-title">UTM 白名單治理</h2>
     <div class="card">
-      <p><strong>設定 → 工作區 → UTM Governance</strong>（只有 ADMIN / OWNER 能改）</p>
+      <p><strong>設定 → UTM 規範</strong> 分頁（只有 OWNER / ADMIN 看得到、能改）</p>
 
       <h3>可設定的項目</h3>
       <ul>
@@ -691,8 +754,9 @@ https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費</div>
 
       <h3>設定後的效果</h3>
       <ul>
-        <li>團隊成員建連結時輸入非白名單值 → 即時 amber warning</li>
-        <li>仍然可以送（不強制擋），但 server 端會拒絕明顯 invalid 的輸入</li>
+        <li>團隊成員建連結時輸入非白名單值 → 欄位下方即時出現黃色提醒</li>
+        <li><strong>儲存時會被擋下</strong>，要改成白名單內的值才能建立；真的需要新值，請 OWNER / ADMIN 先加進白名單</li>
+        <li>白名單留空 = 不限制</li>
       </ul>
 
       <div class="callout callout-green">
@@ -707,15 +771,18 @@ https://...,Spring FB Ad,facebook,cpc,spring-sale,video_30s,FB/付費</div>
     <h2 class="section-title">常見問題</h2>
     <div class="card">
       <ul class="qa-list">
-        <li><strong>Q. 短網址會失效嗎？</strong>不會 — 除非你主動刪除、設過期時間、或設點擊上限。</li>
+        <li><strong>Q. 短網址會失效嗎？</strong>不會 — 除非你主動暫停或刪除、設過期時間、或設點擊上限。</li>
         <li><strong>Q. 我可以換短網址的目的地嗎？</strong>可以。編輯連結 → 改 <code>originalUrl</code> → 儲存。原本分享出去的短網址下次點擊會去新目的地。</li>
         <li><strong>Q. 為什麼建完連結、回到列表看不到？</strong>曾經有這個 bug，現在修好了 — 建立 / 複製 / 刪除等操作都會強制同步。如果偶爾還是遇到，按頁首淡藍色「同步」按鈕。</li>
         <li><strong>Q.「建立副本」跟「複製短網址」差別？</strong>建立副本 = 在 DB 新增一條同設定的連結（不同 short code），用於 A/B 測試或跨通路重用；複製短網址 = 把短網址複製到剪貼簿，用於貼到 EDM / 社群。</li>
         <li><strong>Q. 我建的連結同事看得到嗎？</strong>同工作區的成員都看得到（協作用）。需要私人連結目前不支援。</li>
-        <li><strong>Q. 怎麼撤銷一個已發出去的短網址？</strong>暫時撤銷 → 編輯 → 狀態改「暫停」（點擊會導到「連結已停用」頁）；永久撤銷 → 刪除。</li>
+        <li><strong>Q. 怎麼撤銷一個已發出去的短網址？</strong>暫時撤銷 → 編輯 → 狀態改「暫停」（點擊會導到「連結已停用」頁）；不再使用 → 刪除（會進垃圾桶，刪錯還能還原）。</li>
         <li><strong>Q. 可以追蹤 landing page 之後的行為嗎？</strong>不行 — 這工具只追「點擊前」。Landing 後用 GA4。見 <a href="utm-parameters-guide.html#tool-vs-ga" style="color: var(--violet); font-weight: 600;">UTM 指南的分工定位章節</a>。</li>
-        <li><strong>Q. 輸入非白名單的 source / medium 會怎樣？</strong>會跳 amber warning，但可以送出（除非明顯 invalid 格式被擋）。之後 ADMIN 會被通知、可以把它加入白名單或跟你討論改用別的值。</li>
-        <li><strong>Q. 有點擊是 bot / 爬蟲嗎？會影響統計嗎？</strong>系統有基本去重（2 秒內同 IP 同連結算一次），但不做 UA 分類。社群平台的 link preview 爬蟲會產生點擊，這個比例通常小，可忽略。</li>
+        <li><strong>Q. 輸入非白名單的 source / medium 會怎樣？</strong>欄位下方會出現黃色提醒，而且儲存時會被擋下。改用白名單裡的值；如果確實需要新值，請 OWNER / ADMIN 加進白名單後再建。</li>
+        <li><strong>Q. 有點擊是 bot / 爬蟲嗎？會影響統計嗎？</strong>不會。系統會依瀏覽器識別（User-Agent）排除爬蟲，包括 Facebook、LINE、LinkedIn 抓預覽的爬蟲和搜尋引擎，這些都不記錄。另外 2 秒內同一 IP 重複點同一條連結只算一次。</li>
+        <li><strong>Q. 我自己點來測試，會灌水數據嗎？</strong>用「測試短網址」或點列表上的短碼開啟就不會，這兩種會標成「測試」、不算進點擊數。但直接複製短網址貼到瀏覽器開，會被當成一般點擊。</li>
+        <li><strong>Q. 分享到 FB / LINE 的預覽圖不對怎麼辦？</strong>到「編輯連結 → 社群分享預覽」自訂標題和圖片，再用 Facebook Sharing Debugger 重新抓取。見<a href="#social-preview" style="color: var(--violet); font-weight: 600;">社群分享預覽</a>。</li>
+        <li><strong>Q. 不小心刪錯連結怎麼辦？</strong>連結管理 → 垃圾桶 → 還原，短網址和點擊紀錄都會回來。</li>
       </ul>
     </div>
   </div>
