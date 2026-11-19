@@ -571,7 +571,8 @@
 
       <h3>Campaigns 頁做什麼？</h3>
       <ul>
-        <li><strong>排行榜</strong>：所有活動的績效排行 — 狀態（依活動期間自動顯示）、點擊數、7 天趨勢、最後活動時間、目標達成率；右上方可以依狀態篩選：進行中 / 即將開始 / 已結束 / 已封存</li>
+        <li><strong>排行榜</strong>：所有活動的績效排行 — 負責人、狀態（依活動期間自動顯示）、點擊數、7 天趨勢、最後活動時間、目標達成率（含進度參考線）；可以依負責人和狀態篩選：進行中 / 即將開始 / 已結束 / 已封存</li>
+        <li><strong>負責人摘要卡</strong>（上方）：每人幾檔進行中、幾檔達標、幾檔落後（見下方「負責人」）</li>
         <li><strong>勾選 2–4 個活動</strong>：疊圖比較 / 進入並列比較頁（見下方「比較活動」）</li>
         <li><strong>Orphan Links</strong>：有 <code>utm_campaign</code> 值但還沒綁到任何 Campaign 的連結（通常是舊資料）</li>
       </ul>
@@ -596,6 +597,19 @@
         <li><strong>已結束</strong> — 過了結束日</li>
       </ul>
       <p><strong>封存</strong>是唯一要手動設定的狀態：活動頁右上角的盒子圖示。封存後活動會從列表收起來（篩選「已封存」才看得到），<strong>短網址照常轉址、照常記錄點擊</strong>，隨時可以取消封存。想把舊活動收起來就用封存，不要用刪除。</p>
+
+      <h3>負責人</h3>
+      <p>每個活動可以指定一位<strong>負責人</strong>，這檔活動的成效就算在他的 KPI 上。進入活動頁 → 活動名稱下方「負責人」→ 從工作區成員中選（也可以選「未指派」）。更換會寫進操作紀錄。</p>
+      <ul>
+        <li>只能選工作區成員；同事要先被邀請進工作區才選得到</li>
+        <li>活動列表有「負責人」欄，沒指派的會顯示灰字「未指派」，提醒大家補上</li>
+        <li>用「建立者」當負責人並不準：活動常常是在建第一條連結時自動產生的，建立者只是剛好建了那條連結的人</li>
+      </ul>
+      <div class="callout callout-violet">
+        <div class="callout-title">負責人摘要卡（活動列表上方）</div>
+        <p>每位負責人一張，顯示「進行中 N 檔 · 共 M 檔」「達標 X / Y」「落後進度 Z 檔」，點卡片就只看那個人的活動，再點一次取消。卡片<strong>刻意不加總點擊數</strong>：EDM 活動和展會 QR 活動的點擊量差上百倍，加總只會比出通路，不是比人。</p>
+        <p>列表工具列也有負責人篩選：所有負責人 / 我的活動 / 未指派 / 各成員。</p>
+      </div>
 
       <h3>單活動駕駛艙 <code>/campaigns/[name]</code></h3>
       <p>點活動名稱進入該活動的指揮中心，有 3 個 tab：</p>
@@ -636,7 +650,18 @@
       </div>
 
       <h3>目標 (Goal)</h3>
-      <p>可以幫 Campaign 設「目標點擊數」（總覽分頁的目標卡）。達成率<strong>一律用活動期間內的點擊計算</strong>（沒設期間就是全部期間），不會因為你切到 30 天就變少；活動列表的目標欄用同一個算法。超過目標會照實顯示（例：130%）。</p>
+      <p>在總覽分頁的目標卡按鉛筆設定，有兩種方式：</p>
+      <ul>
+        <li><strong>總數</strong>：整個活動一個目標點擊數</li>
+        <li><strong>依通路</strong>（建議）：每個媒介（email / social / qr…）各填一個數字，總目標自動加總。目標卡會顯示「總計」加上每個通路各一條進度條；有點擊但沒設目標的通路另外列出（點擊仍算進總數）</li>
+      </ul>
+      <p>為什麼建議依通路：只設總數時，EDM 表現好會把 QR 的落後蓋過去，看不出該調整哪個通路。</p>
+      <div class="callout callout-green">
+        <div class="callout-title">進度參考線</div>
+        <p>活動「進行中」且有開始日和結束日時，每條進度條上會有一條灰色直線，代表照時間平均分配、今天應該到的位置，旁邊寫「超前進度 N」或「落後進度 N · 照進度應有 M」；落後的進度條會變橘色。活動列表的目標欄也有同樣的參考線（滑鼠移上去會顯示今天應達幾 %）。</p>
+        <p>參考線是平均分配。展會這類點擊集中在 EDM 寄出日和展期的活動，前期看起來「落後」很正常，之後會追上。</p>
+      </div>
+      <p>達成率<strong>一律用活動期間內的點擊計算</strong>（沒設期間就是全部期間），不會因為你切到 30 天就變少；活動列表的目標欄用同一個算法。超過目標會照實顯示（例：130%）。</p>
 
       <h3>活動列表的期間</h3>
       <p>活動列表上方可以切 <strong>活動期間 / 7 天 / 30 天 / 90 天 / 全部期間</strong>，預設是「活動期間」：每個活動各自算自己的期間。</p>
@@ -775,23 +800,29 @@
         <tbody>
           <tr><td class="wrap">批次建立</td><td><strong>同一個目的網址</strong>、多個版本（例如每位 KOL、每則貼文各一條，用 utm_content 區分）</td></tr>
           <tr><td class="wrap">CSV 匯入</td><td><strong>每一列各自的目的網址與 UTM</strong>，一次建幾十條（例：發給各國代理商）</td></tr>
-          <tr><td class="wrap">活動啟動器</td><td>展會、新品發表：<strong>選一個範本，一次建好整套通路連結</strong></td></tr>
+          <tr><td class="wrap">活動啟動器</td><td>展會、新品上市：<strong>一步一題的引導頁</strong>，一次建好整套通路連結，並設好期間、負責人、目標</td></tr>
         </tbody>
       </table>
 
-      <h3>活動啟動器（展會 / 新品發表）</h3>
+      <h3>活動啟動器（展會 / 新品上市）</h3>
+      <p>行銷活動 → <strong>活動啟動器</strong>（或連結管理「建立新連結」旁的 <code>▾</code>）。一步一題的引導頁，6 步建好整個活動，<strong>不用自己打任何 UTM</strong>：</p>
       <ol>
-        <li>選範本：<strong>Product Launch</strong> 或 <strong>Exhibition Event</strong></li>
-        <li>填活動名稱（utm_campaign）和預設目的網址</li>
-        <li>勾選要的通路，可以改每一列的名稱、source / medium / content，也能複製或刪掉某列</li>
-        <li>按建立，一次產生全部連結</li>
+        <li><strong>活動類型</strong>：展會 / 新品上市（電商促銷即將推出）</li>
+        <li><strong>基本資訊</strong>：活動名稱（例：ISE 2027，系統自動產生追蹤名稱 <code>ise_2027</code>，可修改）、活動期間、負責人。也可以選「幫既有活動補連結」</li>
+        <li><strong>目的網址</strong>：主要的活動頁或產品頁。活動頁還沒上線的話，勾「活動頁還沒上線」先填官網，這些連結會加上「待換活動頁」標籤，等頁面上線後在連結列表篩選出來一次改好（短網址不變）</li>
+        <li><strong>通路</strong>：依時程分組（展會：展前宣傳 / 現場 QR / 展後追蹤；新品：發表 / 第二波追蹤），勾選這次會用的。同一個通路要發好幾則就按「<strong>再加一則</strong>」；現場 QR 可以各自指定要導去哪（例如 Demo 區導到 Craft AI）</li>
+        <li><strong>目標</strong>：依通路填目標。系統會帶入「過去同通路每則平均點擊 × 則數」當參考值，可以一鍵套用，也可以略過</li>
+        <li><strong>確認建立</strong>：逐列檢查標題、內容、短碼、目的網址，都可以直接改。短碼會即時檢查（被用過、清單內重複會標紅框）；按「建立」一次建好，<strong>活動期間、負責人、各通路目標也一起設好</strong></li>
       </ol>
-      <p>展會範本已經內建 <strong>「QR — 展攤海報」</strong>（<code>qr / poster</code>）和 <strong>「QR — 傳單 / DM」</strong>（<code>qr / flyer</code>，預設不勾）通路。</p>
+      <p>系統自動套用的規則：EDM 一律用 <code>mailchimp</code>、社群以 LinkedIn 為主、短碼是好讀的格式（例：<code>ise27-booth</code>，印在海報上別人也能手動輸入），並依階段加上標籤（展前 / 現場QR / 展後 / 發表 / 追蹤）。</p>
       <div class="callout callout-green">
-        <div class="callout-title">每一列可以有自己的目的網址</div>
-        <p>展會海報常常各自導到不同頁面（LinkedIn 公司頁、Calendly 預約、產品頁）。在那一列名稱下方填它自己的網址即可；留空的列才會用上方的預設網址。</p>
+        <div class="callout-title">部分失敗也沒關係</div>
+        <p>例如某個短碼剛好被別人用掉，那一列會顯示原因，其他照常建立。改好後按「重試」只會建失敗的那幾條，不會重複。</p>
       </div>
-      <p>如果這個活動已經有連結，啟動器會自動標出已存在的通路組合，只建缺的，不會重複。</p>
+      <div class="callout callout-violet">
+        <div class="callout-title">多國市場、電商促銷，或手上只有一份長篇企劃？</div>
+        <p>用「活動規劃 skill」（給 Claude / Codex 等 AI 助理用），問答後產出 CSV 匯入檔和一頁成效衡量計畫，再用下方的 CSV 匯入。</p>
+      </div>
 
       <h3>CSV 匯入</h3>
       <p>建立新連結旁的 <code>▾</code> → <strong>CSV 匯入</strong> → 上傳 CSV → 看前 5 列預覽 → 匯入 → 逐列顯示成功或失敗原因。</p>
@@ -855,6 +886,7 @@ https://www.engeniustech.com/en/promo,Spring FB Ad,,facebook,cpc,spring_sale_202
         <li><strong>通路表現</strong>：各媒介、各來源各帶來多少點擊</li>
         <li><strong>連結排行</strong>：哪幾條連結點擊最多</li>
         <li>裝置、瀏覽器、國家</li>
+        <li>活動報告的副標會顯示<strong>負責人</strong>（只有名字）</li>
       </ul>
       <p>報告只算真實流量（不含內部測試點擊和疑似郵件掃描點擊），預設中文，右上角可以切英文。對方只能看、不能編輯，也看不到其他活動。</p>
     </div>
@@ -926,6 +958,7 @@ https://www.engeniustech.com/en/promo,Spring FB Ad,,facebook,cpc,spring_sale_202
         <li><strong>Q. 輸入非白名單的 source / medium 會怎樣？</strong>欄位下方會出現黃色提醒，而且儲存時會被擋下。改用白名單裡的值；如果確實需要新值，請 OWNER / ADMIN 加進白名單後再建。</li>
         <li><strong>Q. 有點擊是 bot / 爬蟲嗎？會影響統計嗎？</strong>不會。系統會依瀏覽器識別（User-Agent）排除爬蟲，包括 Facebook、LINE、LinkedIn 抓預覽的爬蟲和搜尋引擎，這些都不記錄。另外 2 秒內同一 IP 重複點同一條連結只算一次。企業信箱的安全掃描比較難從瀏覽器識別認出來，系統用另一條規則把它們標成「疑似郵件掃描點擊」並排除。</li>
         <li><strong>Q. 為什麼 EDM 的點擊數比以前少？</strong>2026-11 起排除了「疑似郵件掃描點擊」，舊資料也一併重算。以 Interop / Computex 為例，EDM 點擊有一半以上是企業信箱的安全掃描開的，不是真人。想看原本的數字，在數據分析頁或活動頁勾「含測試與疑似機器點擊」。</li>
+        <li><strong>Q. 怎麼看每個人負責的活動成效？</strong>活動列表上方的負責人摘要卡：每人幾檔進行中、幾檔達標、幾檔落後進度，點卡片就只看那個人的活動。前提是每個活動都指定了負責人（活動頁名稱下方）。</li>
         <li><strong>Q. 活動結束了要刪掉嗎？</strong>不用。設好結束日，活動會自動顯示「已結束」；想從列表收起來就按封存，短網址和點擊紀錄都不受影響。</li>
         <li><strong>Q. 我自己點來測試，會灌水數據嗎？</strong>用「測試短網址」或點列表上的短碼開啟就不會，這兩種會標成「測試」、不算進點擊數。但直接複製短網址貼到瀏覽器開，會被當成一般點擊。</li>
         <li><strong>Q. 分享到 FB / LINE 的預覽圖不對怎麼辦？</strong>到「編輯連結 → 社群分享預覽」自訂標題和圖片，再用 Facebook Sharing Debugger 重新抓取。見<a href="#social-preview" style="color: var(--violet); font-weight: 600;">社群分享預覽</a>。</li>
