@@ -335,7 +335,7 @@
   <div class="hero">
     <h1>EnGenius ShortLink<br/><span class="gradient">操作指南</span></h1>
     <p class="subtitle">短網址 + UTM + 點擊分析，三件事在一個工具裡。這份文件從零上手、教你建第一條連結、管理活動、看成效，並解答常見疑問。</p>
-    <p class="meta">適用對象：行銷、內容編輯、合作夥伴管理者 &mdash; 2026-04-20（2026-11-18 更新）</p>
+    <p class="meta">適用對象：行銷、內容編輯、合作夥伴管理者 &mdash; 2026-04-20（2026-11-19 更新）</p>
   </div>
 
   <!-- TOC -->
@@ -456,6 +456,7 @@
       <div class="callout callout-green">
         <div class="callout-title">哪些點擊不算進數據？</div>
         <p>用「測試短網址」或點列表上的短碼開啟的點擊，會標成「測試」，點擊數只算真實流量。<strong>直接複製短網址貼到瀏覽器開，會被算成一般點擊</strong>，自己測試請用前兩種方式。社群平台抓預覽的爬蟲、搜尋引擎等機器人也不會被記錄。</p>
+        <p><strong>企業郵件的安全掃描</strong>（收信時自動打開信裡每個連結的機器）也會被排除，標成「疑似郵件掃描點擊」。B2B 名單的 EDM，這類點擊可能佔一半以上，排除後的數字才是真人。數據分析頁和活動頁上方可以勾「含測試與疑似機器點擊」，把它們加回來看。</p>
       </div>
 
       <div class="callout callout-violet">
@@ -570,24 +571,63 @@
 
       <h3>Campaigns 頁做什麼？</h3>
       <ul>
-        <li><strong>Leaderboard</strong>：所有活動的績效排行 — 點擊數、7 天趨勢、最後活動時間、目標達成率</li>
-        <li><strong>勾選 2–4 個活動</strong>：overlay 折線圖比較 / 進入 side-by-side 比較頁</li>
+        <li><strong>排行榜</strong>：所有活動的績效排行 — 狀態（依活動期間自動顯示）、點擊數、7 天趨勢、最後活動時間、目標達成率；右上方可以依狀態篩選：進行中 / 即將開始 / 已結束 / 已封存</li>
+        <li><strong>勾選 2–4 個活動</strong>：疊圖比較 / 進入並列比較頁（見下方「比較活動」）</li>
         <li><strong>Orphan Links</strong>：有 <code>utm_campaign</code> 值但還沒綁到任何 Campaign 的連結（通常是舊資料）</li>
       </ul>
+
+      <h3>活動期間</h3>
+      <p>每個活動可以設定開始日和結束日：進入活動頁 → 活動名稱下方的日期列 → 鉛筆（還沒設定時顯示「設定期間」）。</p>
+      <ul>
+        <li>用台灣時間計算，<strong>頭尾兩天都包含</strong>；可以只填其中一個（例如只填開始日 = 持續中）</li>
+        <li>設定後，活動列表、活動頁的數字和目標進度都只算這段期間內的點擊</li>
+        <li>沒設期間的活動，一律看全部期間</li>
+      </ul>
+      <div class="callout callout-green">
+        <div class="callout-title">建議活動一建立就設期間</div>
+        <p>展會活動可以從第一封預告信寄出那天，算到展後感謝信寄出後兩週。</p>
+      </div>
+
+      <h3>狀態與封存</h3>
+      <p>狀態<strong>依日期自動判斷</strong>，不用手動切換：</p>
+      <ul>
+        <li><strong>即將開始</strong> — 還沒到開始日</li>
+        <li><strong>進行中</strong> — 在期間內，或沒有設期間</li>
+        <li><strong>已結束</strong> — 過了結束日</li>
+      </ul>
+      <p><strong>封存</strong>是唯一要手動設定的狀態：活動頁右上角的盒子圖示。封存後活動會從列表收起來（篩選「已封存」才看得到），<strong>短網址照常轉址、照常記錄點擊</strong>，隨時可以取消封存。想把舊活動收起來就用封存，不要用刪除。</p>
 
       <h3>單活動駕駛艙 <code>/campaigns/[name]</code></h3>
       <p>點活動名稱進入該活動的指揮中心，有 3 個 tab：</p>
       <ul>
         <li><strong>總覽</strong> — 目標進度 + 點擊趨勢</li>
-        <li><strong>流量</strong> — 這場活動的來源 / 媒介 / 裝置 / 國家</li>
-        <li><strong>連結</strong> — 這場活動底下的所有連結 + 每條的點擊與佔比</li>
+        <li><strong>流量</strong> — 可以點選下鑽的流量拆解</li>
+        <li><strong>連結</strong> — 這場活動底下的所有連結，可以逐條展開</li>
       </ul>
-      <p>總覽和流量右邊可以切 <strong>全部期間 / 90 天 / 30 天</strong>，預設是全部期間 —— 活動結束幾個月後回頭看，數字也還在。</p>
+      <p>總覽和流量右邊可以切 <strong>活動期間 / 全部期間 / 90 天 / 30 天</strong>。有設活動期間時預設看「活動期間」，沒設就看全部期間 —— 跟活動列表的預設一樣，所以兩邊的數字對得上。上方的點擊數、平均點擊也跟著這個期間走。</p>
+
+      <div class="callout callout-violet">
+        <div class="callout-title">流量分頁：點一下就篩選</div>
+        <p>來源、媒介、內容 (Content)、主要連結、國家、來源網站，<strong>點任何一項就會篩選</strong>，整頁的數字、每日圖和其他清單都會跟著變，上方會顯示「N 次點擊 · 佔整個活動 X%」。條件可以疊加，例如「來源：linkedin」再加「國家：JP」。上方的篩選標籤點 ✕ 移除，或按「清除篩選」。</p>
+        <p>來源網站已經依網站合併（例如所有 Mailchimp 的網址併成一列「Mailchimp」），點進去會列出實際的來源頁網址。大部分 Email、QR、App 內的點擊不會帶來源網站，會歸在「（無來源網站）」—— <strong>看通路請看來源 / 媒介</strong>。</p>
+      </div>
+
+      <div class="callout callout-violet">
+        <div class="callout-title">連結分頁：點一列展開</div>
+        <ul>
+          <li>每條連結下方顯示<strong>目的網址</strong></li>
+          <li>「走勢（全期間）」：從活動第一次點擊到今天的迷你走勢，所有列用同一個刻度，旁邊是高峰日（例：高峰 6/6 · 132）</li>
+          <li><strong>點一列就地展開</strong>：點擊數、不重複訪客、第一次 / 最後一次點擊、高峰日、每日走勢、國家 / 來源網站 / 裝置。展開後可以按「在流量分頁只看這條連結」</li>
+          <li>按齒輪編輯連結，存檔後會回到活動頁</li>
+        </ul>
+      </div>
+
       <p>頁首的按鈕：</p>
       <ul>
         <li><strong>新增連結</strong> — 打開建立表單時<strong>已經帶入這個活動</strong>，只要填網址和通路</li>
         <li><strong>分享報告</strong> — 產生給主管 / 合作夥伴看的唯讀報告，見<a href="#share" style="color: var(--violet); font-weight: 600;">公開分享報告</a></li>
         <li><strong>複製所有連結</strong> — 一次複製這個活動的全部短網址</li>
+        <li><strong>封存</strong>（盒子圖示）— 見上方「狀態與封存」</li>
       </ul>
 
       <div class="callout callout-violet">
@@ -596,10 +636,18 @@
       </div>
 
       <h3>目標 (Goal)</h3>
-      <p>可以幫 Campaign 設「目標點擊數」，Leaderboard 的 <code>goal%</code> 欄會顯示達成率。</p>
+      <p>可以幫 Campaign 設「目標點擊數」（總覽分頁的目標卡）。達成率<strong>一律用活動期間內的點擊計算</strong>（沒設期間就是全部期間），不會因為你切到 30 天就變少；活動列表的目標欄用同一個算法。超過目標會照實顯示（例：130%）。</p>
 
       <h3>活動列表的期間</h3>
-      <p>活動列表上方可以切 <strong>近 7 天 / 30 天 / 90 天 / 全部期間</strong>。淡季想看上一檔展會的成績，選「全部期間」。</p>
+      <p>活動列表上方可以切 <strong>活動期間 / 7 天 / 30 天 / 90 天 / 全部期間</strong>，預設是「活動期間」：每個活動各自算自己的期間。</p>
+
+      <h3>比較活動</h3>
+      <p>在活動列表勾選 2–4 個活動 →「並列詳細比較」。</p>
+      <ul>
+        <li>期間一樣可以切活動期間 / 全部期間 / 7d / 30d / 90d</li>
+        <li>每日點擊圖有兩種看法：<strong>依日期</strong>（實際日期）、<strong>對齊開始日</strong>（第 0 天 = 各活動的開始日，沒設期間就用第一次點擊那天；開始日之前的預熱點擊顯示成負的天數）。比較在不同月份舉辦的展會時用「對齊開始日」</li>
+        <li>折線、圖例和下方欄位用同一組顏色</li>
+      </ul>
     </div>
   </div>
 
@@ -655,7 +703,7 @@
         <li><strong>時間軸</strong> — 每日 / 小時的點擊趨勢</li>
         <li><strong>裝置 / 瀏覽器 / OS</strong> — 流量組成</li>
         <li><strong>地區 / 城市</strong> — 地理分佈</li>
-        <li><strong>來源 / 媒介 / Referrer</strong> — 流量來源</li>
+        <li><strong>來源 / 媒介 / 來源網站</strong> — 流量來源（來源網站已依網站合併，例如 Mailchimp、LinkedIn）</li>
         <li><strong>UTM 交叉表</strong> — 例如 <code>source × medium</code> 組合，哪組帶最多量</li>
       </ul>
 
@@ -787,7 +835,7 @@ https://www.engeniustech.com/en/promo,Spring FB Ad,,facebook,cpc,spring_sale_202
 
       <h3>從哪裡產生</h3>
       <ul>
-        <li><strong>活動詳情頁</strong> → 頁首「<strong>分享報告</strong>」：分享這個活動，期間跟你頁面上選的一樣（全部期間 / 90 天 / 30 天）</li>
+        <li><strong>活動詳情頁</strong> → 頁首「<strong>分享報告</strong>」：分享這個活動，期間跟你頁面上選的一樣（活動期間 / 全部期間 / 90 天 / 30 天）</li>
         <li><strong>數據分析頁</strong> → 頁首「<strong>Share report</strong>」：分享目前畫面的範圍（選了單一連結就分享那條、選了活動就分享那個活動，什麼都沒選就是整個工作區）</li>
       </ul>
 
@@ -808,7 +856,7 @@ https://www.engeniustech.com/en/promo,Spring FB Ad,,facebook,cpc,spring_sale_202
         <li><strong>連結排行</strong>：哪幾條連結點擊最多</li>
         <li>裝置、瀏覽器、國家</li>
       </ul>
-      <p>報告只算真實流量（不含內部測試點擊），預設中文，右上角可以切英文。對方只能看、不能編輯，也看不到其他活動。</p>
+      <p>報告只算真實流量（不含內部測試點擊和疑似郵件掃描點擊），預設中文，右上角可以切英文。對方只能看、不能編輯，也看不到其他活動。</p>
     </div>
   </div>
 
@@ -876,7 +924,9 @@ https://www.engeniustech.com/en/promo,Spring FB Ad,,facebook,cpc,spring_sale_202
         <li><strong>Q. 怎麼撤銷一個已發出去的短網址？</strong>暫時撤銷 → 編輯 → 狀態改「暫停」（點擊會導到「連結已停用」頁）；不再使用 → 刪除（會進垃圾桶，刪錯還能還原）。</li>
         <li><strong>Q. 可以追蹤 landing page 之後的行為嗎？</strong>不行 — 這工具只追「點擊前」。Landing 後用 GA4。見 <a href="utm-parameters-guide.html#tool-vs-ga" style="color: var(--violet); font-weight: 600;">UTM 指南的分工定位章節</a>。</li>
         <li><strong>Q. 輸入非白名單的 source / medium 會怎樣？</strong>欄位下方會出現黃色提醒，而且儲存時會被擋下。改用白名單裡的值；如果確實需要新值，請 OWNER / ADMIN 加進白名單後再建。</li>
-        <li><strong>Q. 有點擊是 bot / 爬蟲嗎？會影響統計嗎？</strong>不會。系統會依瀏覽器識別（User-Agent）排除爬蟲，包括 Facebook、LINE、LinkedIn 抓預覽的爬蟲和搜尋引擎，這些都不記錄。另外 2 秒內同一 IP 重複點同一條連結只算一次。</li>
+        <li><strong>Q. 有點擊是 bot / 爬蟲嗎？會影響統計嗎？</strong>不會。系統會依瀏覽器識別（User-Agent）排除爬蟲，包括 Facebook、LINE、LinkedIn 抓預覽的爬蟲和搜尋引擎，這些都不記錄。另外 2 秒內同一 IP 重複點同一條連結只算一次。企業信箱的安全掃描比較難從瀏覽器識別認出來，系統用另一條規則把它們標成「疑似郵件掃描點擊」並排除。</li>
+        <li><strong>Q. 為什麼 EDM 的點擊數比以前少？</strong>2026-11 起排除了「疑似郵件掃描點擊」，舊資料也一併重算。以 Interop / Computex 為例，EDM 點擊有一半以上是企業信箱的安全掃描開的，不是真人。想看原本的數字，在數據分析頁或活動頁勾「含測試與疑似機器點擊」。</li>
+        <li><strong>Q. 活動結束了要刪掉嗎？</strong>不用。設好結束日，活動會自動顯示「已結束」；想從列表收起來就按封存，短網址和點擊紀錄都不受影響。</li>
         <li><strong>Q. 我自己點來測試，會灌水數據嗎？</strong>用「測試短網址」或點列表上的短碼開啟就不會，這兩種會標成「測試」、不算進點擊數。但直接複製短網址貼到瀏覽器開，會被當成一般點擊。</li>
         <li><strong>Q. 分享到 FB / LINE 的預覽圖不對怎麼辦？</strong>到「編輯連結 → 社群分享預覽」自訂標題和圖片，再用 Facebook Sharing Debugger 重新抓取。見<a href="#social-preview" style="color: var(--violet); font-weight: 600;">社群分享預覽</a>。</li>
         <li><strong>Q. 不小心刪錯連結怎麼辦？</strong>連結管理 → 垃圾桶 → 還原，短網址和點擊紀錄都會回來。</li>
